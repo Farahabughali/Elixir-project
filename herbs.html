@@ -1,0 +1,304 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Elixir | الأعشاب الطبيعية</title>
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <link rel="stylesheet" href="herbs.css">
+</head>
+<body>
+
+<!-- الهيدر الثابت -->
+<header>
+    <div class="main-header">
+        <div class="header-right">
+            <a href="homepage.html" style="display: flex; align-items: center; gap: 15px; text-decoration: none;">
+                <div class="logo-circle">
+                    <img src="asset/images/logo.png" alt="Logo">
+                </div>
+                <span class="web-name">Elixir</span>
+            </a>
+            <a href="herbs.html" style="display: flex; align-items: center; gap: 15px; text-decoration: none;">
+                <span class="page-title-in-header">الأعشاب الطبيعية</span>
+            </a>
+        </div>
+        <div class="header-left">
+            <span class="help-text">🌿 هل تحتاج لمساعدة في اختيار العشبة المناسبة؟</span>
+            <a href="chatbot.html" class="ai-consult-link">
+                <i class="fas fa-robot"></i> استشر الذكاء الاصطناعي
+            </a>
+        </div>
+    </div>
+</header>
+
+<div class="container">
+    <!-- شريط الفلتر -->
+    <div class="filter-bar">
+        <span class="filter-label"> تصفية الأعشاب:</span>
+        <select id="filterSelect" class="filter-select">
+            <option value="all">الكل</option>
+            <option value="طبية">أعشاب طبية</option>
+            <option value="عطرية">أعشاب عطرية</option>
+            <option value="خلطات">خلطات خاصة</option>
+        </select>
+        <button id="resetFilter" class="reset-filter"> إعادة ضبط</button>
+    </div>
+
+    <div class="products-grid" id="herbsGrid"></div>
+
+    <div class="back-home">
+        <a href="homepage.html"><i class="fas fa-arrow-right"></i> العودة إلى الرئيسية</a>
+    </div>
+</div>
+
+<div id="customToast" class="toast-message">
+    <i class="fas fa-check-circle"></i>
+    <span id="toastText"></span>
+</div>
+
+<button id="scrollTopBtn" class="scroll-top-btn" style="display:none;">
+    <i class="fas fa-arrow-up"></i>
+</button>
+
+<script>
+    // بيانات الأعشاب
+    const herbsData = [
+    { id: 1, name: "عسل طبيعي متعدد الأعشاب", category: "طبية", desc: "يعتبر مضاداً طبيعياً للأكسدة والبكتيريا، مما يساعد في تقوية الجسم", price: 12, rating: 4.7, img: "asset/images/herbalhoney.png" },
+    { id: 2, name: "البابونج", category: "طبية", desc: "مهدئ طبيعي، يساعد على الاسترخاء والنوم، مفيد للجهاز الهضمي", price: 12, rating: 4.7, img: "asset/images/chamomileherb.jpg" },
+    { id: 3, name: "النعناع الفلفلي", category: "عطرية", desc: "منعش، يخفف عسر الهضم والصداع، يمنح طاقة", price: 10, rating: 4.8, img: "asset/images/peppermintherb.jpg" },
+    { id: 4, name: "الزعتر", category: "طبية", desc: "مضاد للسعال والتهاب الحلق، يقوي المناعة", price: 14, rating: 4.6, img: "asset/images/thymeherb.jpg" },
+    { id: 5, name: "المريمية", category: "طبية", desc: "تخفف التعرق الليلي وأعراض سن اليأس، مضادة للالتهابات", price: 15, rating: 4.7, img: "asset/images/sageherb.jpg" },
+    { id: 6, name: "إكليل الجبل", category: "عطرية", desc: "يحسن الذاكرة، ينشط الدورة الدموية، يقوي الشعر", price: 13, rating: 4.9, img: "asset/images/rosemary.png" },
+    { id: 7, name: "اللافندر", category: "عطرية", desc: "مهدئ للأعصاب، يساعد على النوم العميق، يخفف التوتر", price: 16, rating: 4.8, img: "asset/images/lavenderherb.jpg" },
+    { id: 8, name: "الحبة السوداء", category: "طبية", desc: "تقوي المناعة، تعالج مشاكل الجلد والشعر، مضادة للالتهابات", price: 18, rating: 4.9, img: "asset/images/blackseedherb.jpg" },
+    { id: 9, name: " اليانسون النجمي", category: "طبية", desc: "مفيد للجهاز الهضمي، يخفف المغص والانتفاخات، مدر للحليب", price: 11, rating: 4.5, img: "asset/images/anise.jpg" },
+    { id: 10, name: "الكركديه", category: "خلطات", desc: "يخفض ضغط الدم، غني بمضادات الأكسدة، منعش", price: 9, rating: 4.6, img: "asset/images/hibiscus.jpg" },
+    { id: 11, name: "الزنجبيل", category: "خلطات", desc: "مضاد للغثيان، يخفف آلام المفاصل، يعزز المناعة", price: 12, rating: 4.7, img: "asset/images/ginger.jpg" },
+    { id: 12, name: "القرفة", category: "خلطات", desc: "تنظم سكر الدم، مضادة للأكسدة، تحسن الهضم", price: 10, rating: 4.8, img: "asset/images/cinnamon.jpg" },
+    { id: 13, name: "البردقوش", category: "طبية", desc: "مهدئ للأعصاب، يساعد على الهضم， مفيد للنساء", price: 13, rating: 4.5, img: "asset/images/marjoram.jpg" },
+    { id: 13, name: "الشمر", category: "طبية", desc: "مفيد للهضم، يخفف الانتفاخات، مدر للحليب", price: 11, rating: 4.6, img: "asset/images/fennel.jpg" },
+    { id: 14, name: "العرقسوس", category: "طبية", desc: "ملين للمعدة، يخفف السعال، مفيد للجهاز التنفسي", price: 9, rating: 4.4, img: "asset/images/licorice.jpg" },
+    { id: 15, name: "الخطمية", category: "طبية", desc: "ملطف للحلق، مضاد للسعال، مفيد للجهاز التنفسي", price: 12, rating: 4.5, img: "asset/images/marshmallow.jpg" },
+    { id: 16, name: "القراص", category: "طبية", desc: "مضاد للحساسية، غني بالحديد، مفيد للشعر", price: 10, rating: 4.6, img: "asset/images/nettle.jpg" },
+    { id: 17, name: "الجنكة بيلوبا", category: "طبية", desc: "يحسن الذاكرة والتركيز، ينشط الدورة الدموية الدماغية", price: 22, rating: 4.8, img: "asset/images/ginkgo.jpg" },
+    { id: 18, name: "الاشواغاندا", category: "طبية", desc: "مكيف طبيعي، يقلل التوتر والقلق، يعزز الطاقة", price: 25, rating: 4.9, img: "asset/images/ashwagandha.jpg" },
+    { id: 19, name: "الريحان المقدس", category: "عطرية", desc: "مضاد للإجهاد، يعزز المناعة، مفيد للجهاز التنفسي", price: 14, rating: 4.7, img: "asset/images/holybasil.jpg" },
+    { id: 20, name: "البقدونس", category: "خلطات", desc: "مدر للبول، غني بالفيتامينات، مفيد للكلى", price: 6, rating: 4.5, img: "asset/images/parsley.jpg" },
+    { id: 21, name: "الكزبرة", category: "خلطات", desc: "مضادة للأكسدة، تساعد على الهضم، تخفض الكوليسترول", price: 8, rating: 4.6, img: "asset/images/coriander.jpg" },
+    { id: 22, name: "الحلبة", category: "طبية", desc: "مفيدة للرضاعة، تنظم السكر، تقوي الشعر", price: 10, rating: 4.7, img: "asset/images/fenugreek.jpg" },
+    { id: 24, name: "المليسا", category: "عطرية", desc: "مضادة للقلق، تحسن المزاج، تساعد على النوم", price: 15, rating: 4.7, img: "asset/images/lemonbalm.jpg" },
+    { id: 25, name: "الزوفا", category: "طبية", desc: "مقشع، مضاد للسعال، مفيد للجهاز التنفسي", price: 12, rating: 4.5, img: "asset/images/hyssop.jpg" },
+    { id: 26, name: "الآس", category: "عطرية", desc: "معطر طبيعي، قابض، مفيد للبشرة", price: 14, rating: 4.6, img: "asset/images/myrtle.jpg" },
+    { id: 29, name: "الأقحوان", category: "طبية", desc: "يخفض الحرارة، مفيد للعينين، مهدئ", price: 11, rating: 4.5, img: "asset/images/chrysanthemum.jpg" },
+    { id: 30, name: "القرنفل", category: "خلطات", desc: "مسكن لآلام الأسنان، مضاد للالتهابات", price: 9, rating: 4.6, img: "asset/images/cloveherb.jpg" },
+    { id: 31, name: "الهيل", category: "خلطات", desc: "منعش للفم، مفيد للهضم، مضاد للأكسدة", price: 20, rating: 4.7, img: "asset/images/cardamomherb.jpg" },
+    { id: 32, name: "الكركم", category: "خلطات", desc: "مضاد قوي للالتهابات، غني بمضادات الأكسدة", price: 15, rating: 4.9, img: "asset/images/turmeric.jpg" },
+    { id: 34, name: "الجنسنغ", category: "طبية", desc: "مقوي عام، يزيد الطاقة، يحسن الأداء الذهني", price: 35, rating: 4.9, img: "asset/images/ginseng.jpg" },
+    { id: 35, name: "الإخناسيا", category: "طبية", desc: "مقوي للمناعة، يقي من نزلات البرد", price: 22, rating: 4.8, img: "asset/images/echinacea.jpg" },
+    { id: 36, name: "القطيفة", category: "طبية", desc: "مضادة للالتهابات، تهدئ البشرة، مفيدة للجروح", price: 13, rating: 4.6, img: "asset/images/calendula.jpg" },
+    { id: 37, name: "الريحان", category: "عطرية", desc: "مضاد للتوتر، يحسن المزاج، مفيد للجهاز الهضمي", price: 12, rating: 4.7, img: "asset/images/basil.jpg" },
+    { id: 38, name: "الزعفران", category: "خلطات", desc: "مضاد للاكتئاب، يحسن المزاج، غني بمضادات الأكسدة", price: 50, rating: 4.9, img: "asset/images/saffron.jpg" },
+    { id: 39, name: "الكمون", category: "خلطات", desc: "يساعد على الهضم، مضاد للأكسدة، يخفض الكوليسترول", price: 8, rating: 4.6, img: "asset/images/cumin.jpg" },
+    { id: 40, name: "القرطم", category: "طبية", desc: "مضاد للالتهابات، مفيد للقلب والشرايين", price: 18, rating: 4.7, img: "asset/images/safflower.jpg" }
+    ];
+
+    function renderProducts(selectedCategory = 'all') {
+        const grid = document.getElementById("herbsGrid");
+        let filtered = herbsData;
+        if (selectedCategory !== 'all') {
+            filtered = herbsData.filter(herb => herb.category === selectedCategory);
+        }
+        if (filtered.length === 0) {
+            grid.innerHTML = `<div class="no-results"><i class="fas fa-search"></i> لا توجد أعشاب مطابقة للفلتر</div>`;
+            return;
+        }
+        grid.innerHTML = filtered.map(herb => {
+            let categoryText = "";
+            if (herb.category === "طبية") categoryText = "عشبة طبية";
+            else if (herb.category === "عطرية") categoryText = "عشبة عطرية";
+            else categoryText = "خلطة خاصة";
+            
+            let isFav = false;
+            let favorites = JSON.parse(localStorage.getItem('elixir_favorites')) || [];
+            if (favorites.includes(herb.id)) isFav = true;
+            
+            return `
+            <div class="herb-card" data-id="${herb.id}">
+                <div class="fav-icon ${isFav ? 'active' : ''}" data-id="${herb.id}">
+                    <i class="fa-${isFav ? 'solid' : 'regular'} fa-heart"></i>
+                </div>
+                <img class="herb-img" src="${herb.img}" alt="${herb.name}" onerror="this.src='asset/images/placeholder.png'">
+                <div class="herb-info">
+                    <div class="herb-cat">${categoryText}</div>
+                    <div class="herb-title">${herb.name}</div>
+                    <div class="herb-desc">${herb.desc}</div>
+                    <div class="price-row">
+                        <span class="price">${herb.price} ₪</span>
+                        <div class="btn-group">
+                            <button class="view-details" data-id="${herb.id}" data-name="${herb.name}"> عرض التفاصيل</button>
+                            <button class="add-cart" data-id="${herb.id}" data-name="${herb.name}" data-price="${herb.price}" data-img="${herb.img}"> إضافة إلى السلة</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            `;
+        }).join('');
+        
+        if (window.applyFadeToNewCards) window.applyFadeToNewCards();
+        bindAddToCartEvents();
+        bindViewDetailsEvents();
+    }
+
+    // ربط أزرار الإضافة إلى السلة
+    function bindAddToCartEvents() {
+        document.querySelectorAll('.add-cart').forEach(btn => {
+            btn.removeEventListener('click', handleAddToCart);
+            btn.addEventListener('click', handleAddToCart);
+        });
+    }
+    
+    function handleAddToCart(e) {
+        e.preventDefault();
+        const id = parseInt(e.currentTarget.getAttribute('data-id'));
+        const name = e.currentTarget.getAttribute('data-name');
+        const price = parseFloat(e.currentTarget.getAttribute('data-price'));
+        const img = e.currentTarget.getAttribute('data-img');
+        addToCart(id, name, price, img);
+        showToast(` تمت إضافة ${name} بنجاح، يتمنى ${name} أن ينال إعجابكم 😊`);
+    }
+    
+    function addToCart(id, name, price, img) {
+        let cart = JSON.parse(localStorage.getItem('elixir_cart')) || [];
+        const existing = cart.find(item => item.id === id);
+        if (existing) existing.quantity++;
+        else cart.push({ id, name, price, img, quantity: 1 });
+        localStorage.setItem('elixir_cart', JSON.stringify(cart));
+        updateCartBadge();
+    }
+    
+    function updateCartBadge() {
+        const cart = JSON.parse(localStorage.getItem('elixir_cart')) || [];
+        const total = cart.reduce((sum, item) => sum + item.quantity, 0);
+        const badge = document.querySelector('.cart-count');
+        if (badge) badge.innerText = total;
+    }
+    
+// عرض التفاصيل يفتح صفحة المنتج
+function handleViewDetails(e) {
+    e.preventDefault();
+    const id = e.currentTarget.getAttribute('data-id');
+    if (id) {
+        window.location.href = 'product-details.html?id=' + id;
+    }
+}
+
+function bindViewDetailsEvents() {
+    document.querySelectorAll('.view-details').forEach(btn => {
+        btn.removeEventListener('click', handleViewDetails);
+        btn.addEventListener('click', handleViewDetails);
+    });
+}
+    
+    // ========== المفضلة ==========
+    function updateFavorite(icon, productId) {
+        let favorites = JSON.parse(localStorage.getItem('elixir_favorites')) || [];
+        const index = favorites.indexOf(productId);
+        if (index === -1) {
+            favorites.push(productId);
+            icon.classList.add('active');
+            icon.innerHTML = '<i class="fa-solid fa-heart"></i>';
+        } else {
+            favorites.splice(index, 1);
+            icon.classList.remove('active');
+            icon.innerHTML = '<i class="fa-regular fa-heart"></i>';
+        }
+        localStorage.setItem('elixir_favorites', JSON.stringify(favorites));
+        const favCount = document.querySelector('.favorite-count');
+        if (favCount) favCount.innerText = favorites.length;
+    }
+    
+    function burstHearts(x, y) {
+        for (let i = 0; i < 10; i++) {
+            const heart = document.createElement('div');
+            heart.innerHTML = '❤️';
+            heart.classList.add('heart-particle');
+            const offsetX = (Math.random() - 0.5) * 50;
+            const offsetY = (Math.random() - 0.5) * 40;
+            heart.style.left = (x + offsetX) + 'px';
+            heart.style.top = (y + offsetY) + 'px';
+            heart.style.animationDelay = (Math.random() * 0.2) + 's';
+            document.body.appendChild(heart);
+            setTimeout(() => heart.remove(), 1000);
+        }
+    }
+    
+    // تفويض حدث القلب
+    const grid = document.getElementById('herbsGrid');
+    if (grid) {
+        grid.addEventListener('click', (e) => {
+            const heartIcon = e.target.closest('.fav-icon');
+            if (!heartIcon) return;
+            e.preventDefault();
+            e.stopPropagation();
+            const rect = heartIcon.getBoundingClientRect();
+            burstHearts(rect.left + rect.width / 2, rect.top + rect.height / 2);
+            const productId = parseInt(heartIcon.getAttribute('data-id'));
+            updateFavorite(heartIcon, productId);
+        });
+    }
+    
+    // تأثير fade-up
+    (function() {
+        const elements = document.querySelectorAll('.herb-card, .product-card, .collection-card, section');
+        elements.forEach(el => el.classList.add('fade-up'));
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) entry.target.classList.add('visible');
+            });
+        }, { threshold: 0.1 });
+        elements.forEach(el => observer.observe(el));
+        window.applyFadeToNewCards = function() {
+            document.querySelectorAll('.herb-card:not(.fade-up)').forEach(card => {
+                card.classList.add('fade-up');
+                observer.observe(card);
+            });
+        };
+    })();
+    
+    // فلتر
+    const filterSelect = document.getElementById('filterSelect');
+    filterSelect.addEventListener('change', () => renderProducts(filterSelect.value));
+    document.getElementById('resetFilter').addEventListener('click', () => {
+        filterSelect.value = 'all';
+        renderProducts('all');
+    });
+    
+    // زر الرجوع للأعلى
+    const scrollBtn = document.getElementById('scrollTopBtn');
+    window.addEventListener('scroll', () => {
+        if (window.scrollY > 300) scrollBtn.style.display = 'flex';
+        else scrollBtn.style.display = 'none';
+    });
+    scrollBtn.addEventListener('click', () => {
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+    });
+    
+    // توست
+    function showToast(message) {
+        const toast = document.getElementById('customToast');
+        const toastText = document.getElementById('toastText');
+        toastText.innerHTML = message;
+        toast.style.display = 'flex';
+        setTimeout(() => {
+            toast.style.display = 'none';
+        }, 3000);
+    }
+    
+    // تحديث عدد السلة عند التحميل
+    updateCartBadge();
+    renderProducts('all');
+</script>
+</body>
+</html>

@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Elixir | المفضلة</title>
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <link rel="stylesheet" href="favorite.css">
+    
+</head>
+<body>
+    <div id="emptyState" class="card">
+        <div class="empty-icon">
+            <i class="far fa-heart"></i>
+        </div>
+        <h1>لا توجد مفضلات بعد</h1>
+        <p class="empty-message">لا يوجد أي منتجات في قائمة المفضلة الخاصة بك<br>أضف منتجاتك المفضلة لتظهر هنا</p>
+        <a href="homepage.html" class="shop-btn">
+            <i class="fas fa-arrow-left"></i> ابدأ التسوق
+        </a>
+    </div>
+
+    <!-- الحاوية التي ستظهر عند وجود منتجات مفضلة (ستكون مخفية بداية) -->
+    <div id="favoritesContent" class="hidden">
+        <div class="container" style="max-width:1400px; margin:0 auto; padding:0 1.5rem;">
+            <div class="page-header" style="text-align:center; margin-bottom:2rem;">
+                <h1 style="color:#2c5f2d; background:rgba(255,255,255,0.6); display:inline-block; padding:0.5rem 2rem; border-radius:50px;">
+                    <i class="fa-regular fa-heart"></i> منتجاتي المفضلة <i class="fa-regular fa-heart"></i>
+                </h1>
+            </div>
+            <div class="products-grid" id="favoritesGrid"></div>
+            <div class="back-home">
+                <a href="homepage.html"><i class="fas fa-arrow-right"></i> العودة إلى الرئيسية</a>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // قاعدة بيانات جميع المنتجات (نفس البيانات المستخدمة في oils.html)
+// ========== قاعدة بيانات المنتجات (يجب أن تطابق البيانات في oils.html) ==========
+const allProducts = [
+    { id: 1, name: "زيت اللافندر العطري", category: "عطري", desc: "مهدئ للأعصاب، يساعد على الاسترخاء والنوم العميق", price: 38, img: "asset/images/lavender.jpg" },
+    { id: 2, name: "زيت الورد الجوري", category: "عطري", desc: "مضاد للشيخوخة، مرطب طبيعي للبشرة", price: 185, img: "asset/images/rose.jpg" },
+    { id: 3, name: "زيت إكليل الجبل", category: "عطري", desc: "منشط للدورة الدموية، يقوي بصيلات الشعر", price: 55, img: "asset/images/rosemary.png" },
+    { id: 4, name: "زيت النعناع الفلفلي", category: "عطري", desc: "يخفف الصداع وانسداد الأنف، منعش ومنشط", price: 30, img: "asset/images/peppermint.png" },
+    { id: 5, name: "زيت الياسمين", category: "عطري", desc: "مضاد للتوتر، يحسن المزاج، يمنح رائحة فواحة", price: 45, img: "asset/images/jasmine-oil.png" },
+    { id: 6, name: "زيت شجرة الشاي", category: "عطري", desc: "مطهر طبيعي، مضاد لحب الشباب والفطريات", price: 42, img: "asset/images/teatree.jpg" },
+    { id: 7, name: "زيت البابونج", category: "عطري", desc: "مهدئ للبشرة الحساسة، يخفف الالتهابات", price: 48, img: "asset/images/chamomile.jpg" },
+    { id: 8, name: "زيت البرتقال الحلو", category: "عطري", desc: "منشط للذهن، يخفف القلق، يضيء البشرة", price: 35, img: "asset/images/orange.jpg" },
+    { id: 9, name: "زيت الليمون", category: "عطري", desc: "مضاد للبكتيريا، ينقي الهواء، يمنح طاقة", price: 32, img: "asset/images/lemon.jpg" },
+    { id: 10, name: "زيت اليانغ يانغ", category: "عطري", desc: "متوازن للهرمونات، يمنح رائحة استوائية جذابة", price: 50, img: "asset/images/ylang.jpg" },
+    { id: 11, name: "زيت المريمية", category: "عطري", desc: "يساعد في تخفيف التعرق الليلي وأعراض سن اليأس", price: 40, img: "asset/images/sage.jpg" },
+    { id: 12, name: "زيت الزعتر", category: "عطري", desc: "مضاد للسعال والتهاب الحلق، يقوي المناعة", price: 38, img: "asset/images/thyme.jpg" },
+    { id: 13, name: "زيت الزيتون البكر الفلسطيني", category: "نباتي", desc: "مرطب طبيعي، غني بمضادات الأكسدة", price: 45, img: "asset/images/olive.jpg" },
+    { id: 14, name: "زيت اللوز الحلو", category: "نباتي", desc: "مرطب عميق، غني بفيتامين E، مناسب لجميع البشرة", price: 42, img: "asset/images/almondoil.png" },
+    { id: 15, name: "زيت جوز الهند العضوي", category: "نباتي", desc: "للشعر والبشرة، يرطب ويغذي بعمق", price: 35, img: "asset/images/coconut.jpg" },
+    { id: 16, name: "زيت الأرجان المغربي", category: "نباتي", desc: "لترطيب البشرة والشعر، غني بمضادات الأكسدة", price: 75, img: "asset/images/argan.jpg" },
+    { id: 17, name: "زيت الجوجوبا", category: "نباتي", desc: "مشابه لزيت البشرة الطبيعي، مناسب للبشرة الدهنية", price: 65, img: "asset/images/jojoba.jpg" },
+    { id: 18, name: "زيت السمسم", category: "نباتي", desc: "غني بفيتامين E، يحمي البشرة من الشمس", price: 30, img: "asset/images/sesame.jpg" },
+    { id: 19, name: "زيت الخروع", category: "نباتي", desc: "يطيل الشعر ويكثفه، ينعم الحواجب والرموش", price: 28, img: "asset/images/castor.jpg" },
+    { id: 20, name: "زيت المشمش", category: "نباتي", desc: "خفيف وسريع الامتصاص، مناسب للبشرة الحساسة", price: 50, img: "asset/images/apricot.jpg" },
+    { id: 21, name: "زيت بذور العنب", category: "نباتي", desc: "قابض طبيعي، مناسب للبشرة الدهنية والمختلطة", price: 40, img: "asset/images/grapeseed.jpg" },
+    { id: 22, name: "زيت الأفوكادو", category: "نباتي", desc: "غني بالأحماض الدهنية، مثالي للبشرة الجافة والتالفة", price: 60, img: "asset/images/avocado.jpg" },
+    { id: 23, name: "زيت الخروع الأسود", category: "للشعر", desc: "يقوي الشعر ويمنع التساقط، يطيل الرموش", price: 35, img: "asset/images/blackcastor.jpg" },
+    { id: 24, name: "زيت الروزماري للشعر", category: "للشعر", desc: "يحفز نمو الشعر، يقلل القشرة", price: 48, img: "asset/images/rosemaryhair.jpg" },
+    { id: 25, name: "زيت اللوز المر", category: "للشعر", desc: "يفتح البشرة، يقلل الهالات السوداء", price: 38, img: "asset/images/bitteralmond.jpg" },
+    { id: 26, name: "زيت الورد المسك", category: "للشعر", desc: "يقلل علامات التمدد والندبات", price: 55, img: "asset/images/mosquerose.jpg" },
+    { id: 27, name: "زيت الأوكالبتوس", category: "للشعر", desc: "يفتح المجاري التنفسية، يخفف آلام العضلات", price: 32, img: "asset/images/eucalyptus.jpg" },
+    { id: 28, name: "زيت القرنفل", category: "للشعر", desc: "مسكن لآلام الأسنان، مضاد للالتهابات", price: 30, img: "asset/images/clove.jpg" },
+    { id: 29, name: "زيت الحبة السوداء", category: "للشعر", desc: "يقوي المناعة، يعالج مشاكل الجلد والشعر", price: 40, img: "asset/images/blackseed.jpg" },
+    { id: 30, name: "زيت الباتشولي", category: "للشعر", desc: "مضاد للفطريات، يمنح رائحة ترابية دافئة", price: 45, img: "asset/images/patchouli.jpg" }
+];
+
+// ========== دالة عرض المنتجات المحفوظة ==========
+function displayFavorites() {
+    let favorites = JSON.parse(localStorage.getItem('elixir_favorites')) || [];
+    const emptyStateDiv = document.getElementById('emptyState');
+    const favoritesContentDiv = document.getElementById('favoritesContent');
+    const grid = document.getElementById('favoritesGrid');
+
+    if (favorites.length === 0) {
+        emptyStateDiv.classList.remove('hidden');
+        favoritesContentDiv.classList.add('hidden');
+        return;
+    }
+
+    emptyStateDiv.classList.add('hidden');
+    favoritesContentDiv.classList.remove('hidden');
+
+    const favProducts = allProducts.filter(p => favorites.includes(p.id));
+    if (favProducts.length === 0) {
+        grid.innerHTML = `<div class="empty-message" style="text-align:center; padding:2rem;">⚠️ بعض المنتجات لم تعد متوفرة</div>`;
+        return;
+    }
+
+    let html = '';
+    favProducts.forEach(product => {
+        let categoryText = "";
+        if (product.category === "عطري") categoryText = "زيت عطري";
+        else if (product.category === "نباتي") categoryText = "زيت نباتي ثابت";
+        else categoryText = "للبشرة والشعر";
+
+        html += `
+            <div class="fav-card" data-id="${product.id}">
+                <img class="fav-img" src="${product.img}" alt="${product.name}" onerror="this.src='asset/images/placeholder.png'">
+                <div class="fav-info">
+                    <div class="fav-cat">${categoryText}</div>
+                    <div class="fav-title">${product.name}</div>
+                    <div class="fav-desc">${product.desc}</div>
+                    <div class="price-row">
+                        <span class="price">${product.price} ₪</span>
+                        <button class="remove-fav" data-id="${product.id}"><i class="fa-regular fa-trash-can"></i> إزالة</button>
+                    </div>
+                </div>
+            </div>
+        `;
+    });
+    grid.innerHTML = html;
+    if (window.applyFadeToFavCards) window.applyFadeToFavCards();
+
+    // ربط أزرار الإزالة
+    document.querySelectorAll('.remove-fav').forEach(btn => {
+        btn.addEventListener('click', (e) => {
+            const id = parseInt(btn.getAttribute('data-id'));
+            removeFromFavorites(id);
+        });
+    });
+}
+
+// ========== دالة الإزالة من المفضلة ==========
+function removeFromFavorites(productId) {
+    let favorites = JSON.parse(localStorage.getItem('elixir_favorites')) || [];
+    const newFavorites = favorites.filter(id => id !== productId);
+    localStorage.setItem('elixir_favorites', JSON.stringify(newFavorites));
+    displayFavorites();
+    updateFavCountInHeader();
+}
+  
+// تأثير Fade-up البسيط
+    (function() {
+        // إضافة كلاس fade-up لجميع البطاقات والأقسام
+        const elements = document.querySelectorAll('.oil-card, .product-card, .collection-card, section');
+        elements.forEach(el => el.classList.add('fade-up'));
+
+        // مراقب التمرير
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('visible');
+                }
+            });
+        }, { threshold: 0.1 });
+
+        // بدء المراقبة
+        elements.forEach(el => observer.observe(el));
+
+        // إذا كانت البطاقات تُضاف لاحقاً (مثل بعد الفلتر)، استخدمي هذا السطر داخل دالة renderProducts:
+        window.applyFadeToNewCards = function() {
+            document.querySelectorAll('.oil-card:not(.fade-up)').forEach(card => {
+                card.classList.add('fade-up');
+                observer.observe(card);
+            });
+        };
+    })();
+
+// ========== تحديث عدد المفضلة في الهيدر ==========
+function updateFavCountInHeader() {
+    let favorites = JSON.parse(localStorage.getItem('elixir_favorites')) || [];
+    const countSpan = document.querySelector('.favorite-count');
+    if (countSpan) countSpan.innerText = favorites.length;
+}
+
+// ========== بدء التشغيل عند تحميل الصفحة ==========
+document.addEventListener('DOMContentLoaded', function() {
+    displayFavorites();
+    updateFavCountInHeader();
+});
+    </script>
+</body>
+</html>

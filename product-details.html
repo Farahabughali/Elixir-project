@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Elixir | تفاصيل المنتج</title>
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <link rel="stylesheet" href="product-details.css">
+</head>
+<body>
+
+<header>
+    <div class="main-header">
+        <div class="header-right">
+            <a href="homepage.html" style="display: flex; align-items: center; gap: 15px; text-decoration: none;">
+                <div class="logo-circle"><img src="asset/images/logo.png" alt="Logo"></div>
+                <span class="web-name">Elixir</span>
+            </a>
+            <span class="page-title-in-header" id="category-name">الزيوت الطبيعية والعطرية</span>
+            <span class="page-title-in-header" id="product-name-header" style="margin-right: 5px;"></span>
+        </div>
+        <div class="header-left">
+            <span class="help-text"> هل تحتاج لمساعدة في اختيار الزيت المناسب لك؟</span>
+            <a href="chatbot.html" class="ai-consult-link"><i class="fas fa-robot"></i> استشر الذكاء الاصطناعي</a>
+        </div>
+    </div>
+</header>
+
+<div class="product-main">
+    <div class="product-image"><img src="" alt="صورة المنتج" id="product-img"></div>
+    <div class="product-title" id="product-title"></div>
+
+    <div class="buy-section">
+        <div class="current-price" id="display-price"></div>
+        <div class="size-selector" id="size-selector"></div>
+        <div class="quantity-selector">
+            <button class="qty-btn" id="decrease-qty">-</button>
+            <span id="quantity-value">1</span>
+            <button class="qty-btn" id="increase-qty">+</button>
+        </div>
+        <button class="add-to-cart" id="add-to-cart-btn">+ إضافة إلى السلة</button>
+    </div>
+
+    <div class="delivery-note">
+        <i class="fas fa-map-marker-alt"></i> نُوصل لكل مدن فلسطين: جنين، نابلس، رام الله، الخليل، بيت لحم، القدس، أريحا وغيرها.
+    </div>
+
+    <div class="info-section">
+        <h3>الفوائد الأساسية</h3>
+        <ul id="benefits-list"></ul>
+    </div>
+    <div class="info-section">
+        <h3>طريقة الاستخدام</h3>
+        <ul id="usage-list"></ul>
+    </div>
+    <div class="info-section">
+        <h3>نصائح وتحذيرات</h3>
+        <ul id="precautions-list"></ul>
+    </div>
+
+    <a href="#" class="back-link" id="back-link">← العودة إلى المنتجات</a>
+</div>
+
+<script>
+    // هالجزء حيتم التعامل معه من قِبل صاحبتك (Backend)
+    // البيانات اللي راح تستلمها من PHP حتستخدمها في displayProduct(productData)
+</script>
+
+</body>
+</html>

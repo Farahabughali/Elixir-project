@@ -1,0 +1,223 @@
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Cairo', sans-serif;
+            background: linear-gradient(135deg, #eef5e9 0%, #d4e2c6 100%);
+            min-height: 100vh;
+            padding: 2rem 1.5rem;
+            position: relative;
+        }
+
+
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+        }
+
+        /* البطاقة الرئيسية الشفافة */
+        .glass-card {
+            background: rgba(255, 255, 255, 0.82);
+            backdrop-filter: blur(12px);
+            border-radius: 2rem;
+            box-shadow: 0 25px 45px -12px rgba(0, 0, 0, 0.2);
+            padding: 2.5rem;
+            margin-bottom: 2rem;
+            border: 1px solid rgba(255, 255, 255, 0.5);
+            transition: transform 0.3s ease;
+        }
+
+        .glass-card:hover {
+            transform: translateY(-3px);
+            background: rgba(255, 255, 255, 0.88);
+        }
+
+        /* الهيدر */
+        .header-icon {
+            text-align: center;
+            margin-bottom: 1.5rem;
+        }
+        .header-icon i {
+            font-size: 3.5rem;
+            background: rgba(255, 255, 255, 0.6);
+            width: 90px;
+            height: 90px;
+            border-radius: 50%;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            color: #b9804b;
+            border: 1px solid rgba(185, 128, 75, 0.3);
+        }
+
+        h1 {
+            text-align: center;
+            color: #2c5f2d;
+            font-size: 2rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .intro-text {
+            text-align: center;
+            color: #4a6741;
+            font-size: 1rem;
+            line-height: 1.8;
+            max-width: 700px;
+            margin: 0 auto 1.5rem auto;
+        }
+
+        .highlight {
+            background: linear-gradient(135deg, #438e56, #2c5f2d);
+            color: white;
+            padding: 0.2rem 0.6rem;
+            border-radius: 20px;
+            font-weight: 500;
+        }
+
+        /* الأقسام */
+        .section-title {
+            display: flex;
+            align-items: center;
+            gap: 0.8rem;
+            color: #2c5f2d;
+            font-size: 1.5rem;
+            margin-bottom: 1.5rem;
+            border-right: 4px solid #b9804b;
+            padding-right: 1rem;
+        }
+        .section-title i {
+            color: #b9804b;
+            font-size: 1.5rem;
+        }
+
+        /* شبكة الوظائف */
+        .jobs-grid {
+            display: flex;
+            flex-direction: column;
+            gap: 1.2rem;
+            margin-bottom: 1.5rem;
+        }
+        .job-card {
+            background: rgba(255, 255, 255, 0.5);
+            border-radius: 1.2rem;
+            padding: 1.2rem 1.5rem;
+            transition: 0.2s;
+            border: 1px solid rgba(185, 128, 75, 0.2);
+        }
+        .job-card:hover {
+            background: rgba(255, 255, 255, 0.75);
+            transform: translateX(-5px);
+        }
+        .job-header {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            margin-bottom: 0.8rem;
+            flex-wrap: wrap;
+        }
+        .job-icon {
+            font-size: 1.8rem;
+        }
+        .job-title {
+            font-size: 1.3rem;
+            font-weight: 700;
+            color: #2c5f2d;
+        }
+        .job-badge {
+            background: #438e56;
+            color: white;
+            padding: 0.2rem 0.8rem;
+            border-radius: 20px;
+            font-size: 0.7rem;
+            font-weight: 500;
+        }
+        .job-desc {
+            color: #3a5a32;
+            line-height: 1.6;
+            margin-right: 2.5rem;
+            margin-bottom: 0.5rem;
+        }
+        .job-list {
+            margin-right: 2.5rem;
+            color: #5a7a4a;
+            line-height: 1.7;
+        }
+        .job-list li {
+            margin-bottom: 0.3rem;
+        }
+
+        /* قسم التقديم */
+        .apply-box {
+            background: rgba(67, 142, 86, 0.1);
+            border-radius: 1.5rem;
+            padding: 1.5rem;
+            margin-top: 1rem;
+            text-align: center;
+        }
+        .email-link {
+            direction: ltr;
+            display: inline-block;
+            background: #2c5f2d;
+            color: white;
+            padding: 0.8rem 1.8rem;
+            border-radius: 3rem;
+            text-decoration: none;
+            font-weight: 600;
+            margin: 1rem 0;
+            transition: 0.2s;
+        }
+        .email-link:hover {
+            background: #1f451e;
+            transform: scale(1.02);
+        }
+        .note {
+            font-size: 0.85rem;
+            color: #6b8c42;
+            margin-top: 0.8rem;
+        }
+
+        .back-link {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            color: #6b8c42;
+            text-decoration: none;
+            font-size: 0.9rem;
+            font-weight: 500;
+            transition: 0.2s;
+            margin-top: 1rem;
+        }
+        .back-link:hover {
+            color: #2c5f2d;
+            gap: 0.8rem;
+        }
+
+        hr {
+            margin: 1rem 0;
+            border: none;
+            border-top: 1px solid rgba(185, 128, 75, 0.2);
+        }
+.back-link-container {
+    text-align: center;
+    margin-top: 16px;
+}
+        @media (max-width: 650px) {
+            .glass-card {
+                padding: 1.5rem;
+            }
+            h1 {
+                font-size: 1.5rem;
+            }
+            .job-header {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+            .job-desc, .job-list {
+                margin-right: 0.5rem;
+            }
+        }
+   

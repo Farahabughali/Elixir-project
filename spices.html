@@ -1,0 +1,285 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Elixir | البهارات العالمية والعربية</title>
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <link rel="stylesheet" href="spices.css">
+</head>
+<body>
+
+<!-- الهيدر الثابت -->
+<header>
+    <div class="main-header">
+        <div class="header-right">
+            <a href="homepage.html" style="display: flex; align-items: center; gap: 15px; text-decoration: none;">
+                <div class="logo-circle">
+                    <img src="asset/images/logo.png" alt="Logo">
+                </div>
+                <span class="web-name">Elixir</span>
+            </a>
+            <a href="spices.html" style="display: flex; align-items: center; gap: 15px; text-decoration: none;">
+                <span class="page-title-in-header">البهارات العالمية والعربية</span>
+            </a>
+        </div>
+        <div class="header-left">
+            <span class="help-text"> هل تحتاج لمساعدة في اختيار البهارات المناسبة؟</span>
+            <a href="chatbot.html" class="ai-consult-link">
+                <i class="fas fa-robot"></i> استشر الذكاء الاصطناعي
+            </a>
+        </div>
+    </div>
+</header>
+
+<div class="container">
+    <!-- شريط الفلتر -->
+    <div class="filter-bar">
+        <span class="filter-label"> تصفية البهارات:</span>
+        <select id="filterSelect" class="filter-select">
+            <option value="all">الكل</option>
+            <option value="عربية">بهارات عربية</option>
+            <option value="عالمية">بهارات عالمية</option>
+            <option value="خلطات">خلطات خاصة</option>
+        </select>
+        <button id="resetFilter" class="reset-filter"> إعادة ضبط</button>
+    </div>
+
+    <div class="products-grid" id="spicesGrid"></div>
+
+    <div class="back-home">
+        <a href="homepage.html"><i class="fas fa-arrow-right"></i> العودة إلى الرئيسية</a>
+    </div>
+</div>
+
+<div id="customToast" class="toast-message">
+    <i class="fas fa-check-circle"></i>
+    <span id="toastText"></span>
+</div>
+
+<button id="scrollTopBtn" class="scroll-top-btn" style="display:none;">
+    <i class="fas fa-arrow-up"></i>
+</button>
+
+<script>
+    const spicesData = [
+        { id: 1, name: "بهارات مشكلة (عربية)", category: "عربية", desc: "خليط متكامل من البهارات العربية الأصيلة، مثالي للأرز واللحوم", price: 12, rating: 4.8, img: "asset/images/spice-mix.jpg" },
+        { id: 2, name: "بهارات الكبسة", category: "عربية", desc: "خليط بهارات الكبسة الخليجية، يضفي نكهة رائعة على الأرز والدجاج", price: 10, rating: 4.7, img: "asset/images/kabsa-spice.jpg" },
+        { id: 3, name: "بهارات اللحم)", category: "عربية", desc: "مزيج قوي ومناسب للحوم والقدور، يمنح نكهة عميقة", price: 14, rating: 4.9, img: "asset/images/meat-spice.jpg" },
+        { id: 4, name: "بهارات المندي", category: "عربية", desc: "خليط المندي العطري، يستخدم للأرز واللحم", price: 11, rating: 4.6, img: "asset/images/mandi-spice.jpg" },
+        { id: 5, name: "سماق", category: "عربية", desc: "بهار حامض قليلًا، يستخدم على اللحوم والسلطات", price: 8, rating: 4.5, img: "asset/images/sumac.jpg" },
+        { id: 6, name: "كمون", category: "عربية", desc: "من أهم البهارات في المطبخ العربي، يعزز الهضم", price: 7, rating: 4.6, img: "asset/images/cumin-spice.jpg" },
+        { id: 7, name: "كزبرة جافة مطحونة", category: "عربية", desc: "نكهة دافئة وحلوة قليلًا، تستخدم في الطبخ والصلصات", price: 6, rating: 4.4, img: "asset/images/coriander-spice.jpg" },
+        { id: 8, name: "كركم", category: "عالمية", desc: "بهار ذهبي مضاد للأكسدة، يستخدم في الطبخ الهندي والعلاجات", price: 9, rating: 4.8, img: "asset/images/turmeric-spice.jpg" },
+        { id: 9, name: "زنجبيل مطحون", category: "عالمية", desc: "يضفي نكهة حارة ودافئة، مفيد للجهاز الهضمي", price: 10, rating: 4.7, img: "asset/images/ginger-spice.jpg" },
+        { id: 10, name: "هيل (حبهان)", category: "عالمية", desc: "بهار عطري يستخدم في القهوة والشاي والحلويات", price: 25, rating: 4.9, img: "asset/images/cardamom-spice.jpg" },
+        { id: 11, name: "قرنفل (كبش قرنفل)", category: "عالمية", desc: "نكهة قوية وحادة، يستخدم في الأرز والمخللات", price: 12, rating: 4.5, img: "asset/images/clove-spice.jpg" },
+        { id: 12, name: "فلفل أسود مطحون", category: "عالمية", desc: "أشهر بهار في العالم، يضفي حرارة ونكهة", price: 8, rating: 4.7, img: "asset/images/black-pepper.jpg" },
+        { id: 13, name: "بابريكا (فلفل حلو مجفف)", category: "عالمية", desc: "لون أحمر ونكهة مدخنة خفيفة، مثالية للدجاج", price: 9, rating: 4.6, img: "asset/images/paprika.jpg" },
+        { id: 14, name: "فلفل حار مطحون (شطة)", category: "عالمية", desc: "حرارة قوية تضفي نكهة حارة للأطباق", price: 8, rating: 4.5, img: "asset/images/chili.jpg" },
+        { id: 15, name: "قرفة مطحونة", category: "عالمية", desc: "نكهة دافئة وحلوة، تستخدم في الحلويات واللحوم", price: 10, rating: 4.8, img: "asset/images/cinnamon-spice.jpg" },
+        { id: 16, name: "يانسون نجمي", category: "عالمية", desc: "نكهة عرق السوس، يستخدم في الأطباق الآسيوية", price: 18, rating: 4.6, img: "asset/images/star-anise.jpg" },
+        { id: 17, name: "بهارات غارام ماسالا", category: "خلطات", desc: "خليط بهارات هندي دافئ، مثالي للكاري واللحوم", price: 22, rating: 4.9, img: "asset/images/garam-masala.jpg" },
+        { id: 18, name: "بهارات شاورما", category: "خلطات", desc: "خليط خاص للشاورما والدجاج المشوي", price: 12, rating: 4.8, img: "asset/images/shawarma-spice.jpg" },
+        { id: 19, name: "بهارات فاهيتا", category: "خلطات", desc: "مزيج مكسيكي مثالي للحوم والخضروات المشوية", price: 11, rating: 4.7, img: "asset/images/fajita-spice.jpg" },
+        { id: 20, name: "بهارات الشوربة", category: "خلطات", desc: "خليط بهارات خاص للحساء", price: 13, rating: 4.7, img: "asset/images/soup-spice.jpg" },
+        { id: 21, name: "سبع بهارات", category: "خلطات", desc: "بهارات أساسية في المطبخ العربية تضاف على كثير من الأكلات", price: 10, rating: 4.6, img: "asset/images/seven-spices.jpg" }
+
+    ];
+
+    function renderProducts(selectedCategory = 'all') {
+        const grid = document.getElementById("spicesGrid");
+        let filtered = spicesData;
+        if (selectedCategory !== 'all') {
+            filtered = spicesData.filter(spice => spice.category === selectedCategory);
+        }
+        if (filtered.length === 0) {
+            grid.innerHTML = `<div class="no-results"><i class="fas fa-search"></i> لا توجد بهارات مطابقة للفلتر</div>`;
+            return;
+        }
+        grid.innerHTML = filtered.map(spice => {
+            let categoryText = "";
+            if (spice.category === "عربية") categoryText = "بهارات عربية";
+            else if (spice.category === "عالمية") categoryText = "بهارات عالمية";
+            else categoryText = "خلطة خاصة";
+            
+            let isFav = false;
+            let favorites = JSON.parse(localStorage.getItem('elixir_favorites')) || [];
+            if (favorites.includes(spice.id)) isFav = true;
+            
+            return `
+            <div class="spice-card" data-id="${spice.id}">
+                <div class="fav-icon ${isFav ? 'active' : ''}" data-id="${spice.id}">
+                    <i class="fa-${isFav ? 'solid' : 'regular'} fa-heart"></i>
+                </div>
+                <img class="spice-img" src="${spice.img}" alt="${spice.name}" onerror="this.src='asset/images/placeholder.png'">
+                <div class="spice-info">
+                    <div class="spice-cat">${categoryText}</div>
+                    <div class="spice-title">${spice.name}</div>
+                    <div class="spice-desc">${spice.desc}</div>
+                    <div class="price-row">
+                        <span class="price">${spice.price} ₪</span>
+                        <div class="btn-group">
+                            <button class="view-details" data-id="${spice.id}" data-name="${spice.name}"> عرض التفاصيل</button>
+                            <button class="add-cart" data-id="${spice.id}" data-name="${spice.name}" data-price="${spice.price}" data-img="${spice.img}"> إضافة إلى السلة</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            `;
+        }).join('');
+        
+        if (window.applyFadeToNewCards) window.applyFadeToNewCards();
+        bindAddToCartEvents();
+        bindViewDetailsEvents();
+    }
+
+    // ربط أزرار الإضافة إلى السلة
+    function bindAddToCartEvents() {
+        document.querySelectorAll('.add-cart').forEach(btn => {
+            btn.removeEventListener('click', handleAddToCart);
+            btn.addEventListener('click', handleAddToCart);
+        });
+    }
+    
+    function handleAddToCart(e) {
+        e.preventDefault();
+        const id = parseInt(e.currentTarget.getAttribute('data-id'));
+        const name = e.currentTarget.getAttribute('data-name');
+        const price = parseFloat(e.currentTarget.getAttribute('data-price'));
+        const img = e.currentTarget.getAttribute('data-img');
+        addToCart(id, name, price, img);
+        showToast(`تمت إضافة ${name} بنجاح، يتمنى ${name} أن ينال إعجابكم 😊`);
+    }
+    
+    function addToCart(id, name, price, img) {
+        let cart = JSON.parse(localStorage.getItem('elixir_cart')) || [];
+        const existing = cart.find(item => item.id === id);
+        if (existing) existing.quantity++;
+        else cart.push({ id, name, price, img, quantity: 1 });
+        localStorage.setItem('elixir_cart', JSON.stringify(cart));
+        updateCartBadge();
+    }
+    
+    function updateCartBadge() {
+        const cart = JSON.parse(localStorage.getItem('elixir_cart')) || [];
+        const total = cart.reduce((sum, item) => sum + item.quantity, 0);
+        const badge = document.querySelector('.cart-count');
+        if (badge) badge.innerText = total;
+    }
+    
+    function bindViewDetailsEvents() {
+        document.querySelectorAll('.view-details').forEach(btn => {
+            btn.removeEventListener('click', handleViewDetails);
+            btn.addEventListener('click', handleViewDetails);
+        });
+    }
+    
+    function handleViewDetails(e) {
+        e.preventDefault();
+        const id = e.currentTarget.getAttribute('data-id');
+        window.location.href = `product-details.html?id=${id}`;
+    }
+    
+    // ========== المفضلة ==========
+    function updateFavorite(icon, productId) {
+        let favorites = JSON.parse(localStorage.getItem('elixir_favorites')) || [];
+        const index = favorites.indexOf(productId);
+        if (index === -1) {
+            favorites.push(productId);
+            icon.classList.add('active');
+            icon.innerHTML = '<i class="fa-solid fa-heart"></i>';
+        } else {
+            favorites.splice(index, 1);
+            icon.classList.remove('active');
+            icon.innerHTML = '<i class="fa-regular fa-heart"></i>';
+        }
+        localStorage.setItem('elixir_favorites', JSON.stringify(favorites));
+        const favCount = document.querySelector('.favorite-count');
+        if (favCount) favCount.innerText = favorites.length;
+    }
+    
+    function burstHearts(x, y) {
+        for (let i = 0; i < 10; i++) {
+            const heart = document.createElement('div');
+            heart.innerHTML = '❤️';
+            heart.classList.add('heart-particle');
+            const offsetX = (Math.random() - 0.5) * 50;
+            const offsetY = (Math.random() - 0.5) * 40;
+            heart.style.left = (x + offsetX) + 'px';
+            heart.style.top = (y + offsetY) + 'px';
+            heart.style.animationDelay = (Math.random() * 0.2) + 's';
+            document.body.appendChild(heart);
+            setTimeout(() => heart.remove(), 1000);
+        }
+    }
+    
+    // تفويض حدث القلب
+    const grid = document.getElementById('spicesGrid');
+    if (grid) {
+        grid.addEventListener('click', (e) => {
+            const heartIcon = e.target.closest('.fav-icon');
+            if (!heartIcon) return;
+            e.preventDefault();
+            e.stopPropagation();
+            const rect = heartIcon.getBoundingClientRect();
+            burstHearts(rect.left + rect.width / 2, rect.top + rect.height / 2);
+            const productId = parseInt(heartIcon.getAttribute('data-id'));
+            updateFavorite(heartIcon, productId);
+        });
+    }
+    
+    // تأثير fade-up
+    (function() {
+        const elements = document.querySelectorAll('.spice-card, .product-card, .collection-card, section');
+        elements.forEach(el => el.classList.add('fade-up'));
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) entry.target.classList.add('visible');
+            });
+        }, { threshold: 0.1 });
+        elements.forEach(el => observer.observe(el));
+        window.applyFadeToNewCards = function() {
+            document.querySelectorAll('.spice-card:not(.fade-up)').forEach(card => {
+                card.classList.add('fade-up');
+                observer.observe(card);
+            });
+        };
+    })();
+    
+    // فلتر
+    const filterSelect = document.getElementById('filterSelect');
+    filterSelect.addEventListener('change', () => renderProducts(filterSelect.value));
+    document.getElementById('resetFilter').addEventListener('click', () => {
+        filterSelect.value = 'all';
+        renderProducts('all');
+    });
+    
+    // زر الرجوع للأعلى
+    const scrollBtn = document.getElementById('scrollTopBtn');
+    window.addEventListener('scroll', () => {
+        if (window.scrollY > 300) scrollBtn.style.display = 'flex';
+        else scrollBtn.style.display = 'none';
+    });
+    scrollBtn.addEventListener('click', () => {
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+    });
+    
+    // توست
+    function showToast(message) {
+        const toast = document.getElementById('customToast');
+        const toastText = document.getElementById('toastText');
+        toastText.innerHTML = message;
+        toast.style.display = 'flex';
+        setTimeout(() => {
+            toast.style.display = 'none';
+        }, 3000);
+    }
+    
+    // تحديث عداد السلة عند التحميل
+    updateCartBadge();
+    renderProducts('all');
+</script>
+</body>
+</html>

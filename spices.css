@@ -1,0 +1,429 @@
+/* ========== الأساسيات - ألوان بنية فاتحة ========== */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Cairo', sans-serif;
+    background: linear-gradient(135deg, #f5ecd9 0%, #e6d5b8 100%);
+    min-height: 100vh;
+    padding-top: 90px;
+    position: relative;
+}
+
+/* ========== الهيدر الثابت ========== */
+.main-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 5px 40px;
+    height: 80px;
+    background-color: #faf5eb;
+    border-bottom: 1px solid #e0cba0;
+    position: fixed;
+    top: 0;
+    right: 0;
+    left: 0;
+    z-index: 1000;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+    direction: rtl;
+}
+
+.header-right {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    flex-wrap: wrap;
+}
+
+.logo-circle img {
+    width: 44px;
+    height: 44px;
+    border-radius: 50%;
+    border: 2px solid #d4b878;
+}
+
+.web-name {
+    color: #8b5e3c;
+    font-weight: bold;
+    font-size: 1.3rem;
+    font-family: "Playfair Display", serif;
+}
+
+.page-title-in-header {
+    font-size: 1rem;
+    color: #a67c52;
+    font-weight: 500;
+    margin-right: 10px;
+    padding-right: 10px;
+    border-right: 1px solid #e0cba0;
+}
+
+.header-left {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+}
+
+.help-text {
+    color: #8b5e3c;
+    font-size: 0.9rem;
+    font-weight: 500;
+}
+
+.ai-consult-link {
+    background: linear-gradient(95deg, #a67c52, #8b5e3c);
+    color: white;
+    text-decoration: none;
+    padding: 6px 16px;
+    border-radius: 30px;
+    font-size: 0.85rem;
+    font-weight: 600;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    transition: 0.3s;
+}
+
+.ai-consult-link:hover {
+    background: linear-gradient(95deg, #8b5e3c, #6d462a);
+    transform: translateY(-2px);
+}
+
+/* ========== أيقونات السلة والمفضلة ========== */
+.header-icons {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    margin-right: 20px;
+}
+
+.icon-btn {
+    position: relative;
+    text-decoration: none;
+    color: #8b5e3c;
+    font-size: 1.4rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.cart-count, .favorite-count {
+    position: absolute;
+    top: -8px;
+    right: -12px;
+    background: #d49a5a;
+    color: white;
+    font-size: 10px;
+    width: 18px;
+    height: 18px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: bold;
+}
+
+/* ========== شريط الفلتر ========== */
+.filter-bar {
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+    gap: 15px;
+    background: rgba(245, 236, 217, 0.8);
+    backdrop-filter: blur(4px);
+    padding: 8px 20px;
+    border-radius: 50px;
+    margin: 20px 0 30px;
+    width: fit-content;
+    border: 1px solid rgba(200, 170, 120, 0.4);
+}
+
+.filter-label {
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: #8b5e3c;
+}
+
+.filter-select {
+    padding: 5px 12px;
+    border-radius: 30px;
+    border: 1px solid #d4b878;
+    font-family: 'Cairo', sans-serif;
+    font-size: 0.8rem;
+    background: white;
+    cursor: pointer;
+    color: #6d462a;
+}
+
+.reset-filter {
+    background: #d49a5a;
+    color: white;
+    border: none;
+    padding: 5px 14px;
+    border-radius: 30px;
+    cursor: pointer;
+    font-size: 0.75rem;
+    font-weight: bold;
+    transition: 0.2s;
+}
+
+.reset-filter:hover {
+    background: #b87a3a;
+}
+
+/* ========== شبكة المنتجات ========== */
+.container {
+    max-width: 1400px;
+    margin: 0 auto;
+    padding: 0 1.5rem;
+}
+
+.products-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 25px;
+}
+
+/* ========== بطاقة البهارات ========== */
+.spice-card {
+    background: rgba(255, 248, 235, 0.85);
+    backdrop-filter: blur(8px);
+    border-radius: 1.5rem;
+    overflow: hidden;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    border: 1px solid rgba(180, 150, 100, 0.3);
+    position: relative;
+}
+
+.spice-card:hover {
+    transform: translateY(-8px);
+    box-shadow: 0 15px 30px rgba(100, 70, 40, 0.1);
+}
+
+.spice-img {
+    width: 100%;
+    height: 200px;
+    object-fit: cover;
+    background: #f5ebd9;
+}
+
+.spice-info {
+    padding: 1rem;
+    text-align: right;
+}
+
+.spice-cat {
+    font-size: 0.7rem;
+    color: #a67c52;
+    font-weight: 600;
+    margin-bottom: 5px;
+}
+
+.spice-title {
+    font-size: 1rem;
+    font-weight: 700;
+    color: #6d462a;
+    margin: 5px 0;
+}
+
+.spice-desc {
+    font-size: 0.75rem;
+    color: #8b6844;
+    margin-bottom: 0.8rem;
+    line-height: 1.4;
+}
+
+.price-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 0.5rem;
+    flex-wrap: wrap;
+    gap: 8px;
+}
+
+.price {
+    font-weight: bold;
+    color: #c47a3a;
+    font-size: 1.1rem;
+}
+
+.btn-group {
+    display: flex;
+    gap: 8px;
+}
+
+.add-cart, .view-details {
+    background: #c47a3a;
+    color: white;
+    border: none;
+    padding: 5px 12px;
+    border-radius: 30px;
+    cursor: pointer;
+    font-size: 0.7rem;
+    transition: 0.2s;
+}
+
+.view-details {
+    background: #d49a5a;
+}
+
+.add-cart:hover {
+    background: #a05e2a;
+}
+
+.view-details:hover {
+    background: #b87a3a;
+}
+
+/* ========== أيقونة القلب ========== */
+.fav-icon {
+    position: absolute;
+    top: 12px;
+    left: 12px;
+    background: rgba(255, 248, 235, 0.9);
+    border-radius: 50%;
+    width: 32px;
+    height: 32px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: 0.2s;
+    z-index: 2;
+    color: #c47a3a;
+    font-size: 1.2rem;
+}
+.fav-icon:hover {
+    transform: scale(1.1);
+}
+.fav-icon.active {
+    color: #e94f6f;
+}
+
+/* ========== رسالة التوست ========== */
+.toast-message {
+    position: fixed;
+    bottom: 30px;
+    right: 30px;
+    background: #8b5e3c;
+    color: white;
+    padding: 12px 24px;
+    border-radius: 50px;
+    font-size: 0.9rem;
+    z-index: 9999;
+    display: none;
+    align-items: center;
+    gap: 10px;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+}
+
+/* ========== زر الرجوع للأعلى ========== */
+.scroll-top-btn {
+    position: fixed;
+    bottom: 30px;
+    right: 30px;
+    width: 50px;
+    height: 50px;
+    background: #c47a3a;
+    color: white;
+    border: none;
+    border-radius: 50%;
+    cursor: pointer;
+    font-size: 1.5rem;
+    z-index: 99;
+    transition: 0.3s;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+.scroll-top-btn:hover {
+    background: #a05e2a;
+    transform: translateY(-5px);
+}
+
+/* ========== تأثير fade-up ========== */
+.fade-up {
+    opacity: 0;
+    transform: translateY(30px);
+    transition: opacity 0.7s ease, transform 0.7s ease;
+}
+.fade-up.visible {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+/* ========== قلوب متطايرة ========== */
+.heart-particle {
+    position: fixed;
+    font-size: 1.3rem;
+    pointer-events: none;
+    z-index: 9999;
+    animation: floatHeart 1s ease-out forwards;
+    color: #e94f6f;
+}
+@keyframes floatHeart {
+    0% {
+        opacity: 1;
+        transform: translateY(0) scale(0.8);
+    }
+    100% {
+        opacity: 0;
+        transform: translateY(-120px) scale(1.2);
+    }
+}
+
+/* ========== لا توجد نتائج ========== */
+.no-results {
+    text-align: center;
+    padding: 3rem;
+    background: rgba(245, 236, 217, 0.7);
+    border-radius: 2rem;
+    color: #a67c52;
+}
+
+.back-home {
+    display: inline-block;
+    margin-top: 2rem;
+    text-align: center;
+    width: 100%;
+}
+.back-home a {
+    background: rgba(245, 236, 217, 0.8);
+    backdrop-filter: blur(4px);
+    padding: 10px 25px;
+    border-radius: 40px;
+    color: #8b5e3c;
+    text-decoration: none;
+    font-weight: 500;
+    transition: 0.2s;
+}
+.back-home a:hover {
+    background: #c47a3a;
+    color: white;
+}
+
+/* ========== تجاوب ========== */
+@media (max-width: 768px) {
+    .main-header {
+        flex-direction: column;
+        height: auto;
+        gap: 10px;
+        padding: 10px;
+    }
+    body {
+        padding-top: 130px;
+    }
+    .filter-bar {
+        width: 100%;
+        justify-content: center;
+        flex-wrap: wrap;
+    }
+    .products-grid {
+        grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+    }
+}

@@ -1,0 +1,241 @@
+
+
+           * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Cairo', sans-serif;
+            background: linear-gradient(135deg, #eef5e9 0%, #d4e2c6 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 1.5rem;
+            position: relative;
+        }
+
+        body::before {
+            content: "♡";
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            font-size: 50px;
+            color: #d4e2c6;
+            opacity: 0.15;
+        }
+        body::after {
+
+            position: absolute;
+            bottom: 20px;
+            left: 20px;
+            font-size: 55px;
+            opacity: 0.15;
+        }
+
+        /* البطاقة الشفافة */
+        .card {
+            background: rgba(255, 255, 255, 0.75);
+            backdrop-filter: blur(12px);
+            border-radius: 2rem;
+            box-shadow: 0 25px 45px -12px rgba(0, 0, 0, 0.2);
+            width: 100%;
+            max-width: 480px;
+            padding: 2.5rem 2rem;
+            text-align: center;
+            transition: transform 0.3s ease;
+            border: 1px solid rgba(255, 255, 255, 0.4);
+        }
+
+        .card:hover {
+            transform: translateY(-5px);
+            background: rgba(255, 255, 255, 0.85);
+        }
+
+        .empty-icon {
+            background: rgba(255, 255, 255, 0.5);
+            width: 100px;
+            height: 100px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 1.5rem;
+            border: 1px solid rgba(185, 128, 75, 0.3);
+        }
+        .empty-icon i {
+            font-size: 3.5rem;
+            color: #b9804b;
+        }
+
+        h1 {
+            color: #2c5f2d;
+            font-size: 1.8rem;
+            margin-bottom: 0.8rem;
+        }
+
+        .empty-message {
+            color: #6b8c42;
+            font-size: 1rem;
+            margin-bottom: 2rem;
+            line-height: 1.6;
+        }
+
+        .shop-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.7rem;
+            background: linear-gradient(95deg, #2d5a2c, #528a3a);
+            color: white;
+            text-decoration: none;
+            padding: 0.8rem 2rem;
+            border-radius: 3rem;
+            font-weight: 600;
+            font-size: 1rem;
+            transition: all 0.3s;
+            box-shadow: 0 5px 12px rgba(45, 90, 44, 0.2);
+            border: none;
+            cursor: pointer;
+        }
+
+        .shop-now-btn:hover {
+            background: linear-gradient(95deg, #1f451e, #3f6a2c);
+            transform: scale(1.02);
+            box-shadow: 0 8px 20px rgba(45, 90, 44, 0.3);
+        }
+
+
+        /* أنماط إضافية خاصة بالمنتجات (لن تؤثر على البطاقة الفارغة) */
+        .products-grid {
+            display: grid;
+            justify-content: center;
+            direction: rtl;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 25px;
+            margin-top: 2rem;
+        }
+        .fav-card {
+            background: rgba(255, 255, 255, 0.85);
+            backdrop-filter: blur(8px);
+            border-radius: 1.5rem;
+            overflow: hidden;
+            border: 1px solid rgba(255,255,255,0.3);
+            position: relative;
+            margin:0 auto;
+            width: 100%;
+            
+        }
+        .fav-card:hover {
+            background: rgba(255, 255, 255, 0.95);
+            box-shadow: 0 15px 30px rgba(0,0,0,0.1);
+        }
+        .fav-img {
+            width: 100%;
+            height: 220px;
+            object-fit: cover;
+        }
+        .fav-info {
+            padding: 1rem;
+            text-align: right;
+        }
+        .fav-cat {
+            font-size: 0.75rem;
+            color: #7c0606;
+            font-weight: 600;
+        }
+        .fav-title {
+            font-size: 1.1rem;
+            font-weight: 700;
+            color: #2c5f2d;
+            margin: 5px 0;
+        }
+        .fav-desc {
+            font-size: 0.8rem;
+            color: #5a7a4a;
+            margin-bottom: 0.8rem;
+            line-height: 1.4;
+        }
+        .price-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 0.5rem;
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+        .price {
+            font-weight: bold;
+            color: #438e56;
+            font-size: 1.1rem;
+        }
+        .remove-fav {
+            background: #cb4e4e;
+            color: white;
+            border: none;
+            padding: 6px 14px;
+            border-radius: 30px;
+            cursor: pointer;
+            font-size: 0.75rem;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            transition: 0.2s;
+        }
+        .remove-fav:hover {
+            background: #fb1c1c;
+        }
+        .back-home {
+            display: inline-block;
+            margin-top: 2rem;
+            text-align: center;
+            width: 100%;
+        }
+        .back-home a {
+            background: rgba(255,255,255,0.7);
+            backdrop-filter: blur(4px);
+            padding: 10px 25px;
+            border-radius: 40px;
+            color: #2c5f2d;
+            text-decoration: none;
+            font-weight: 500;
+            transition: 0.2s;
+        }
+        .back-home a:hover {
+            background: #438e56;
+            color: white;
+        }
+        /* إخفاء الشبكة عند عدم الحاجة */
+        .hidden {
+            display: none;
+        }
+
+
+
+        .fade-up {
+    opacity: 0;
+    transform: translateY(30px);
+    transition: opacity 0.8s ease, transform 0.8s ease;
+}
+.fade-up.visible {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+  @media (max-width: 550px) {
+            .glass-card {
+                padding: 1.8rem;
+            }
+            h1 {
+                font-size: 1.5rem;
+            }
+            .empty-icon {
+                width: 75px;
+                height: 75px;
+            }
+            .empty-icon i {
+                font-size: 2.5rem;
+            }
+        }
+   

@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Elixir | طلباتي السابقة</title>
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <link rel="stylesheet" href="orders-history.css">
+</head>
+<body>
+    <div class="glass-card">
+        <h1>طلباتي السابقة</h1>
+        <p class="subtitle">أدخِل رقم هاتفك لعرض طلباتك السابقة</p>
+
+        <div class="phone-form">
+            <input type="tel" id="phoneNumber" placeholder="05xxxxxxxx">
+            <button id="showOrdersBtn">عرض طلباتي</button>
+        </div>
+
+        <div id="ordersResult" class="orders-list">
+        </div>
+        <a href="homepage.html" class="back-link">← العودة إلى الرئيسية</a>
+    </div>
+
+    <script>
+        const ordersDatabase = {
+            "0599123456": [
+                { id: 101, date: "2025-04-10", items: "زيت اللافندر العضوي", quantity: 1, price: 38 },
+                { id: 98, date: "2025-03-28", items: "بكجة الاسترخاء المتكامل", quantity: 1, price: 210 },
+                { id: 95, date: "2025-03-15", items: "عسل طبيعي متعدد الأعشاب", quantity: 2, price: 270 }
+            ],
+            "0598765432": [
+                { id: 102, date: "2025-04-12", items: "زيت الورد النقي", quantity: 1, price: 25 },
+                { id: 99, date: "2025-03-30", items: "صابون الغار", quantity: 3, price: 72 }
+            ]
+        };
+
+        document.getElementById('showOrdersBtn').onclick = function() {
+            const phone = document.getElementById('phoneNumber').value.trim();
+            const resultDiv = document.getElementById('ordersResult');
+
+            if (!phone.match(/^05\d{8}$/)) {
+                resultDiv.innerHTML = '<div class="order-item" style="color:red;">⚠️ الرجاء إدخال رقم جوال صحيح (يبدأ بـ 05 يليه 8 أرقام)</div>';
+                return;
+            }
+
+            const orders = ordersDatabase[phone];
+            if (!orders) {
+                resultDiv.innerHTML = '<div class="order-item">😊 لا توجد طلبات سابقة لهذا الرقم</div>';
+                return;
+            }
+
+            let html = '';
+            for (let order of orders) {
+                html += `<div class="order-item">
+                            <strong>طلب #${order.id}</strong> - تاريخ: ${order.date}<br>
+                            ${order.items} - ${order.quantity} قطعة - ${order.price} ₪
+                         </div>`;
+            }
+            resultDiv.innerHTML = html;
+        };
+    </script>
+</body>
+</html>

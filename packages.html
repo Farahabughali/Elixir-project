@@ -1,0 +1,265 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Elixir | بكجاتنا</title>
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <link rel="stylesheet" href="packages.css">
+</head>
+<body>
+
+<!-- الهيدر -->
+<header>
+    <div class="main-header">
+        <div class="header-right">
+            <a href="homepage.html" style="display: flex; align-items: center; gap: 15px; text-decoration: none;">
+                <div class="logo-circle">
+                    <img src="asset/images/logo.png" alt="Logo">
+                </div>
+                <span class="web-name">Elixir</span>
+            </a>
+            <a href="packages.html" style="display: flex; align-items: center; gap: 15px; text-decoration: none;">
+                <span class="page-title-in-header">البكجات</span>
+            </a>
+        </div>
+        <div class="header-left">
+            <span class="help-text">🎁 اختر البكج المناسب لك</span>
+            <a href="chatbot.html" class="ai-consult-link">
+                <i class="fas fa-robot"></i> استشر الذكاء الاصطناعي
+            </a>
+        </div>
+    </div>
+</header>
+
+<div class="container">
+    <!-- فلتر مميز -->
+    <div class="filter-bar">
+        <span class="filter-label">🔍 اكتشف البكجات:</span>
+        <div class="filter-buttons">
+            <button class="filter-btn active" data-filter="all">الكل</button>
+            <button class="filter-btn" data-filter="نشاط">النشاط والتوازن</button>
+            <button class="filter-btn" data-filter="ورد">جوهر الورد</button>
+            <button class="filter-btn" data-filter="بهارات">عالم البهارات</button>
+            <button class="filter-btn" data-filter="نضارة">النضارة والإشراقة</button>
+            <button class="filter-btn" data-filter="هدوء">الهدوء والتأمل</button>
+            <button class="filter-btn" data-filter="عناية">العناية الفاخرة للبشرة</button>
+            <button class="filter-btn" data-filter="شفاء">الشفاء الطبيعي</button>
+            <button class="filter-btn" data-filter="شعر">العناية بالشعر</button>
+        </div>
+    </div>
+
+    <div class="packages-grid" id="packagesGrid"></div>
+
+    <div class="back-home">
+        <a href="homepage.html"><i class="fas fa-arrow-right"></i> العودة إلى الرئيسية</a>
+    </div>
+</div>
+
+<div id="customToast" class="toast-message">
+    <i class="fas fa-check-circle"></i>
+    <span id="toastText"></span>
+</div>
+
+<button id="scrollTopBtn" class="scroll-top-btn" style="display:none;">
+    <i class="fas fa-arrow-up"></i>
+</button>
+
+<script>
+    const packagesData = [
+        { id: 1, name: "بكج النشاط والتوازن", category: "نشاط", desc: "منتجات تمنحك الطاقة والنشاط، مع زيت النعناع المنعش والعسل الطبيعي وزيت الليمون وإكليل الجبل.", price: 65, img: "asset/images/balance-package.png", bgColor: "#fff3e0", btnColor: "#ef6c00" },
+        { id: 2, name: "بكج جوهر الورد", category: "ورد", desc: "زيت الورد الجوري، ماء الورد، مرطب الورد وبتلات الورد المجففة للعناية الفاخرة.", price: 110, img: "asset/images/roseessence-package.png", bgColor: "#fce4ec", btnColor: "#c2185b" },
+        { id: 3, name: "بكج عالم البهارات", category: "بهارات", desc: "بهارات مشكلة، غارام ماسالا، شاورما وبابريكا – جولة في مطابخ العالم.", price: 45, img: "asset/images/spices-package.jpg", bgColor: "#efebe9", btnColor: "#8d6e63" },
+        { id: 4, name: "بكج النضارة والإشراقة", category: "نضارة", desc: "تونر ماء الورد، صابون زيتون، كريم ورد وزيت لوز حلو لنضارة فائقة.", price: 75, img: "asset/images/freshness-package.jpg", bgColor: "#e0f7fa", btnColor: "#00838f" },
+        { id: 5, name: "بكج الهدوء والتأمل", category: "هدوء", desc: "زيت اللافندر، شاي البابونج، زيت الياسمين وبتلات الورد للاسترخاء العميق.", price: 46, img: "asset/images/calm-package.jpg", bgColor: "#e8eaf6", btnColor: "#3949ab" },
+        { id: 6, name: "بكج العناية الفاخرة للبشرة", category: "عناية", desc: "صابونة طين أبيض، زيت أركان، تونر ماء ورد ومرطب ورد لبشرة فاخرة.", price: 80, img: "asset/images/luxury-package.jpg", bgColor: "#ffe0f0", btnColor: "#d81b60" },
+        { id: 7, name: "بكج الشفاء الطبيعي", category: "شفاء", desc: "عسل أعشاب، زيت حبة سوداء، تونر بابونج وزيت شجرة الشاي للشفاء الطبيعي.", price: 68, img: "asset/images/healing-package.jpg", bgColor: "#e0f2e0", btnColor: "#43a047" },
+        { id: 8, name: "بكج العناية بالشعر", category: "شعر", desc: "زيت إكليل الجبل، زيت جوز الهند، زيت الخروع وزيت الأرجان للعناية الفائقة بالشعر.", price: 85, img: "asset/images/hair-package.jpg", bgColor: "#fef3e8", btnColor: "#c47a3a" }
+    ];
+
+    let currentFilter = "all";
+
+    function renderPackages() {
+        const grid = document.getElementById("packagesGrid");
+        let filtered = packagesData;
+        if (currentFilter !== "all") {
+            filtered = packagesData.filter(pkg => pkg.category === currentFilter);
+        }
+        if (filtered.length === 0) {
+            grid.innerHTML = `<div class="no-results"><i class="fas fa-search"></i> لا توجد بكجات مطابقة للفلتر</div>`;
+            return;
+        }
+        grid.innerHTML = filtered.map(pkg => {
+            let isFav = false;
+            let favorites = JSON.parse(localStorage.getItem('elixir_favorites')) || [];
+            if (favorites.includes(pkg.id)) isFav = true;
+            return `
+            <div class="package-card" data-category="${pkg.category}" data-id="${pkg.id}" style="background: ${pkg.bgColor}; border-bottom: 4px solid ${pkg.btnColor};">
+                <div class="fav-icon ${isFav ? 'active' : ''}" data-id="${pkg.id}">
+                    <i class="fa-${isFav ? 'solid' : 'regular'} fa-heart"></i>
+                </div>
+                <img class="package-img" src="${pkg.img}" alt="${pkg.name}" onerror="this.src='asset/images/placeholder.png'">
+                <div class="package-info">
+                    <div class="package-title">${pkg.name}</div>
+                    <div class="package-desc">${pkg.desc}</div>
+                    <div class="price-row">
+                        <span class="price">${pkg.price} ₪</span>
+                        <div class="btn-group">
+                            <button class="view-details" data-id="${pkg.id}" data-name="${pkg.name}">📄 عرض التفاصيل</button>
+                            <button class="add-package-cart" data-id="${pkg.id}" data-name="${pkg.name}" data-price="${pkg.price}" data-img="${pkg.img}" style="background: ${pkg.btnColor};">🛒 إضافة إلى السلة</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            `;
+        }).join('');
+        
+        // ربط أحداث القلب
+        document.querySelectorAll('.fav-icon').forEach(icon => {
+            icon.addEventListener('click', (e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                const productId = parseInt(icon.getAttribute('data-id'));
+                const rect = icon.getBoundingClientRect();
+                burstHearts(rect.left + rect.width / 2, rect.top + rect.height / 2);
+                updateFavorite(icon, productId);
+            });
+        });
+        
+        // ربط أزرار الإضافة إلى السلة
+        document.querySelectorAll('.add-package-cart').forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                const name = btn.getAttribute('data-name');
+                addToCartPackage(btn);
+            });
+        });
+        
+        // ربط أزرار عرض التفاصيل
+        document.querySelectorAll('.view-details').forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                const id = btn.getAttribute('data-id');
+                window.location.href = `package-details.html?id=${id}`;
+            });
+        });
+    }
+
+    function addToCartPackage(btn) {
+        let cart = JSON.parse(localStorage.getItem('elixir_cart')) || [];
+        const id = parseInt(btn.getAttribute('data-id'));
+        const name = btn.getAttribute('data-name');
+        const price = parseFloat(btn.getAttribute('data-price'));
+        const img = btn.getAttribute('data-img');
+        const existing = cart.find(item => item.id === id);
+        if (existing) existing.quantity++;
+        else cart.push({ id, name, price, img, quantity: 1 });
+        localStorage.setItem('elixir_cart', JSON.stringify(cart));
+        updateCartBadge();
+        showToast(`✅ تمت إضافة ${name} بنجاح، يتمنى ${name} أن ينال إعجابكم 😊`);
+    }
+
+    function updateCartBadge() {
+        const cart = JSON.parse(localStorage.getItem('elixir_cart')) || [];
+        const total = cart.reduce((sum, item) => sum + item.quantity, 0);
+        const badge = document.querySelector('.cart-count');
+        if (badge) badge.innerText = total;
+    }
+
+    function updateFavorite(icon, productId) {
+        let favorites = JSON.parse(localStorage.getItem('elixir_favorites')) || [];
+        const index = favorites.indexOf(productId);
+        if (index === -1) {
+            favorites.push(productId);
+            icon.classList.add('active');
+            icon.innerHTML = '<i class="fa-solid fa-heart"></i>';
+        } else {
+            favorites.splice(index, 1);
+            icon.classList.remove('active');
+            icon.innerHTML = '<i class="fa-regular fa-heart"></i>';
+        }
+        localStorage.setItem('elixir_favorites', JSON.stringify(favorites));
+        const favCount = document.querySelector('.favorite-count');
+        if (favCount) favCount.innerText = favorites.length;
+    }
+
+    function burstHearts(x, y) {
+        for (let i = 0; i < 10; i++) {
+            const heart = document.createElement('div');
+            heart.innerHTML = '❤️';
+            heart.classList.add('heart-particle');
+            const offsetX = (Math.random() - 0.5) * 50;
+            const offsetY = (Math.random() - 0.5) * 40;
+            heart.style.left = (x + offsetX) + 'px';
+            heart.style.top = (y + offsetY) + 'px';
+            heart.style.animationDelay = (Math.random() * 0.2) + 's';
+            document.body.appendChild(heart);
+            setTimeout(() => heart.remove(), 1000);
+        }
+    }
+
+    function showToast(message) {
+        const toast = document.getElementById('customToast');
+        const toastText = document.getElementById('toastText');
+        toastText.innerHTML = message;
+        toast.style.display = 'flex';
+        setTimeout(() => {
+            toast.style.display = 'none';
+        }, 3000);
+    }
+
+    // فلترة
+    document.querySelectorAll('.filter-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+            document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+            currentFilter = btn.getAttribute('data-filter');
+            renderPackages();
+        });
+    });
+
+    // تأثير تغيير لون الخلفية مع hover على البطاقة
+    const body = document.body;
+    const originalBg = window.getComputedStyle(body).background;
+
+    function setBodyColor(color) {
+        body.style.transition = "background 0.4s ease";
+        body.style.background = color;
+    }
+
+    function resetBodyColor() {
+        body.style.transition = "background 0.4s ease";
+        body.style.background = originalBg;
+    }
+
+    document.addEventListener('mouseover', (e) => {
+        const card = e.target.closest('.package-card');
+        if (card) {
+            const bgColor = window.getComputedStyle(card).backgroundColor;
+            setBodyColor(bgColor);
+        }
+    });
+
+    document.addEventListener('mouseout', (e) => {
+        const card = e.target.closest('.package-card');
+        if (!card) resetBodyColor();
+    });
+
+    // زر الرجوع للأعلى
+    const scrollBtn = document.getElementById('scrollTopBtn');
+    window.addEventListener('scroll', () => {
+        if (window.scrollY > 300) scrollBtn.style.display = 'flex';
+        else scrollBtn.style.display = 'none';
+    });
+    scrollBtn.addEventListener('click', () => {
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+    });
+
+    updateCartBadge();
+    renderPackages();
+</script>
+</body>
+</html>
