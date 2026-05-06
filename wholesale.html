@@ -15,12 +15,12 @@
     <div class="main-header">
         <div class="header-right">
             <div class="header-icons">
-                <a href="favorite.html" class="icon-btn favorite-icon">
-                    <span class="favorite-count">0</span>
+                <a href="wholesale-favorite.html" class="icon-btn">
+                    <span class="wholesale-fav-count" id="wholesaleFavCount">0</span>
                     <i class="fa-regular fa-heart"></i>
                 </a>
                 <div class="cart-wrapper">
-                    <a href="cart.html" class="icon-btn cart-icon">
+                    <a href="wholesale-cart.html" class="icon-btn cart-icon">
                         <span class="cart-count">0</span>
                         <i class="fa-solid fa-cart-shopping"></i>
                     </a>
@@ -41,13 +41,13 @@
         </div>
 
         <div class="header-left">
-            <button class="purchase-history-btn" onclick="window.location.href='purchase-history.html'">سجل المشتريات</button>
+            <button class="purchase-history-btn" onclick="window.location.href='orders-history.html'">سجل المشتريات</button>
         </div>
     </div>
 </header>
+<br><br>
 
 <div class="container">
-    <!-- فلتر الفئات -->
     <div class="filter-bar">
         <span class="filter-label"> اختر الفئة:</span>
         <div class="filter-buttons">
@@ -75,71 +75,115 @@
     <i class="fas fa-arrow-up"></i>
 </button>
 
+<link rel="stylesheet" href="wholesale-cart.css">
+<script src="wholesale-cart.js"></script>
+
 <script>
-    // ========== منتجات الجملة (مأخوذة من الكود الفعلي مع سعر جملة مخفض) ==========
+    // ========== منتجات الجملة ==========
     const wholesaleProducts = {
         herbs: [
-            { id: 101, name: "البابونج", retail: 12, wholesale: 9, img: "asset/images/chamomileherb.jpg", category: "herbs" },
+            { id: 101, name: "البابونج", retail: 12, wholesale: 9, img: "asset/images/chamomileherb.jpg", category: "herbs"  },
             { id: 102, name: "الزعتر", retail: 14, wholesale: 11, img: "asset/images/thymeherb.jpg", category: "herbs" },
-            { id: 103, name: "المريمية", retail: 15, wholesale: 12, img: "asset/images/sageherb.jpg", category: "herbs" },
-            { id: 104, name: "الحبة السوداء", retail: 18, wholesale: 14, img: "asset/images/blackseedherb.jpg", category: "herbs" },
-            { id: 105, name: "اليانسون", retail: 11, wholesale: 8, img: "asset/images/anise.jpg", category: "herbs" },
+            { id: 103, name: "المريمية", retail: 15, wholesale: 12, img: "asset/images/sageherb.jpg", category: "herbs"},
+            { id: 104, name: "الحبة السوداء", retail: 18, wholesale: 14, img: "asset/images/blackseedherb.jpg", category: "herbs"},
+            { id: 105, name: "اليانسون", retail: 11, wholesale: 8, img: "asset/images/anise.jpg", category: "herbs"},
             { id: 106, name: "الكركديه", retail: 9, wholesale: 7, img: "asset/images/hibiscus.jpg", category: "herbs" },
-            { id: 107, name: "الزنجبيل", retail: 12, wholesale: 9, img: "asset/images/ginger.jpg", category: "herbs" },
+            { id: 107, name: "الزنجبيل", retail: 12, wholesale: 9, img: "asset/images/ginger.jpg", category: "herbs"},
             { id: 108, name: "القرفة", retail: 10, wholesale: 7, img: "asset/images/cinnamon.jpg", category: "herbs" },
             { id: 109, name: "البردقوش", retail: 13, wholesale: 10, img: "asset/images/marjoram.jpg", category: "herbs" },
-            { id: 110, name: "الشمر", retail: 11, wholesale: 8, img: "asset/images/fennel.jpg", category: "herbs" },
+            { id: 110, name: "الشمر", retail: 11, wholesale: 8, img: "asset/images/fennel.jpg", category: "herbs"},
             { id: 111, name: "العرقسوس", retail: 9, wholesale: 7, img: "asset/images/licorice.jpg", category: "herbs" },
-            { id: 112, name: "القراص", retail: 10, wholesale: 8, img: "asset/images/nettle.jpg", category: "herbs" }
+            { id: 112, name: "القراص", retail: 10, wholesale: 8, img: "asset/images/nettle.jpg", category: "herbs"}
         ],
         oils: [
             { id: 201, name: "زيت اللافندر العطري", retail: 18, wholesale: 14, img: "asset/images/lavender.jpg", category: "oils" },
             { id: 202, name: "زيت الورد الجوري", retail: 55, wholesale: 45, img: "asset/images/rose.jpg", category: "oils" },
             { id: 203, name: "زيت إكليل الجبل", retail: 22, wholesale: 17, img: "asset/images/rosemaryoil.png", category: "oils" },
             { id: 204, name: "زيت شجرة الشاي", retail: 19, wholesale: 15, img: "asset/images/teatree.jpg", category: "oils" },
-            { id: 205, name: "زيت النعناع الفلفلي", retail: 15, wholesale: 12, img: "asset/images/peppermint.jpg", category: "oils" },
-            { id: 206, name: "زيت الياسمين", retail: 20, wholesale: 16, img: "asset/images/jasmine-oil.png", category: "oils" },
+            { id: 205, name: "زيت النعناع الفلفلي", retail: 15, wholesale: 12, img: "asset/images/peppermint.jpg", category: "oils"},
+            { id: 206, name: "زيت الياسمين", retail: 20, wholesale: 16, img: "asset/images/jasmine-oil.png", category: "oils"},
             { id: 207, name: "زيت البابونج", retail: 20, wholesale: 16, img: "asset/images/chamomileoil.png", category: "oils" },
-            { id: 208, name: "زيت البرتقال الحلو", retail: 16, wholesale: 12, img: "asset/images/orangeoil.jpg", category: "oils" },
-            { id: 209, name: "زيت الليمون", retail: 15, wholesale: 12, img: "asset/images/lemon.jpg", category: "oils" },
-            { id: 210, name: "زيت الزيتون البكر الفلسطيني", retail: 20, wholesale: 16, img: "asset/images/olive.jpg", category: "oils" },
+            { id: 208, name: "زيت البرتقال الحلو", retail: 16, wholesale: 12, img: "asset/images/orangeoil.jpg", category: "oils"},
+            { id: 209, name: "زيت الليمون", retail: 15, wholesale: 12, img: "asset/images/lemon.jpg", category: "oils"},
+            { id: 210, name: "زيت الزيتون البكر", retail: 20, wholesale: 16, img: "asset/images/olive.jpg", category: "oils"},
             { id: 211, name: "زيت اللوز الحلو", retail: 18, wholesale: 14, img: "asset/images/almondoil.png", category: "oils" },
-            { id: 212, name: "زيت جوز الهند العضوي", retail: 16, wholesale: 12, img: "asset/images/coconut.jpg", category: "oils" }
+            { id: 212, name: "زيت جوز الهند", retail: 16, wholesale: 12, img: "asset/images/coconut.jpg", category: "oils"}
         ],
         spices: [
-            { id: 301, name: "بهارات مشكلة (عربية)", retail: 12, wholesale: 9, img: "asset/images/spice-mix.jpg", category: "spices" },
-            { id: 302, name: "بهارات غارام ماسالا", retail: 22, wholesale: 17, img: "asset/images/garam-masala.jpg", category: "spices" },
+            { id: 301, name: "بهارات مشكلة", retail: 12, wholesale: 9, img: "asset/images/spice-mix.jpg", category: "spices" },
+            { id: 302, name: "غارام ماسالا", retail: 22, wholesale: 17, img: "asset/images/garam-masala.jpg", category: "spices" },
             { id: 303, name: "بهارات شاورما", retail: 12, wholesale: 9, img: "asset/images/shawarma-spice.jpg", category: "spices" },
-            { id: 304, name: "بابريكا", retail: 9, wholesale: 7, img: "asset/images/paprika.jpg", category: "spices" },
+            { id: 304, name: "بابريكا", retail: 9, wholesale: 7, img: "asset/images/paprika.jpg", category: "spices"},
             { id: 305, name: "كركم", retail: 9, wholesale: 7, img: "asset/images/turmeric-spice.jpg", category: "spices" },
-            { id: 306, name: "فلفل أسود مطحون", retail: 8, wholesale: 6, img: "asset/images/black-pepper.jpg", category: "spices" },
-            { id: 307, name: "كمون", retail: 7, wholesale: 5, img: "asset/images/cumin-spice.jpg", category: "spices" },
-            { id: 308, name: "كزبرة جافة مطحونة", retail: 6, wholesale: 4, img: "asset/images/coriander-spice.jpg", category: "spices" },
-            { id: 309, name: "هيل (حبهان)", retail: 25, wholesale: 20, img: "asset/images/cardamom-spice.jpg", category: "spices" },
-            { id: 310, name: "قرنفل", retail: 12, wholesale: 9, img: "asset/images/clove-spice.jpg", category: "spices" },
-            { id: 311, name: "زنجبيل مطحون", retail: 10, wholesale: 8, img: "asset/images/ginger-spice.jpg", category: "spices" },
-            { id: 312, name: "قرفة مطحونة", retail: 10, wholesale: 8, img: "asset/images/cinnamon-spice.jpg", category: "spices" }
+            { id: 306, name: "فلفل أسود", retail: 8, wholesale: 6, img: "asset/images/black-pepper.jpg", category: "spices"},
+            { id: 307, name: "كمون", retail: 7, wholesale: 5, img: "asset/images/cumin-spice.jpg", category: "spices"},
+            { id: 308, name: "كزبرة", retail: 6, wholesale: 4, img: "asset/images/coriander-spice.jpg", category: "spices" },
+            { id: 309, name: "هيل", retail: 25, wholesale: 20, img: "asset/images/cardamom-spice.jpg", category: "spices"},
+            { id: 310, name: "قرنفل", retail: 12, wholesale: 9, img: "asset/images/clove-spice.jpg", category: "spices"},
+            { id: 311, name: "زنجبيل مطحون", retail: 10, wholesale: 8, img: "asset/images/ginger-spice.jpg", category: "spices"},
+            { id: 312, name: "قرفة مطحونة", retail: 10, wholesale: 8, img: "asset/images/cinnamon-spice.jpg", category: "spices"}
         ],
         care: [
-            { id: 401, name: "صابون زيت الزيتون الطبيعي", retail: 18, wholesale: 14, img: "asset/images/olive-soap.jpg", category: "care" },
+            { id: 401, name: "صابون زيت الزيتون", retail: 18, wholesale: 14, img: "asset/images/olive-soap.jpg", category: "care"},
             { id: 402, name: "صابونة الفحم النشط", retail: 22, wholesale: 17, img: "asset/images/charcoal-soap.jpg", category: "care" },
-            { id: 403, name: "الصابون الأفريقي الأسود التقليدي", category: "صابون", desc: "صابون طبيعي عضوي يصنع يدوياً من مواد خام من أفريقيا، يعتبر غذاءً متكاملاً للبشرة والشعر.", price: 28, rating: 4.9, img: "asset/images/african-soap.jpg" },
-            { id: 404, name: "صابون العسل الطبيعي", retail: 20, wholesale: 16, img: "asset/images/honey-soap.jpg", category: "care" },
-            { id: 405, name: "صابون الصبار الطبيعي", retail: 21, wholesale: 17, img: "asset/images/aloe-soap.jpg", category: "care" },
+            { id: 403, name: "الصابون الأفريقي", retail: 28, wholesale: 22, img: "asset/images/african-soap.jpg", category: "care" },
+            { id: 404, name: "صابون العسل", retail: 20, wholesale: 16, img: "asset/images/honey-soap.jpg", category: "care" },
+            { id: 405, name: "صابون الصبار", retail: 21, wholesale: 17, img: "asset/images/aloe-soap.jpg", category: "care"},
             { id: 406, name: "زبدة الشيا", retail: 30, wholesale: 24, img: "asset/images/shea-butter.jpg", category: "care" },
-            { id: 407, name: "كريم الورد المركز", retail: 28, wholesale: 22, img: "asset/images/rose-cream.jpg", category: "care" },
-            { id: 408, name: "جل الصبار (الألوفيرا)", retail: 18, wholesale: 14, img: "asset/images/aloe-gel.jpg", category: "care" },
-            { id: 409, name: "ماء الورد المقطر الطبيعي", retail: 15, wholesale: 12, img: "asset/images/rose-water.jpg", category: "care" },
-            { id: 410, name: "الليفة المغربية الأصلية", retail: 25, wholesale: 20, img: "asset/images/moroccan-loofah.png", category: "care" },
-            { id: 411, name: "طين الغسول المغربي الطبيعي", retail: 20, wholesale: 16, img: "asset/images/ghassoul-clay.jpg", category: "care" },
-            { id: 412, name: "صابون فيتامين سي المبيّضة", category: "صابون", price: 25, rating: 4.8, img: "asset/images/vitc-soap.jpg" },
-          { id: 414, name: "مقشر السكر بالورد وزيت جوز الهند", category: "مقشر", price: 22, rating: 4.9, img: "asset/images/rose-scrub.jpg" },
-
+            { id: 407, name: "كريم الورد", retail: 28, wholesale: 22, img: "asset/images/rose-cream.jpg", category: "care" },
+            { id: 408, name: "جل الصبار", retail: 18, wholesale: 14, img: "asset/images/aloe-gel.jpg", category: "care" },
+            { id: 409, name: "ماء الورد", retail: 15, wholesale: 12, img: "asset/images/rose-water.jpg", category: "care"},
+            { id: 410, name: "الليفة المغربية", retail: 25, wholesale: 20, img: "asset/images/moroccan-loofah.png", category: "care" },
+            { id: 411, name: "طين الغسول", retail: 20, wholesale: 16, img: "asset/images/ghassoul-clay.jpg", category: "care" },
+            { id: 412, name: "صابون فيتامين سي", retail: 25, wholesale: 20, img: "asset/images/vitc-soap.jpg", category: "care"},
+            { id: 414, name: "مقشر السكر بالورد", retail: 22, wholesale: 17, img: "asset/images/rose-scrub.jpg", category: "care" }
         ]
     };
 
     let currentFilter = "all";
 
+    // ========== دوال المفضلة (جديدة) ==========
+    function updateWholesaleBadges() {
+        const fav = JSON.parse(localStorage.getItem('elixir_wholesale_favorites') || '[]');
+        const favBadge = document.getElementById('wholesaleFavCount');
+        if (favBadge) favBadge.innerText = fav.length;
+    }
+
+    function burstWholesaleHearts(x, y) {
+        for (let i = 0; i < 12; i++) {
+            const heart = document.createElement('div');
+            heart.innerHTML = '❤️';
+            heart.classList.add('wholesale-heart-particle');
+            const offsetX = (Math.random() - 0.5) * 60;
+            const offsetY = (Math.random() - 0.5) * 50;
+            heart.style.left = (x + offsetX) + 'px';
+            heart.style.top = (y + offsetY) + 'px';
+            heart.style.animationDelay = (Math.random() * 0.2) + 's';
+            document.body.appendChild(heart);
+            setTimeout(() => heart.remove(), 1000);
+        }
+    }
+
+    function toggleWholesaleFavorite(icon, productId) {
+        const rect = icon.getBoundingClientRect();
+        burstWholesaleHearts(rect.left + rect.width / 2, rect.top + rect.height / 2);
+        
+        let favorites = JSON.parse(localStorage.getItem('elixir_wholesale_favorites') || '[]');
+        const index = favorites.indexOf(productId);
+        if (index === -1) {
+            favorites.push(productId);
+            icon.classList.add('active');
+            icon.innerHTML = '<i class="fa-solid fa-heart"></i>';
+        } else {
+            favorites.splice(index, 1);
+            icon.classList.remove('active');
+            icon.innerHTML = '<i class="fa-regular fa-heart"></i>';
+        }
+        localStorage.setItem('elixir_wholesale_favorites', JSON.stringify(favorites));
+        updateWholesaleBadges();
+    }
+
+    // ========== عرض المنتجات ==========
     function renderProducts() {
         const grid = document.getElementById("wholesaleGrid");
         let allProducts = [];
@@ -160,31 +204,50 @@
             return;
         }
 
+        let favorites = JSON.parse(localStorage.getItem('elixir_wholesale_favorites') || '[]');
+
         grid.innerHTML = allProducts.map(product => {
             let categoryText = "";
             switch(product.category) {
-                case "herbs": categoryText = " أعشاب طبيعية"; break;
-                case "oils": categoryText = " زيوت طبيعية"; break;
-                case "spices": categoryText = " بهارات"; break;
-                case "care": categoryText = " عناية شخصية & ورد"; break;
+                case "herbs": categoryText = "🌿 أعشاب طبيعية"; break;
+                case "oils": categoryText = "💧 زيوت طبيعية"; break;
+                case "spices": categoryText = "🧂 بهارات"; break;
+                case "care": categoryText = "🌸 عناية شخصية & ورد"; break;
             }
+            let isFav = favorites.includes(product.id);
             return `
             <div class="wholesale-card" data-id="${product.id}">
+                <div class="wholesale-fav-icon ${isFav ? 'active' : ''}" data-id="${product.id}">
+                    <i class="fa-${isFav ? 'solid' : 'regular'} fa-heart"></i>
+                </div>
                 <img class="wholesale-img" src="${product.img}" alt="${product.name}" onerror="this.src='asset/images/placeholder.png'">
                 <div class="wholesale-info">
                     <div class="wholesale-cat">${categoryText}</div>
                     <div class="wholesale-title">${product.name}</div>
+                    <div class="wholesale-desc">${product.desc || ''}</div>
                     <div class="price-row">
                         <span class="old-price">${product.retail} ₪</span>
                         <span class="wholesale-price">${product.wholesale} ₪ (جملة)</span>
                     </div>
-                    <button class="add-wholesale-cart" data-id="${product.id}" data-name="${product.name}" data-price="${product.wholesale}" data-img="${product.img}">🛒 إضافة إلى سلة الجملة</button>
+                    <div class="wholesale-actions">
+                        <button class="view-details-btn" data-id="${product.id}">📄 عرض التفاصيل</button>
+                        <button class="add-wholesale-cart" data-id="${product.id}" data-name="${product.name}" data-price="${product.wholesale}" data-img="${product.img}">🛒 إضافة إلى السلة</button>
+                    </div>
                 </div>
             </div>
             `;
         }).join('');
 
-        // ربط أزرار الإضافة
+        // ربط أحداث القلب (المفضلة)
+        document.querySelectorAll('.wholesale-fav-icon').forEach(icon => {
+            icon.addEventListener('click', (e) => {
+                e.stopPropagation();
+                const id = parseInt(icon.getAttribute('data-id'));
+                toggleWholesaleFavorite(icon, id);
+            });
+        });
+
+        // ربط أزرار الإضافة (السلة - موجودة سابقاً)
         document.querySelectorAll('.add-wholesale-cart').forEach(btn => {
             btn.addEventListener('click', (e) => {
                 e.preventDefault();
@@ -196,8 +259,20 @@
                 showToast(`✅ تمت إضافة ${name} إلى سلة الجملة`);
             });
         });
+
+        // ربط أزرار عرض التفاصيل
+        document.querySelectorAll('.view-details-btn').forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                e.preventDefault();
+                const id = btn.getAttribute('data-id');
+                window.location.href = `product-details.html?id=${id}`;
+            });
+        });
+
+        if (window.applyFadeToWholesaleCards) window.applyFadeToWholesaleCards();
     }
 
+    // ========== دوال السلة (موجودة سابقاً ولم نغيرها) ==========
     function addToWholesaleCart(id, name, price, img) {
         let cart = JSON.parse(localStorage.getItem('elixir_wholesale_cart')) || [];
         const existing = cart.find(item => item.id === id);
@@ -234,6 +309,24 @@
         });
     });
 
+    // تأثير Fade-up
+    (function() {
+        const elements = document.querySelectorAll('.wholesale-card');
+        elements.forEach(el => el.classList.add('fade-up'));
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) entry.target.classList.add('visible');
+            });
+        }, { threshold: 0.1 });
+        elements.forEach(el => observer.observe(el));
+        window.applyFadeToWholesaleCards = function() {
+            document.querySelectorAll('.wholesale-card:not(.fade-up)').forEach(card => {
+                card.classList.add('fade-up');
+                observer.observe(card);
+            });
+        };
+    })();
+
     // زر الرجوع للأعلى
     const scrollBtn = document.getElementById('scrollTopBtn');
     window.addEventListener('scroll', () => {
@@ -245,6 +338,7 @@
     });
 
     updateWholesaleCartBadge();
+    updateWholesaleBadges();
     renderProducts();
 </script>
 </body>

@@ -62,46 +62,49 @@
     <i class="fas fa-arrow-up"></i>
 </button>
 
+<link rel="stylesheet" href="floating-cart.css">
+<script src="floating-cart.js"></script>
+
 <script>
-    // بيانات الأعشاب
+    // بيانات الأعشاب (نفس البيانات مع إزالة التكرارات)
     const herbsData = [
-    { id: 1, name: "عسل طبيعي متعدد الأعشاب", category: "طبية", desc: "يعتبر مضاداً طبيعياً للأكسدة والبكتيريا، مما يساعد في تقوية الجسم", price: 12, rating: 4.7, img: "asset/images/herbalhoney.png" },
-    { id: 2, name: "البابونج", category: "طبية", desc: "مهدئ طبيعي، يساعد على الاسترخاء والنوم، مفيد للجهاز الهضمي", price: 12, rating: 4.7, img: "asset/images/chamomileherb.jpg" },
-    { id: 3, name: "النعناع الفلفلي", category: "عطرية", desc: "منعش، يخفف عسر الهضم والصداع، يمنح طاقة", price: 10, rating: 4.8, img: "asset/images/peppermintherb.jpg" },
-    { id: 4, name: "الزعتر", category: "طبية", desc: "مضاد للسعال والتهاب الحلق، يقوي المناعة", price: 14, rating: 4.6, img: "asset/images/thymeherb.jpg" },
-    { id: 5, name: "المريمية", category: "طبية", desc: "تخفف التعرق الليلي وأعراض سن اليأس، مضادة للالتهابات", price: 15, rating: 4.7, img: "asset/images/sageherb.jpg" },
-    { id: 6, name: "إكليل الجبل", category: "عطرية", desc: "يحسن الذاكرة، ينشط الدورة الدموية، يقوي الشعر", price: 13, rating: 4.9, img: "asset/images/rosemary.png" },
-    { id: 7, name: "اللافندر", category: "عطرية", desc: "مهدئ للأعصاب، يساعد على النوم العميق، يخفف التوتر", price: 16, rating: 4.8, img: "asset/images/lavenderherb.jpg" },
-    { id: 8, name: "الحبة السوداء", category: "طبية", desc: "تقوي المناعة، تعالج مشاكل الجلد والشعر، مضادة للالتهابات", price: 18, rating: 4.9, img: "asset/images/blackseedherb.jpg" },
-    { id: 9, name: " اليانسون النجمي", category: "طبية", desc: "مفيد للجهاز الهضمي، يخفف المغص والانتفاخات، مدر للحليب", price: 11, rating: 4.5, img: "asset/images/anise.jpg" },
-    { id: 10, name: "الكركديه", category: "خلطات", desc: "يخفض ضغط الدم، غني بمضادات الأكسدة، منعش", price: 9, rating: 4.6, img: "asset/images/hibiscus.jpg" },
-    { id: 11, name: "الزنجبيل", category: "خلطات", desc: "مضاد للغثيان، يخفف آلام المفاصل، يعزز المناعة", price: 12, rating: 4.7, img: "asset/images/ginger.jpg" },
-    { id: 12, name: "القرفة", category: "خلطات", desc: "تنظم سكر الدم، مضادة للأكسدة، تحسن الهضم", price: 10, rating: 4.8, img: "asset/images/cinnamon.jpg" },
-    { id: 13, name: "البردقوش", category: "طبية", desc: "مهدئ للأعصاب، يساعد على الهضم， مفيد للنساء", price: 13, rating: 4.5, img: "asset/images/marjoram.jpg" },
-    { id: 13, name: "الشمر", category: "طبية", desc: "مفيد للهضم، يخفف الانتفاخات، مدر للحليب", price: 11, rating: 4.6, img: "asset/images/fennel.jpg" },
-    { id: 14, name: "العرقسوس", category: "طبية", desc: "ملين للمعدة، يخفف السعال، مفيد للجهاز التنفسي", price: 9, rating: 4.4, img: "asset/images/licorice.jpg" },
-    { id: 15, name: "الخطمية", category: "طبية", desc: "ملطف للحلق، مضاد للسعال، مفيد للجهاز التنفسي", price: 12, rating: 4.5, img: "asset/images/marshmallow.jpg" },
-    { id: 16, name: "القراص", category: "طبية", desc: "مضاد للحساسية، غني بالحديد، مفيد للشعر", price: 10, rating: 4.6, img: "asset/images/nettle.jpg" },
-    { id: 17, name: "الجنكة بيلوبا", category: "طبية", desc: "يحسن الذاكرة والتركيز، ينشط الدورة الدموية الدماغية", price: 22, rating: 4.8, img: "asset/images/ginkgo.jpg" },
-    { id: 18, name: "الاشواغاندا", category: "طبية", desc: "مكيف طبيعي، يقلل التوتر والقلق، يعزز الطاقة", price: 25, rating: 4.9, img: "asset/images/ashwagandha.jpg" },
-    { id: 19, name: "الريحان المقدس", category: "عطرية", desc: "مضاد للإجهاد، يعزز المناعة، مفيد للجهاز التنفسي", price: 14, rating: 4.7, img: "asset/images/holybasil.jpg" },
-    { id: 20, name: "البقدونس", category: "خلطات", desc: "مدر للبول، غني بالفيتامينات، مفيد للكلى", price: 6, rating: 4.5, img: "asset/images/parsley.jpg" },
-    { id: 21, name: "الكزبرة", category: "خلطات", desc: "مضادة للأكسدة، تساعد على الهضم، تخفض الكوليسترول", price: 8, rating: 4.6, img: "asset/images/coriander.jpg" },
-    { id: 22, name: "الحلبة", category: "طبية", desc: "مفيدة للرضاعة، تنظم السكر، تقوي الشعر", price: 10, rating: 4.7, img: "asset/images/fenugreek.jpg" },
-    { id: 24, name: "المليسا", category: "عطرية", desc: "مضادة للقلق، تحسن المزاج، تساعد على النوم", price: 15, rating: 4.7, img: "asset/images/lemonbalm.jpg" },
-    { id: 25, name: "الزوفا", category: "طبية", desc: "مقشع، مضاد للسعال، مفيد للجهاز التنفسي", price: 12, rating: 4.5, img: "asset/images/hyssop.jpg" },
-    { id: 26, name: "الآس", category: "عطرية", desc: "معطر طبيعي، قابض، مفيد للبشرة", price: 14, rating: 4.6, img: "asset/images/myrtle.jpg" },
-    { id: 29, name: "الأقحوان", category: "طبية", desc: "يخفض الحرارة، مفيد للعينين، مهدئ", price: 11, rating: 4.5, img: "asset/images/chrysanthemum.jpg" },
-    { id: 30, name: "القرنفل", category: "خلطات", desc: "مسكن لآلام الأسنان، مضاد للالتهابات", price: 9, rating: 4.6, img: "asset/images/cloveherb.jpg" },
-    { id: 31, name: "الهيل", category: "خلطات", desc: "منعش للفم، مفيد للهضم، مضاد للأكسدة", price: 20, rating: 4.7, img: "asset/images/cardamomherb.jpg" },
-    { id: 32, name: "الكركم", category: "خلطات", desc: "مضاد قوي للالتهابات، غني بمضادات الأكسدة", price: 15, rating: 4.9, img: "asset/images/turmeric.jpg" },
-    { id: 34, name: "الجنسنغ", category: "طبية", desc: "مقوي عام، يزيد الطاقة، يحسن الأداء الذهني", price: 35, rating: 4.9, img: "asset/images/ginseng.jpg" },
-    { id: 35, name: "الإخناسيا", category: "طبية", desc: "مقوي للمناعة، يقي من نزلات البرد", price: 22, rating: 4.8, img: "asset/images/echinacea.jpg" },
-    { id: 36, name: "القطيفة", category: "طبية", desc: "مضادة للالتهابات، تهدئ البشرة، مفيدة للجروح", price: 13, rating: 4.6, img: "asset/images/calendula.jpg" },
-    { id: 37, name: "الريحان", category: "عطرية", desc: "مضاد للتوتر، يحسن المزاج، مفيد للجهاز الهضمي", price: 12, rating: 4.7, img: "asset/images/basil.jpg" },
-    { id: 38, name: "الزعفران", category: "خلطات", desc: "مضاد للاكتئاب، يحسن المزاج، غني بمضادات الأكسدة", price: 50, rating: 4.9, img: "asset/images/saffron.jpg" },
-    { id: 39, name: "الكمون", category: "خلطات", desc: "يساعد على الهضم، مضاد للأكسدة، يخفض الكوليسترول", price: 8, rating: 4.6, img: "asset/images/cumin.jpg" },
-    { id: 40, name: "القرطم", category: "طبية", desc: "مضاد للالتهابات، مفيد للقلب والشرايين", price: 18, rating: 4.7, img: "asset/images/safflower.jpg" }
+        { id: 1, name: "عسل طبيعي متعدد الأعشاب", category: "طبية", desc: "يعتبر مضاداً طبيعياً للأكسدة والبكتيريا، مما يساعد في تقوية الجسم", price: 12, rating: 4.7, img: "asset/images/herbalhoney.png" },
+        { id: 2, name: "عشبة البابونج", category: "طبية", desc: "مهدئ طبيعي، يساعد على الاسترخاء والنوم، مفيد للجهاز الهضمي", price: 12, rating: 4.7, img: "asset/images/chamomileherb.jpg" },
+        { id: 3, name: "عشبة النعناع الفلفلي", category: "عطرية", desc: "منعش، يخفف عسر الهضم والصداع، يمنح طاقة", price: 10, rating: 4.8, img: "asset/images/peppermintherb.jpg" },
+        { id: 4, name: "عشبة الزعتر", category: "طبية", desc: "مضاد للسعال والتهاب الحلق، يقوي المناعة", price: 14, rating: 4.6, img: "asset/images/thymeherb.jpg" },
+        { id: 5, name: "عشبة المريمية", category: "طبية", desc: "تخفف التعرق الليلي وأعراض سن اليأس، مضادة للالتهابات", price: 15, rating: 4.7, img: "asset/images/sageherb.jpg" },
+        { id: 6, name: "إكليل الجبل", category: "عطرية", desc: "يحسن الذاكرة، ينشط الدورة الدموية، يقوي الشعر", price: 13, rating: 4.9, img: "asset/images/rosemary.png" },
+        { id: 7, name: "اللافندر", category: "عطرية", desc: "مهدئ للأعصاب، يساعد على النوم العميق، يخفف التوتر", price: 16, rating: 4.8, img: "asset/images/lavenderherb.jpg" },
+        { id: 8, name: "الحبة السوداء", category: "طبية", desc: "تقوي المناعة، تعالج مشاكل الجلد والشعر، مضادة للالتهابات", price: 18, rating: 4.9, img: "asset/images/blackseedherb.jpg" },
+        { id: 9, name: "اليانسون النجمي", category: "طبية", desc: "مفيد للجهاز الهضمي، يخفف المغص والانتفاخات، مدر للحليب", price: 11, rating: 4.5, img: "asset/images/anise.jpg" },
+        { id: 10, name: "الكركديه", category: "خلطات", desc: "يخفض ضغط الدم، غني بمضادات الأكسدة، منعش", price: 9, rating: 4.6, img: "asset/images/hibiscus.jpg" },
+        { id: 11, name: "الزنجبيل", category: "خلطات", desc: "مضاد للغثيان، يخفف آلام المفاصل، يعزز المناعة", price: 12, rating: 4.7, img: "asset/images/ginger.jpg" },
+        { id: 12, name: "القرفة", category: "خلطات", desc: "تنظم سكر الدم، مضادة للأكسدة، تحسن الهضم", price: 10, rating: 4.8, img: "asset/images/cinnamon.jpg" },
+        { id: 13, name: "البردقوش", category: "طبية", desc: "مهدئ للأعصاب، يساعد على الهضم، مفيد للنساء", price: 13, rating: 4.5, img: "asset/images/marjoram.jpg" },
+        { id: 14, name: "الشمر", category: "طبية", desc: "مفيد للهضم، يخفف الانتفاخات، مدر للحليب", price: 11, rating: 4.6, img: "asset/images/fennel.jpg" },
+        { id: 15, name: "العرقسوس", category: "طبية", desc: "ملين للمعدة، يخفف السعال، مفيد للجهاز التنفسي", price: 9, rating: 4.4, img: "asset/images/licorice.jpg" },
+        { id: 16, name: "الخطمية", category: "طبية", desc: "ملطف للحلق، مضاد للسعال، مفيد للجهاز التنفسي", price: 12, rating: 4.5, img: "asset/images/marshmallow.jpg" },
+        { id: 17, name: "القراص", category: "طبية", desc: "مضاد للحساسية، غني بالحديد، مفيد للشعر", price: 10, rating: 4.6, img: "asset/images/nettle.jpg" },
+        { id: 18, name: "الجنكة بيلوبا", category: "طبية", desc: "يحسن الذاكرة والتركيز، ينشط الدورة الدموية الدماغية", price: 22, rating: 4.8, img: "asset/images/ginkgo.jpg" },
+        { id: 19, name: "الاشواغاندا", category: "طبية", desc: "مكيف طبيعي، يقلل التوتر والقلق، يعزز الطاقة", price: 25, rating: 4.9, img: "asset/images/ashwagandha.jpg" },
+        { id: 20, name: "الريحان المقدس", category: "عطرية", desc: "مضاد للإجهاد، يعزز المناعة، مفيد للجهاز التنفسي", price: 14, rating: 4.7, img: "asset/images/holybasil.jpg" },
+        { id: 21, name: "البقدونس", category: "خلطات", desc: "مدر للبول، غني بالفيتامينات، مفيد للكلى", price: 6, rating: 4.5, img: "asset/images/parsley.jpg" },
+        { id: 22, name: "الكزبرة", category: "خلطات", desc: "مضادة للأكسدة، تساعد على الهضم، تخفض الكوليسترول", price: 8, rating: 4.6, img: "asset/images/coriander.jpg" },
+        { id: 23, name: "الحلبة", category: "طبية", desc: "مفيدة للرضاعة، تنظم السكر، تقوي الشعر", price: 10, rating: 4.7, img: "asset/images/fenugreek.jpg" },
+        { id: 24, name: "المليسا", category: "عطرية", desc: "مضادة للقلق، تحسن المزاج، تساعد على النوم", price: 15, rating: 4.7, img: "asset/images/lemonbalm.jpg" },
+        { id: 25, name: "الزوفا", category: "طبية", desc: "مقشع، مضاد للسعال، مفيد للجهاز التنفسي", price: 12, rating: 4.5, img: "asset/images/hyssop.jpg" },
+        { id: 26, name: "الآس", category: "عطرية", desc: "معطر طبيعي، قابض، مفيد للبشرة", price: 14, rating: 4.6, img: "asset/images/myrtle.jpg" },
+        { id: 27, name: "الأقحوان", category: "طبية", desc: "يخفض الحرارة، مفيد للعينين، مهدئ", price: 11, rating: 4.5, img: "asset/images/chrysanthemum.jpg" },
+        { id: 28, name: "القرنفل", category: "خلطات", desc: "مسكن لآلام الأسنان، مضاد للالتهابات", price: 9, rating: 4.6, img: "asset/images/cloveherb.jpg" },
+        { id: 29, name: "الهيل", category: "خلطات", desc: "منعش للفم، مفيد للهضم، مضاد للأكسدة", price: 20, rating: 4.7, img: "asset/images/cardamomherb.jpg" },
+        { id: 30, name: "الكركم", category: "خلطات", desc: "مضاد قوي للالتهابات، غني بمضادات الأكسدة", price: 15, rating: 4.9, img: "asset/images/turmeric.jpg" },
+        { id: 31, name: "الجنسنغ", category: "طبية", desc: "مقوي عام، يزيد الطاقة، يحسن الأداء الذهني", price: 35, rating: 4.9, img: "asset/images/ginseng.jpg" },
+        { id: 32, name: "الإخناسيا", category: "طبية", desc: "مقوي للمناعة، يقي من نزلات البرد", price: 22, rating: 4.8, img: "asset/images/echinacea.jpg" },
+        { id: 33, name: "القطيفة", category: "طبية", desc: "مضادة للالتهابات، تهدئ البشرة، مفيدة للجروح", price: 13, rating: 4.6, img: "asset/images/calendula.jpg" },
+        { id: 34, name: "الريحان", category: "عطرية", desc: "مضاد للتوتر، يحسن المزاج، مفيد للجهاز الهضمي", price: 12, rating: 4.7, img: "asset/images/basil.jpg" },
+        { id: 35, name: "الزعفران", category: "خلطات", desc: "مضاد للاكتئاب، يحسن المزاج، غني بمضادات الأكسدة", price: 50, rating: 4.9, img: "asset/images/saffron.jpg" },
+        { id: 36, name: "الكمون", category: "خلطات", desc: "يساعد على الهضم، مضاد للأكسدة، يخفض الكوليسترول", price: 8, rating: 4.6, img: "asset/images/cumin.jpg" },
+        { id: 37, name: "القرطم", category: "طبية", desc: "مضاد للالتهابات، مفيد للقلب والشرايين", price: 18, rating: 4.7, img: "asset/images/safflower.jpg" }
     ];
 
     function renderProducts(selectedCategory = 'all') {
@@ -147,60 +150,57 @@
         }).join('');
         
         if (window.applyFadeToNewCards) window.applyFadeToNewCards();
-        bindAddToCartEvents();
-        bindViewDetailsEvents();
+        // تم إزالة bindAddToCartEvents() و bindViewDetailsEvents()
     }
 
-    // ربط أزرار الإضافة إلى السلة
-    function bindAddToCartEvents() {
-        document.querySelectorAll('.add-cart').forEach(btn => {
-            btn.removeEventListener('click', handleAddToCart);
-            btn.addEventListener('click', handleAddToCart);
-        });
-    }
-    
-    function handleAddToCart(e) {
+    // ========== إضافة المنتج إلى السلة (تفويض الأحداث) ==========
+    document.addEventListener('click', function(e) {
+        const btn = e.target.closest('.add-cart');
+        if (!btn) return;
         e.preventDefault();
-        const id = parseInt(e.currentTarget.getAttribute('data-id'));
-        const name = e.currentTarget.getAttribute('data-name');
-        const price = parseFloat(e.currentTarget.getAttribute('data-price'));
-        const img = e.currentTarget.getAttribute('data-img');
-        addToCart(id, name, price, img);
-        showToast(` تمت إضافة ${name} بنجاح، يتمنى ${name} أن ينال إعجابكم 😊`);
-    }
-    
-    function addToCart(id, name, price, img) {
-        let cart = JSON.parse(localStorage.getItem('elixir_cart')) || [];
-        const existing = cart.find(item => item.id === id);
-        if (existing) existing.quantity++;
-        else cart.push({ id, name, price, img, quantity: 1 });
-        localStorage.setItem('elixir_cart', JSON.stringify(cart));
-        updateCartBadge();
-    }
-    
-    function updateCartBadge() {
-        const cart = JSON.parse(localStorage.getItem('elixir_cart')) || [];
-        const total = cart.reduce((sum, item) => sum + item.quantity, 0);
-        const badge = document.querySelector('.cart-count');
-        if (badge) badge.innerText = total;
-    }
-    
-// عرض التفاصيل يفتح صفحة المنتج
-function handleViewDetails(e) {
-    e.preventDefault();
-    const id = e.currentTarget.getAttribute('data-id');
-    if (id) {
-        window.location.href = 'product-details.html?id=' + id;
-    }
-}
 
-function bindViewDetailsEvents() {
-    document.querySelectorAll('.view-details').forEach(btn => {
-        btn.removeEventListener('click', handleViewDetails);
-        btn.addEventListener('click', handleViewDetails);
+        const id = parseInt(btn.getAttribute('data-id'));
+        const name = btn.getAttribute('data-name');
+        const price = parseFloat(btn.getAttribute('data-price'));
+        const img = btn.getAttribute('data-img');
+
+        let cart = JSON.parse(localStorage.getItem('elixir_cart') || '[]');
+        const existing = cart.find(item => item.id === id);
+        if (existing) {
+            existing.quantity++;
+        } else {
+            cart.push({ id, name, price, img, quantity: 1 });
+        }
+        localStorage.setItem('elixir_cart', JSON.stringify(cart));
+
+        // تحديث العداد في الهيدر والسلة العائمة
+        const headerBadge = document.querySelector('.cart-count');
+        if (headerBadge) {
+            const total = cart.reduce((sum, item) => sum + item.quantity, 0);
+            headerBadge.innerText = total;
+        }
+        if (window.updateFloatingCart) window.updateFloatingCart();
+
+        // إظهار رسالة توست
+        const toast = document.getElementById('customToast');
+        if (toast) {
+            document.getElementById('toastText').innerHTML = `تمت إضافة ${name} بنجاح، يتمنى ${name} أن ينال إعجابكم 😊`;
+            toast.style.display = 'flex';
+            setTimeout(() => toast.style.display = 'none', 3000);
+        }
     });
-}
-    
+
+    // عرض التفاصيل يفتح صفحة المنتج
+    document.addEventListener('click', function(e) {
+        const btn = e.target.closest('.view-details');
+        if (!btn) return;
+        e.preventDefault();
+        const id = btn.getAttribute('data-id');
+        if (id) {
+            window.location.href = `product-details.html?id=${id}`;
+        }
+    });
+
     // ========== المفضلة ==========
     function updateFavorite(icon, productId) {
         let favorites = JSON.parse(localStorage.getItem('elixir_favorites')) || [];
@@ -285,19 +285,15 @@ function bindViewDetailsEvents() {
         window.scrollTo({ top: 0, behavior: 'smooth' });
     });
     
-    // توست
-    function showToast(message) {
-        const toast = document.getElementById('customToast');
-        const toastText = document.getElementById('toastText');
-        toastText.innerHTML = message;
-        toast.style.display = 'flex';
-        setTimeout(() => {
-            toast.style.display = 'none';
-        }, 3000);
-    }
-    
     // تحديث عدد السلة عند التحميل
-    updateCartBadge();
+    function initCartBadge() {
+        const cart = JSON.parse(localStorage.getItem('elixir_cart')) || [];
+        const total = cart.reduce((sum, item) => sum + item.quantity, 0);
+        const headerBadge = document.querySelector('.cart-count');
+        if (headerBadge) headerBadge.innerText = total;
+        if (window.updateFloatingCart) window.updateFloatingCart();
+    }
+    initCartBadge();
     renderProducts('all');
 </script>
 </body>

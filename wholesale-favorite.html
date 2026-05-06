@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Elixir | مفضلة الجملة</title>
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+     <link rel="stylesheet" href="wholesale-favorite.css">
+</head>
+<body>
+<div class="container">
+    <div class="header">
+        <h1>مفضلة الجملة</h1>
+        <a href="wholesale.html" class="back-link"> العودة لمتجر الجملة</a>
+    </div>
+    <div id="favGrid" class="fav-grid"></div>
+    <a href="index.html" class="home-link"><i class="fas fa-home"></i> العودة إلى الرئيسية</a>
+</div>
+
+<script>
+    // منتجات الجملة كاملة (نفس الموجودة في wholesale.html)
+    const wholesaleProducts = [
+        { id: 101, name: "البابونج", price: 9, img: "asset/images/chamomileherb.jpg" },
+        { id: 102, name: "الزعتر", price: 11, img: "asset/images/thymeherb.jpg" },
+        { id: 103, name: "المريمية", price: 12, img: "asset/images/sageherb.jpg" },
+        { id: 104, name: "الحبة السوداء", price: 14, img: "asset/images/blackseedherb.jpg" },
+        { id: 105, name: "اليانسون", price: 8, img: "asset/images/anise.jpg" },
+        { id: 106, name: "الكركديه", price: 7, img: "asset/images/hibiscus.jpg" },
+        { id: 107, name: "الزنجبيل", price: 9, img: "asset/images/ginger.jpg" },
+        { id: 108, name: "القرفة", price: 7, img: "asset/images/cinnamon.jpg" },
+        { id: 109, name: "البردقوش", price: 10, img: "asset/images/marjoram.jpg" },
+        { id: 110, name: "الشمر", price: 8, img: "asset/images/fennel.jpg" },
+        { id: 111, name: "العرقسوس", price: 7, img: "asset/images/licorice.jpg" },
+        { id: 112, name: "القراص", price: 8, img: "asset/images/nettle.jpg" },
+        { id: 201, name: "زيت اللافندر العطري", price: 14, img: "asset/images/lavender.jpg" },
+        { id: 202, name: "زيت الورد الجوري", price: 45, img: "asset/images/rose.jpg" },
+        { id: 203, name: "زيت إكليل الجبل", price: 17, img: "asset/images/rosemaryoil.png" },
+        { id: 204, name: "زيت شجرة الشاي", price: 15, img: "asset/images/teatree.jpg" },
+        { id: 205, name: "زيت النعناع الفلفلي", price: 12, img: "asset/images/peppermint.jpg" },
+        { id: 206, name: "زيت الياسمين", price: 16, img: "asset/images/jasmine-oil.png" },
+        { id: 207, name: "زيت البابونج", price: 16, img: "asset/images/chamomileoil.png" },
+        { id: 208, name: "زيت البرتقال الحلو", price: 12, img: "asset/images/orangeoil.jpg" },
+        { id: 209, name: "زيت الليمون", price: 12, img: "asset/images/lemon.jpg" },
+        { id: 210, name: "زيت الزيتون البكر الفلسطيني", price: 16, img: "asset/images/olive.jpg" },
+        { id: 211, name: "زيت اللوز الحلو", price: 14, img: "asset/images/almondoil.png" },
+        { id: 212, name: "زيت جوز الهند العضوي", price: 12, img: "asset/images/coconut.jpg" },
+        { id: 301, name: "بهارات مشكلة (عربية)", price: 9, img: "asset/images/spice-mix.jpg" },
+        { id: 302, name: "بهارات غارام ماسالا", price: 17, img: "asset/images/garam-masala.jpg" },
+        { id: 303, name: "بهارات شاورما", price: 9, img: "asset/images/shawarma-spice.jpg" },
+        { id: 304, name: "بابريكا", price: 7, img: "asset/images/paprika.jpg" },
+        { id: 305, name: "كركم", price: 7, img: "asset/images/turmeric-spice.jpg" },
+        { id: 306, name: "فلفل أسود مطحون", price: 6, img: "asset/images/black-pepper.jpg" },
+        { id: 307, name: "كمون", price: 5, img: "asset/images/cumin-spice.jpg" },
+        { id: 308, name: "كزبرة جافة مطحونة", price: 4, img: "asset/images/coriander-spice.jpg" },
+        { id: 309, name: "هيل (حبهان)", price: 20, img: "asset/images/cardamom-spice.jpg" },
+        { id: 310, name: "قرنفل", price: 9, img: "asset/images/clove-spice.jpg" },
+        { id: 311, name: "زنجبيل مطحون", price: 8, img: "asset/images/ginger-spice.jpg" },
+        { id: 312, name: "قرفة مطحونة", price: 8, img: "asset/images/cinnamon-spice.jpg" },
+        { id: 401, name: "صابون زيت الزيتون الطبيعي", price: 14, img: "asset/images/olive-soap.jpg" },
+        { id: 402, name: "صابونة الفحم النشط", price: 17, img: "asset/images/charcoal-soap.jpg" },
+        { id: 403, name: "الصابون الأفريقي الأسود التقليدي", price: 22, img: "asset/images/african-soap.jpg" },
+        { id: 404, name: "صابون العسل الطبيعي", price: 16, img: "asset/images/honey-soap.jpg" },
+        { id: 405, name: "صابون الصبار الطبيعي", price: 17, img: "asset/images/aloe-soap.jpg" },
+        { id: 406, name: "زبدة الشيا", price: 24, img: "asset/images/shea-butter.jpg" },
+        { id: 407, name: "كريم الورد المركز", price: 22, img: "asset/images/rose-cream.jpg" },
+        { id: 408, name: "جل الصبار (الألوفيرا)", price: 14, img: "asset/images/aloe-gel.jpg" },
+        { id: 409, name: "ماء الورد المقطر الطبيعي", price: 12, img: "asset/images/rose-water.jpg" },
+        { id: 410, name: "الليفة المغربية الأصلية", price: 20, img: "asset/images/moroccan-loofah.png" },
+        { id: 411, name: "طين الغسول المغربي الطبيعي", price: 16, img: "asset/images/ghassoul-clay.jpg" },
+        { id: 412, name: "صابون فيتامين سي المبيّضة", price: 20, img: "asset/images/vitc-soap.jpg" },
+        { id: 414, name: "مقشر السكر بالورد وزيت جوز الهند", price: 17, img: "asset/images/rose-scrub.jpg" }
+    ];
+
+    // تأثير Fade-up
+    function applyFadeToCards() {
+        const cards = document.querySelectorAll('.fav-card');
+        cards.forEach(card => card.classList.add('fade-up'));
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) entry.target.classList.add('visible');
+            });
+        }, { threshold: 0.1 });
+        cards.forEach(card => observer.observe(card));
+    }
+
+    function renderWholesaleFavorites() {
+        const favorites = JSON.parse(localStorage.getItem('elixir_wholesale_favorites') || '[]');
+        const grid = document.getElementById('favGrid');
+        const favProducts = wholesaleProducts.filter(p => favorites.includes(p.id));
+
+        if (favProducts.length === 0) {
+            grid.innerHTML = `
+                <div class="empty-fav">
+                    <i class="fa-regular fa-heart"></i>
+                    <h2>لا توجد منتجات في مفضلة الجملة</h2>
+                    <p>أضف منتجات إلى مفضلتك من متجر الجملة</p>
+                    <a href="wholesale.html" class="start-btn">تصفح المنتجات </a>
+                </div>
+            `;
+            return;
+        }
+
+        grid.innerHTML = favProducts.map(p => `
+            <div class="fav-card">
+                <img class="fav-img" src="${p.img}" alt="${p.name}" onerror="this.src='asset/images/placeholder.png'">
+                <div class="fav-info">
+                    <div class="fav-title">${p.name}</div>
+                    <div class="fav-price">${p.price} ₪ (جملة)</div>
+                    <button class="remove-fav-btn" data-id="${p.id}"> إزالة</button>
+                </div>
+            </div>
+        `).join('');
+
+        // ربط أزرار الإزالة
+        document.querySelectorAll('.remove-fav-btn').forEach(btn => {
+            btn.addEventListener('click', () => {
+                const id = parseInt(btn.getAttribute('data-id'));
+                let favs = JSON.parse(localStorage.getItem('elixir_wholesale_favorites') || '[]');
+                favs = favs.filter(fid => fid !== id);
+                localStorage.setItem('elixir_wholesale_favorites', JSON.stringify(favs));
+                renderWholesaleFavorites();
+            });
+        });
+
+        // تطبيق تأثير Fade-up
+        applyFadeToCards();
+    }
+
+    renderWholesaleFavorites();
+</script>
+</body>
+</html>

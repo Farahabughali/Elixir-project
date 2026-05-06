@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Elixir | سلة طلبات الجملة</title>
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <link rel="stylesheet" href="wholesale-cart.css">
+</head>
+<body>
+
+<div class="wholesale-cart-container">
+    <div class="cart-header">
+        <h1><i class="fas fa-store"></i> سلة طلبات الجملة</h1>
+        <a href="wholesale.html" class="back-to-shop"><i class="fas fa-arrow-right"></i> مواصلة التسوق</a>
+    </div>
+
+    <div id="wholesaleCartContent" class="cart-content">
+        <!-- سيتم عرض المنتجات هنا ديناميكياً -->
+    </div>
+
+    <div class="cart-footer">
+        <a href="wholesale.html" class="home-link"><i class="fas fa-home"></i> العودة إلى الرئيسية</a>
+    </div>
+</div>
+
+<script>
+    // دالة عرض سلة الجملة
+    function renderWholesaleCart() {
+        const cart = JSON.parse(localStorage.getItem('elixir_wholesale_cart') || '[]');
+        const container = document.getElementById('wholesaleCartContent');
+
+        if (cart.length === 0) {
+            container.innerHTML = `
+                <div class="empty-cart">
+                    <i class="fas fa-shopping-cart"></i>
+                    <h2>سلة طلبات الجملة فارغة</h2>
+                    <p>لم تقم بإضافة أي منتجات لطلب الجملة بعد</p>
+                    <a href="wholesale.html" class="start-shopping-btn">ابدأ التسوق <i class="fas fa-arrow-left"></i></a>
+                </div>
+            `;
+            return;
+        }
+
+        let html = `<div class="cart-grid">`;
+        let total = 0;
+        cart.forEach((item, index) => {
+            const itemTotal = item.price * item.quantity;
+            total += itemTotal;
+            html += `
+                <div class="cart-item">
+                    <img class="cart-item-img" src="${item.img}" alt="${item.name}" onerror="this.src='asset/images/placeholder.png'">
+                    <div class="cart-item-info">
+                        <div class="cart-item-title">${item.name}</div>
+                        <div class="cart-item-price">${item.price} ₪</div>
+                        <div class="quantity-control">
+                            <button class="qty-minus" data-index="${index}">-</button>
+                            <span class="item-qty">${item.quantity}</span>
+                            <button class="qty-plus" data-index="${index}">+</button>
+                        </div>
+                        <button class="remove-item" data-index="${index}"><i class="fa-regular fa-trash-can"></i> إزالة</button>
+                    </div>
+                </div>
+            `;
+        });
+        html += `</div>`;
+        html += `
+            <div class="cart-summary">
+                <h3>إجمالي طلب الجملة</h3>
+                <div class="total-price">${total} ₪</div>
+                <button class="checkout-btn" id="wholesaleCheckoutBtn">إتمام طلب الجملة</button>
+            </div>
+        `;
+        container.innerHTML = html;
+
+        // ربط أحداث الأزرار
+        document.querySelectorAll('.qty-minus').forEach(btn => {
+            btn.addEventListener('click', () => {
+                const idx = parseInt(btn.dataset.index);
+                let cart = JSON.parse(localStorage.getItem('elixir_wholesale_cart') || '[]');
+                if (cart[idx].quantity > 1) cart[idx].quantity--;
+                else cart.splice(idx, 1);
+                localStorage.setItem('elixir_wholesale_cart', JSON.stringify(cart));
+                renderWholesaleCart();
+            });
+        });
+        document.querySelectorAll('.qty-plus').forEach(btn => {
+            btn.addEventListener('click', () => {
+                const idx = parseInt(btn.dataset.index);
+                let cart = JSON.parse(localStorage.getItem('elixir_wholesale_cart') || '[]');
+                cart[idx].quantity++;
+                localStorage.setItem('elixir_wholesale_cart', JSON.stringify(cart));
+                renderWholesaleCart();
+            });
+        });
+        document.querySelectorAll('.remove-item').forEach(btn => {
+            btn.addEventListener('click', () => {
+                const idx = parseInt(btn.dataset.index);
+                let cart = JSON.parse(localStorage.getItem('elixir_wholesale_cart') || '[]');
+                cart.splice(idx, 1);
+                localStorage.setItem('elixir_wholesale_cart', JSON.stringify(cart));
+                renderWholesaleCart();
+            });
+        });
+        document.getElementById('wholesaleCheckoutBtn')?.addEventListener('click', () => {
+            alert('شكراً لتسوقك مع Elixir (طلب جملة). سيتم التواصل معك قريباً لتأكيد الطلب.');
+        });
+    }
+
+    renderWholesaleCart();
+</script>
+
+</body>
+</html>

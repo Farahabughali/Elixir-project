@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>متجر إكسير</title>
-    <link rel="stylesheet" href="index.css">
+    <link rel="stylesheet" href="style.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -73,7 +73,7 @@
     <h1 id="slideTitle">جوهر الطبيعة<br>بلمسة من أرض فلسطين</h1>
     <p id="slideDesc">نقدم لك أعشاب وزيوت طبيعية، ومستحضرات ورد طبيعية<br> مستوحاة من تراث الطبيعة الفلسطينية ومحضرة بتقنيات حديثة</p>
     <div class="introSection_buttons">
-        <button class="btn-primary">تسوق الآن</button>
+        <button class="btn-primary" id="shopNowBtn">تسوق الآن</button>
     </div>
 </div>
 <div class="ai-content">
@@ -86,7 +86,7 @@
     </section>
 
      <a name="collection"></a>
-   <section class="collections">
+   <section id = "collection" class="collections">
     <div class="container">
         <h2 class="section-title">تصفح مجموعاتنا</h2>
         <p class="section-subtitle">الطبيعي أفضل. اختر ما يناسب احتياجاتك من تشكيلتنا</p>
@@ -172,7 +172,7 @@
                         <span class="old-price">150 ₪</span>
                         <span class="new-price">135 ₪</span>
                     </div>
-                    <button class="offer-add-btn">إضافة إلى السلة <i class="fa-solid fa-cart-shopping"></i></button>
+                    <button class="offer-add-btn add-cart" data-id="1" data-name="عسل طبيعي متعدد الأعشاب" data-price="135" data-img="asset/images/herbalhoney.png">إضافة إلى السلة <i class="fa-solid fa-cart-shopping"></i></button>
                 </div>
             </div>
 
@@ -189,7 +189,7 @@
                         <span class="old-price">70 ₪</span>
                         <span class="new-price">49 ₪</span>
                     </div>
-                    <button class="offer-add-btn">إضافة إلى السلة <i class="fa-solid fa-cart-shopping"></i></button>
+                    <button class="offer-add-btn add-cart" data-id="2" data-name="الليفة المغربية" data-price="49" data-img="asset/images/moroccan-loofah.png">إضافة إلى السلة <i class="fa-solid fa-cart-shopping"></i></button>
                 </div>
             </div>
             <div class="offer-product-card">
@@ -205,7 +205,7 @@
                         <span class="old-price">35 ₪</span>
                         <span class="new-price">28 ₪</span>
                     </div>
-                    <button class="offer-add-btn">إضافة إلى السلة <i class="fa-solid fa-cart-shopping"></i></button>
+                    <button class="offer-add-btn add-cart" data-id="3" data-name="زيت الياسمين" data-price="28" data-img="asset/images/jasmine-oil.png">إضافة إلى السلة <i class="fa-solid fa-cart-shopping"></i></button>
                 </div>
             </div>
         </div>
@@ -238,7 +238,7 @@
                     <h3>زيت اللوز الحلو العضوي</h3>
                     <div class="rating">4.7 ★</div>
                     <div class="product-footer">
-                        <button class="add-to-cart-btn">إضافة إلى السلة<i class="fa-solid fa-cart-shopping"></i></button>
+                        <button class="add-to-cart-btn add-cart" data-id="4" data-name="زيت اللوز الحلو العضوي" data-price="15" data-img="asset/images/almondoil.png">إضافة إلى السلة<i class="fa-solid fa-cart-shopping"></i></button>
                         <span class="price">15.00 ₪</span>
                     </div>
                 </div>
@@ -255,7 +255,7 @@
                     <h3>جارام مسالا\بهار هندي</h3>
                     <div class="rating">4.9 ★</div>
                     <div class="product-footer">
-                        <button class="add-to-cart-btn">إضافة إلى السلة <i class="fa-solid fa-cart-shopping"></i></button>
+                        <button class="add-to-cart-btn add-cart" data-id="5" data-name="جارام مسالا بهار هندي" data-price="35" data-img="asset/images/garammasala.png">إضافة إلى السلة <i class="fa-solid fa-cart-shopping"></i></button>
                         <span class="price">35.00 ₪</span>
                     </div>
                 </div>
@@ -272,7 +272,7 @@
                     <h3>تونر البابونج</h3>
                     <div class="rating">5.0 ★</div>
                     <div class="product-footer">
-                        <button class="add-to-cart-btn">إضافة إلى السلة <i class="fa-solid fa-cart-shopping"></i></button>
+                        <button class="add-to-cart-btn add-cart" data-id="6" data-name="تونر البابونج" data-price="58" data-img="asset/images/chamomiletoner.png">إضافة إلى السلة <i class="fa-solid fa-cart-shopping"></i></button>
                         <span class="price">58.00 ₪</span>
                     </div>
                 </div>
@@ -303,7 +303,7 @@
                     <h3>زيت اللافندر للاسترخاء</h3>
                     <div class="rating">4.8 ★</div>
                     <div class="product-footer">
-                        <button class="add-to-cart-btn">
+                        <button class="add-to-cart-btn add-cart" data-id="7" data-name="زيت اللافندر للاسترخاء" data-price="38" data-img="asset/images/lavender.jpg">
                              إضافة إلى السلة <i class="fa-solid fa-cart-shopping"></i>
                         </button>
                         <span class="price">38.00 ₪</span>
@@ -321,7 +321,7 @@
                     <h3>إكليل الجبل العشبي</h3>
                     <div class="rating">4.5 ★</div>
                     <div class="product-footer">
-                        <button class="add-to-cart-btn">
+                        <button class="add-to-cart-btn add-cart" data-id="8" data-name="إكليل الجبل العشبي" data-price="25" data-img="asset/images/rosemary.png">
                             إضافة إلى السلة <i class="fa-solid fa-cart-shopping"></i>
                         </button>
                         <span class="price">25.00 ₪</span>
@@ -339,7 +339,7 @@
                     <h3>زيت الورد النقي</h3>
                     <div class="rating">4.9 ★</div>
                     <div class="product-footer">
-                        <button class="add-to-cart-btn">
+                        <button class="add-to-cart-btn add-cart" data-id="9" data-name="زيت الورد النقي" data-price="25" data-img="asset/images/rose.jpg">
                             إضافة إلى السلة <i class="fa-solid fa-cart-shopping"></i>
                         </button>
                         <span class="price">25.00 ₪</span>
@@ -371,7 +371,7 @@
          <h3>بكج عالم البهارات</h3>
                     <span class="category">بهارات مشكلة، غارام ماسالا، شاورما وبابريكا – جولة في مطابخ العالم.</span>
                     <div class="product-footer">
-                        <button class="add-to-cart-btn">
+                        <button class="add-to-cart-btn add-cart" data-id="10" data-name="بكج عالم البهارات" data-price="210" data-img="asset/images/spices-package.jpg">
                              إضافة إلى السلة<i class="fa-solid fa-cart-shopping"></i>
                         </button>
                         <span class="price">210.00 ₪</span>
@@ -388,7 +388,7 @@
                 <h3>بكج النشاط والتوازن</h3>
                     <span class="category">مجموعة طبيعية تجمع بين شاي الأعشاب المنعش، العسل الطبيعي ومستحضرات مهدئة تساعد على استعادة النشاط وتحقيق توازن صحي للجسم والعقل</span>
                     <div class="product-footer">
-                        <button class="add-to-cart-btn">
+                        <button class="add-to-cart-btn add-cart" data-id="11" data-name="بكج النشاط والتوازن" data-price="190" data-img="asset/images/balance-package.png">
                             إضافة إلى السلة<i class="fa-solid fa-cart-shopping"></i>
                         </button>
                         <span class="price">190.00 ₪</span>
@@ -405,7 +405,7 @@
                   <h3>بكج جوهر الورد</h3>
                     <span class="category"> مجموعة فاخرة مستوحاة من الورد الطبيعي، تحتوي على زيوت ومستحضرات تساعد على ترطيب البشرة وتغذيتها ومنحها نعومة وإشراقة طبيعية</span>
                     <div class="product-footer">
-                        <button class="add-to-cart-btn">
+                        <button class="add-to-cart-btn add-cart" data-id="12" data-name="بكج جوهر الورد" data-price="295" data-img="asset/images/roseessence-package.png">
                             إضافة إلى السلة<i class="fa-solid fa-cart-shopping"></i>
                         </button>
                         <span class="price">295.00 ₪</span>
@@ -507,8 +507,18 @@
 <button id="scrollTopBtn" class="scroll-top-btn" style="display:none;">
     <i class="fas fa-arrow-up"></i>
 </button>
+<link rel="stylesheet" href="floating-cart.css">
+<script src="floating-cart.js"></script>
 
-.<script>
+<div id="customToast" class="toast-message">
+    <i class="fas fa-check-circle"></i>
+    <span id="toastText"></span>
+</div>
+<div id="customToast" class="toast-message">
+    <i class="fas fa-check-circle"></i>
+    <span id="toastText"></span>
+</div>
+<script>
     
 function updateFavCount() {
     let favorites = JSON.parse(localStorage.getItem('elixir_favorites')) || [];
@@ -553,6 +563,12 @@ const slideData = [
     }
 ];
 
+document.getElementById('shopNowBtn').addEventListener('click', function() {
+    const collectionSection = document.getElementById('collection');
+    if (collectionSection) {
+        collectionSection.scrollIntoView({ behavior: 'smooth' });
+    }
+});
 // تحديث النصوص والروابط عند تغيير الشريحة
 function updateSlideContent(index) {
     const data = slideData[index];
@@ -620,39 +636,90 @@ function updateCountdown() {
     document.getElementById("hours").innerHTML = hours < 10 ? "0" + hours : hours;
     document.getElementById("minutes").innerHTML = minutes < 10 ? "0" + minutes : minutes;
     document.getElementById("seconds").innerHTML = seconds < 10 ? "0" + seconds : seconds;
+}
     
 // تأثير Fade-up البسيط
-    (function() {
-        // إضافة كلاس fade-up لجميع البطاقات والأقسام
-        const elements = document.querySelectorAll('.oil-card, .product-card, .collection-card, section');
-        elements.forEach(el => el.classList.add('fade-up'));
+   
+// تأثير Fade-up البسيط للصفحة الرئيسية
+(function() {
+    // إضافة كلاس fade-up لجميع العناصر الموجودة في الصفحة الرئيسية
+    const elements = document.querySelectorAll('.product-card, .collection-card, .offer-product-card, .feature-item, .packages .product-card');
+    elements.forEach(el => el.classList.add('fade-up'));
 
-        // مراقب التمرير
-        const observer = new IntersectionObserver((entries) => {
-            entries.forEach(entry => {
-                if (entry.isIntersecting) {
-                    entry.target.classList.add('visible');
-                }
-            });
-        }, { threshold: 0.1 });
+    // مراقب التمرير
+    const observer = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+            if (entry.isIntersecting) {
+                entry.target.classList.add('visible');
+            }
+        });
+    }, { threshold: 0.1 });
 
-        // بدء المراقبة
-        elements.forEach(el => observer.observe(el));
+    // بدء المراقبة
+    elements.forEach(el => observer.observe(el));
 
-        // إذا كانت البطاقات تُضاف لاحقاً (مثل بعد الفلتر)، استخدمي هذا السطر داخل دالة renderProducts:
-        window.applyFadeToNewCards = function() {
-            document.querySelectorAll('.oil-card:not(.fade-up)').forEach(card => {
-                card.classList.add('fade-up');
-                observer.observe(card);
-            });
-        };
-    })();
-
-}
+    // دالة لتطبيق التأثير على العناصر الجديدة (إذا أضيفت لاحقاً)
+    window.applyFadeToNewCards = function() {
+        document.querySelectorAll('.product-card:not(.fade-up), .collection-card:not(.fade-up), .offer-product-card:not(.fade-up)').forEach(card => {
+            card.classList.add('fade-up');
+            observer.observe(card);
+        });
+    };
+})();
 
 // تحديث المؤقت كل ثانية
 setInterval(updateCountdown, 1000);
 updateCountdown(); // تشغيل فوري
+
+// ========== دالة التوست (نفس الموجودة في صفحات المنتجات) ==========
+function showToast(message) {
+    const toast = document.getElementById('customToast');
+    const toastText = document.getElementById('toastText');
+    if (!toast) return;
+    toastText.innerHTML = message;
+    toast.style.display = 'flex';
+    setTimeout(() => {
+        toast.style.display = 'none';
+    }, 3000);
+}
+
+// ========== كود إضافة المنتجات إلى السلة في الصفحة الرئيسية ==========
+document.addEventListener('click', function(e) {
+    const btn = e.target.closest('.add-cart');
+    if (!btn) return;
+    e.preventDefault();
+
+    const id = parseInt(btn.getAttribute('data-id'));
+    const name = btn.getAttribute('data-name');
+    const price = parseFloat(btn.getAttribute('data-price'));
+    const img = btn.getAttribute('data-img');
+
+    if (!id || !name || !price) {
+        console.warn('الزر يفتقد البيانات المطلوبة');
+        return;
+    }
+
+    let cart = JSON.parse(localStorage.getItem('elixir_cart') || '[]');
+    const existing = cart.find(item => item.id === id);
+    if (existing) {
+        existing.quantity++;
+        showToast(`🧴 تمت زيادة الكمية: ${name} (${existing.quantity})`);
+    } else {
+        cart.push({ id, name, price, img, quantity: 1 });
+        localStorage.setItem('elixir_cart', JSON.stringify(cart));
+        showToast(` تمت إضافة ${name} بنجاح، يتمنى ${name} أن ينال إعجابكم 😊`);
+    }
+
+    // تحديث العداد في الهيدر
+    const headerBadge = document.querySelector('.cart-count');
+    if (headerBadge) {
+        const total = cart.reduce((sum, i) => sum + i.quantity, 0);
+        headerBadge.innerText = total;
+    }
+    
+    // تحديث السلة العائمة إذا كانت موجودة
+    if (window.updateFloatingCart) window.updateFloatingCart();
+});
 
 </script>
 </body>

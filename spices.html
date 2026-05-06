@@ -61,7 +61,8 @@
 <button id="scrollTopBtn" class="scroll-top-btn" style="display:none;">
     <i class="fas fa-arrow-up"></i>
 </button>
-
+<link rel="stylesheet" href="floating-cart.css">
+<script src="floating-cart.js"></script>
 <script>
     const spicesData = [
         { id: 1, name: "بهارات مشكلة (عربية)", category: "عربية", desc: "خليط متكامل من البهارات العربية الأصيلة، مثالي للأرز واللحوم", price: 12, rating: 4.8, img: "asset/images/spice-mix.jpg" },
@@ -131,57 +132,52 @@
         }).join('');
         
         if (window.applyFadeToNewCards) window.applyFadeToNewCards();
-        bindAddToCartEvents();
-        bindViewDetailsEvents();
+        // تم إزالة bindAddToCartEvents() هنا
     }
 
-    // ربط أزرار الإضافة إلى السلة
-    function bindAddToCartEvents() {
-        document.querySelectorAll('.add-cart').forEach(btn => {
-            btn.removeEventListener('click', handleAddToCart);
-            btn.addEventListener('click', handleAddToCart);
-        });
-    }
-    
-    function handleAddToCart(e) {
+    // ربط أزرار الإضافة إلى السلة (تفويض الأحداث) – يعمل مع جميع الأزرار الحالية والمستقبلية
+    document.addEventListener('click', function(e) {
+        const btn = e.target.closest('.add-cart');
+        if (!btn) return;
         e.preventDefault();
-        const id = parseInt(e.currentTarget.getAttribute('data-id'));
-        const name = e.currentTarget.getAttribute('data-name');
-        const price = parseFloat(e.currentTarget.getAttribute('data-price'));
-        const img = e.currentTarget.getAttribute('data-img');
-        addToCart(id, name, price, img);
-        showToast(`تمت إضافة ${name} بنجاح، يتمنى ${name} أن ينال إعجابكم 😊`);
-    }
-    
-    function addToCart(id, name, price, img) {
-        let cart = JSON.parse(localStorage.getItem('elixir_cart')) || [];
+
+        const id = parseInt(btn.getAttribute('data-id'));
+        const name = btn.getAttribute('data-name');
+        const price = parseFloat(btn.getAttribute('data-price'));
+        const img = btn.getAttribute('data-img');
+
+        let cart = JSON.parse(localStorage.getItem('elixir_cart') || '[]');
         const existing = cart.find(item => item.id === id);
-        if (existing) existing.quantity++;
-        else cart.push({ id, name, price, img, quantity: 1 });
+        if (existing) {
+            existing.quantity++;
+        } else {
+            cart.push({ id, name, price, img, quantity: 1 });
+        }
         localStorage.setItem('elixir_cart', JSON.stringify(cart));
-        updateCartBadge();
-    }
-    
-    function updateCartBadge() {
-        const cart = JSON.parse(localStorage.getItem('elixir_cart')) || [];
-        const total = cart.reduce((sum, item) => sum + item.quantity, 0);
-        const badge = document.querySelector('.cart-count');
-        if (badge) badge.innerText = total;
-    }
-    
-    function bindViewDetailsEvents() {
-        document.querySelectorAll('.view-details').forEach(btn => {
-            btn.removeEventListener('click', handleViewDetails);
-            btn.addEventListener('click', handleViewDetails);
-        });
-    }
-    
-    function handleViewDetails(e) {
+
+        // تحديث العداد في الهيدر والسلة العائمة
+        const headerBadge = document.querySelector('.cart-count');
+        if (headerBadge) {
+            const total = cart.reduce((sum, item) => sum + item.quantity, 0);
+            headerBadge.innerText = total;
+        }
+        if (window.updateFloatingCart) window.updateFloatingCart();
+
+        // إظهار رسالة توست
+        showToast(`تمت إضافة ${name} بنجاح، يتمنى ${name} أن ينال إعجابكم 😊`);
+    });
+
+    // عرض التفاصيل يفتح صفحة المنتج
+    document.addEventListener('click', function(e) {
+        const detailsBtn = e.target.closest('.view-details');
+        if (!detailsBtn) return;
         e.preventDefault();
-        const id = e.currentTarget.getAttribute('data-id');
-        window.location.href = `product-details.html?id=${id}`;
-    }
-    
+        const id = detailsBtn.getAttribute('data-id');
+        if (id) {
+            window.location.href = 'product-details.html?id=' + id;
+        }
+    });
+
     // ========== المفضلة ==========
     function updateFavorite(icon, productId) {
         let favorites = JSON.parse(localStorage.getItem('elixir_favorites')) || [];
@@ -278,7 +274,15 @@
     }
     
     // تحديث عداد السلة عند التحميل
-    updateCartBadge();
+    function initCartBadge() {
+        const cart = JSON.parse(localStorage.getItem('elixir_cart') || '[]');
+        const total = cart.reduce((sum, item) => sum + item.quantity, 0);
+        const headerBadge = document.querySelector('.cart-count');
+        if (headerBadge) headerBadge.innerText = total;
+        if (window.updateFloatingCart) window.updateFloatingCart();
+    }
+    initCartBadge();
+    
     renderProducts('all');
 </script>
 </body>
