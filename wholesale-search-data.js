@@ -1,0 +1,58 @@
+const wholesaleSearchData = [
+    // ========== أعشاب طبيعية (id: 101-112) ==========
+    { id: 101, name: "البابونج", category: "أعشاب طبيعية", price: 9, img: "asset/images/chamomileherb.jpg", link: "product-details.html?id=32", keywords: ["بابونج", "أعشاب", "عشبة"] },
+    { id: 102, name: "الزعتر", category: "أعشاب طبيعية", price: 11, img: "asset/images/thymeherb.jpg", link: "product-details.html?id=34", keywords: ["زعتر", "أعشاب", "عشبة"] },
+    { id: 103, name: "المريمية", category: "أعشاب طبيعية", price: 12, img: "asset/images/sageherb.jpg", link: "product-details.html?id=35", keywords: ["مريمية", "أعشاب", "عشبة"] },
+    { id: 104, name: "الحبة السوداء", category: "أعشاب طبيعية", price: 14, img: "asset/images/blackseedherb.jpg", link: "product-details.html?id=38", keywords: ["حبة سوداء", "أعشاب", "عشبة"] },
+    { id: 105, name: "اليانسون", category: "أعشاب طبيعية", price: 8, img: "asset/images/anise.jpg", link: "product-details.html?id=39", keywords: ["يانسون",  "أعشاب", "عشبة"] },
+    { id: 106, name: "الكركديه", category: "أعشاب طبيعية", price: 7, img: "asset/images/hibiscus.jpg", link: "product-details.html?id=40", keywords: ["كركديه",  "أعشاب", "عشبة"] },
+    { id: 107, name: "الزنجبيل", category: "أعشاب طبيعية", price: 9, img: "asset/images/ginger.jpg", link: "product-details.html?id=41", keywords: ["زنجبيل",  "أعشاب", "عشبة"] },
+    { id: 108, name: "القرفة", category: "أعشاب طبيعية", price: 7, img: "asset/images/cinnamon.jpg", link: "product-details.html?id=42", keywords: ["قرفة", "أعشاب", "عشبة"] },
+    { id: 109, name: "البردقوش", category: "أعشاب طبيعية", price: 10, img: "asset/images/marjoram.jpg", link: "product-details.html?id=43", keywords: ["بردقوش","أعشاب", "عشبة"] },
+    { id: 110, name: "الشمر", category: "أعشاب طبيعية", price: 8, img: "asset/images/fennel.jpg", link: "product-details.html?id=44", keywords: ["شمر",  "أعشاب", "عشبة"] },
+    { id: 111, name: "العرقسوس", category: "أعشاب طبيعية", price: 7, img: "asset/images/licorice.jpg", link: "product-details.html?id=45", keywords: ["عرقسوس",  "أعشاب", "عشبة"] },
+    { id: 112, name: "القراص", category: "أعشاب طبيعية", price: 8, img: "asset/images/nettle.jpg", link: "product-details.html?id=47", keywords: ["قراص",  "أعشاب", "عشبة"] },
+
+    // ========== زيوت طبيعية وعطرية (id: 201-212) ==========
+    { id: 201, name: "زيت اللافندر العطري", category: "زيوت", price: 14, img: "asset/images/lavender.jpg", link: "product-details.html?id=1", keywords: ["لافندر", "زيت", "زبت"] },
+    { id: 202, name: "زيت الورد الجوري", category: "زيوت", price: 45, img: "asset/images/rose.jpg", link: "product-details.html?id=2", keywords: ["ورد","زيت", "زبت"] },
+    { id: 203, name: "زيت إكليل الجبل", category: "زيوت", price: 17, img: "asset/images/rosemaryoil.png", link: "product-details.html?id=3", keywords: ["إكليل جبل", "زيت", "زبت"] },
+    { id: 204, name: "زيت شجرة الشاي", category: "زيوت", price: 15, img: "asset/images/teatree.jpg", link: "product-details.html?id=6", keywords: ["شجرة شاي",  "زيت", "زبت"] },
+    { id: 205, name: "زيت النعناع الفلفلي", category: "زيوت", price: 12, img: "asset/images/peppermint.jpg", link: "product-details.html?id=4", keywords: ["نعناع", "زيت", "زبت"] },
+    { id: 206, name: "زيت الياسمين", category: "زيوت", price: 16, img: "asset/images/jasmine-oil.png", link: "product-details.html?id=5", keywords: ["ياسمين",  "زيت", "زبت"] },
+    { id: 207, name: "زيت البابونج", category: "زيوت", price: 16, img: "asset/images/chamomileoil.png", link: "product-details.html?id=7", keywords: ["بابونج",  "زيت", "زبت"] },
+    { id: 208, name: "زيت البرتقال الحلو", category: "زيوت", price: 12, img: "asset/images/orangeoil.jpg", link: "product-details.html?id=8", keywords: ["برتقال",  "زيت", "زبت"] },
+    { id: 209, name: "زيت الليمون", category: "زيوت", price: 12, img: "asset/images/lemon.jpg", link: "product-details.html?id=9", keywords: ["ليمون",  "زيت", "زبت"] },
+    { id: 210, name: "زيت الزيتون البكر الفلسطيني", category: "زيوت", price: 16, img: "asset/images/olive.jpg", link: "product-details.html?id=13", keywords: ["زيت زيتون",  "زيت", "زبت"] },
+    { id: 211, name: "زيت اللوز الحلو", category: "زيوت", price: 14, img: "asset/images/almondoil.png", link: "product-details.html?id=14", keywords: ["لوز حلو",  "زيت", "زبت"] },
+    { id: 212, name: "زيت جوز الهند العضوي", category: "زيوت", price: 12, img: "asset/images/coconut.jpg", link: "product-details.html?id=15", keywords: ["جوز هند", "ترطيب", "زيت", "زبت"] },
+
+    // ========== بهارات (id: 301-312) ==========
+    { id: 301, name: "بهارات مشكلة (عربية)", category: "بهارات", price: 9, img: "asset/images/spice-mix.jpg", link: "product-details.html?id=68", keywords: ["بهارات عربية", "بهار", "بهر", "بهارات"] },
+    { id: 302, name: "بهارات غارام ماسالا", category: "بهارات", price: 17, img: "asset/images/garam-masala.jpg", link: "product-details.html?id=84", keywords: ["غارام ماسالا",  "بهار", "بهر", "بهارات"] },
+    { id: 303, name: "بهارات شاورما", category: "بهارات", price: 9, img: "asset/images/shawarma-spice.jpg", link: "product-details.html?id=85", keywords: ["شاورما",  "بهار", "بهر", "بهارات", "مشاوي"] },
+    { id: 304, name: "بابريكا", category: "بهارات", price: 7, img: "asset/images/paprika.jpg", link: "product-details.html?id=80", keywords: ["بابريكا", "فلفل حلو", "مدخن", "دجاج", "بهار", "بهر", "بهارات"] },
+    { id: 305, name: "كركم", category: "بهارات", price: 7, img: "asset/images/turmeric-spice.jpg", link: "product-details.html?id=75", keywords: ["كركم","هندي","بهار", "بهر", "بهارات"] },
+    { id: 306, name: "فلفل أسود مطحون", category: "بهارات", price: 6, img: "asset/images/black-pepper.jpg", link: "product-details.html?id=79", keywords: ["فلفل أسود",  "بهار", "بهر", "بهارات"] },
+    { id: 307, name: "كمون", category: "بهارات", price: 5, img: "asset/images/cumin-spice.jpg", link: "product-details.html?id=73", keywords: ["كمون", "بهارات",  "بهار", "بهر", "بهارات"] },
+    { id: 308, name: "كزبرة جافة مطحونة", category: "بهارات", price: 4, img: "asset/images/coriander-spice.jpg", link: "product-details.html?id=74", keywords: ["كزبرة",  "بهار", "بهر", "بهارات"] },
+    { id: 309, name: "هيل (حبهان)", category: "بهارات", price: 20, img: "asset/images/cardamom-spice.jpg", link: "product-details.html?id=77", keywords: ["هيل", "حبهان",  "بهار", "بهر", "بهارات"] },
+    { id: 310, name: "قرنفل", category: "بهارات", price: 9, img: "asset/images/clove-spice.jpg", link: "product-details.html?id=78", keywords: ["قرنفل", "كبش",  "بهار", "بهر", "بهارات"] },
+    { id: 311, name: "زنجبيل مطحون", category: "بهارات", price: 8, img: "asset/images/ginger-spice.jpg", link: "product-details.html?id=76", keywords: ["زنجبيل",  "بهار", "بهر", "بهارات"] },
+    { id: 312, name: "قرفة مطحونة", category: "بهارات", price: 8, img: "asset/images/cinnamon-spice.jpg", link: "product-details.html?id=82", keywords: ["قرفة",  "بهار", "بهر", "بهارات"] },
+
+    // ========== عناية شخصية (id: 401-414) ==========
+    { id: 401, name: "صابون زيت الزيتون الطبيعي", category: "عناية", price: 14, img: "asset/images/olive-soap.jpg", link: "product-details.html?id=92", keywords: ["صابون", "زيتون",  "ترطيب"] },
+    { id: 402, name: "صابونة الفحم النشط", category: "عناية", price: 17, img: "asset/images/charcoal-soap.jpg", link: "product-details.html?id=93", keywords: ["صابون", "فحم", "زيوت"] },
+    { id: 403, name: "الصابون الأفريقي الأسود التقليدي", category: "عناية", price: 22, img: "asset/images/african-soap.jpg", link: "product-details.html?id=100", keywords: ["صابون افريقي", "اسود",  "بشرة", "شعر"] },
+    { id: 404, name: "صابون العسل الطبيعي", category: "عناية", price: 16, img: "asset/images/honey-soap.jpg", link: "product-details.html?id=94", keywords: ["صابون", "عسل"] },
+    { id: 405, name: "صابون الصبار الطبيعي", category: "عناية", price: 17, img: "asset/images/aloe-soap.jpg", link: "product-details.html?id=95", keywords: ["صابون", "صبار", "الوفيرا", "تهيج"] },
+    { id: 406, name: "زبدة الشيا", category: "عناية", price: 24, img: "asset/images/shea-butter.jpg", link: "product-details.html?id=106", keywords: ["زبدة شيا", "ترطيب", "بشرة"] },
+    { id: 407, name: "كريم الورد المركز", category: "عناية", price: 22, img: "asset/images/rose-cream.jpg", link: "product-details.html?id=107", keywords: ["كريم", "ورد", "تبييض", "ترطيب"] },
+    { id: 408, name: "جل الصبار (الألوفيرا)", category: "عناية", price: 14, img: "asset/images/aloe-gel.jpg", link: "product-details.html?id=111", keywords: ["جل", "صبار", "الوفيرا", "ترطيب", "مهدئ"] },
+    { id: 409, name: "ماء الورد المقطر الطبيعي", category: "عناية", price: 12, img: "asset/images/rose-water.jpg", link: "product-details.html?id=112", keywords: ["ماء ورد", "مقطر", "تونر", "منعش"] },
+    { id: 410, name: "الليفة المغربية الأصلية", category: "عناية", price: 20, img: "asset/images/moroccan-loofah.png", link: "product-details.html?id=113", keywords: ["ليفة", "مغربية", "تقشير"] },
+    { id: 411, name: "طين الغسول المغربي الطبيعي", category: "عناية", price: 16, img: "asset/images/ghassoul-clay.jpg", link: "product-details.html?id=114", keywords: ["طين", "غسول", "مغربي", "بشرة", "شعر"] },
+    { id: 412, name: "صابون فيتامين سي المبيّضة", category: "عناية", price: 20, img: "asset/images/vitc-soap.jpg", link: "product-details.html?id=99", keywords: ["صابون", "فيتامين سي", "تفتيح", "إشراقة"] },
+    { id: 414, name: "مقشر السكر بالورد وزيت جوز الهند", category: "عناية", price: 17, img: "asset/images/rose-scrub.jpg", link: "product-details.html?id=105", keywords: ["مقشر", "ورد", "جوز هند", "تقشير"] }
+];

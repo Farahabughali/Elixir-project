@@ -7,6 +7,8 @@
     <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <link rel="stylesheet" href="wholesale.css">
+    <link rel="stylesheet" href="wholesale-search-modal.css">
+    <link rel="stylesheet" href="wholesale-cart.css">
 </head>
 <body>
 
@@ -25,9 +27,9 @@
                         <i class="fa-solid fa-cart-shopping"></i>
                     </a>
                 </div>
-                <a href="#" class="icon-btn search-icon">
-                    <i class="fa-brands fa-sistrix"></i>
-                </a>
+                <button class="icon-btn search-icon" onclick="openWholesaleSearchModal()">
+                    <i class="fa-solid fa-magnifying-glass"></i>
+                </button>
             </div>
         </div>
 
@@ -75,7 +77,23 @@
     <i class="fas fa-arrow-up"></i>
 </button>
 
-<link rel="stylesheet" href="wholesale-cart.css">
+<!-- نافذة البحث لتاجر الجملة -->
+<div id="wholesaleSearchModal" class="search-modal-overlay">
+    <div class="search-modal-container">
+        <div class="search-header">
+            <h3><i class="fas fa-search"></i> بحث في متجر الجملة</h3>
+            <button class="close-search" id="closeWholesaleSearchBtn">&times;</button>
+        </div>
+        <div class="search-input-wrapper">
+            <i class="fas fa-search"></i>
+            <input type="text" id="wholesaleSearchInput" placeholder="ابحث عن منتج... زيت، عشبة، بهار..." autocomplete="off">
+        </div>
+        <div id="wholesaleSearchResults" class="search-results"></div>
+    </div>
+</div>
+
+<script src="wholesale-search-data.js"></script>
+<script src="wholesale-search-modal.js"></script>
 <script src="wholesale-cart.js"></script>
 
 <script>
@@ -142,7 +160,7 @@
 
     let currentFilter = "all";
 
-    // ========== دوال المفضلة (جديدة) ==========
+    // ========== دوال المفضلة ==========
     function updateWholesaleBadges() {
         const fav = JSON.parse(localStorage.getItem('elixir_wholesale_favorites') || '[]');
         const favBadge = document.getElementById('wholesaleFavCount');
@@ -238,7 +256,6 @@
             `;
         }).join('');
 
-        // ربط أحداث القلب (المفضلة)
         document.querySelectorAll('.wholesale-fav-icon').forEach(icon => {
             icon.addEventListener('click', (e) => {
                 e.stopPropagation();
@@ -247,7 +264,6 @@
             });
         });
 
-        // ربط أزرار الإضافة (السلة - موجودة سابقاً)
         document.querySelectorAll('.add-wholesale-cart').forEach(btn => {
             btn.addEventListener('click', (e) => {
                 e.preventDefault();
@@ -260,7 +276,6 @@
             });
         });
 
-        // ربط أزرار عرض التفاصيل
         document.querySelectorAll('.view-details-btn').forEach(btn => {
             btn.addEventListener('click', (e) => {
                 e.preventDefault();
@@ -272,7 +287,7 @@
         if (window.applyFadeToWholesaleCards) window.applyFadeToWholesaleCards();
     }
 
-    // ========== دوال السلة (موجودة سابقاً ولم نغيرها) ==========
+    // ========== دوال السلة ==========
     function addToWholesaleCart(id, name, price, img) {
         let cart = JSON.parse(localStorage.getItem('elixir_wholesale_cart')) || [];
         const existing = cart.find(item => item.id === id);
@@ -336,6 +351,42 @@
     scrollBtn.addEventListener('click', () => {
         window.scrollTo({ top: 0, behavior: 'smooth' });
     });
+    
+
+// فتح النافذة
+function openWholesaleSearchModal() {
+    const modal = document.getElementById('wholesaleSearchModal');
+    if (modal) modal.style.display = 'flex';
+    document.getElementById('wholesaleSearchInput')?.focus();
+}
+
+// إغلاق النافذة
+function closeWholesaleSearchModal() {
+    document.getElementById('wholesaleSearchModal').style.display = 'none';
+}
+
+// البحث
+document.getElementById('wholesaleSearchInput')?.addEventListener('input', function(e) {
+    const q = e.target.value.toLowerCase();
+    const results = wholesaleSearchData.filter(p => p.name.toLowerCase().includes(q));
+    const container = document.getElementById('wholesaleSearchResults');
+    if (!container) return;
+    if (!q) { container.innerHTML = '<div class="no-results">✨ ابدأ الكتابة</div>'; return; }
+    if (results.length === 0) { container.innerHTML = '<div class="no-results">❌ لا توجد نتائج</div>'; return; }
+    container.innerHTML = results.map(p => `
+        <div class="result-item" onclick="window.location.href='${p.link}'">
+            <img src="${p.img}" style="width:50px;height:50px;border-radius:10px;">
+            <div><strong>${p.name}</strong><br>${p.category} - ${p.price} ₪</div>
+        </div>
+    `).join('');
+});
+
+// إغلاق النافذة بالضغط على الـ X
+document.getElementById('closeWholesaleSearchBtn')?.addEventListener('click', closeWholesaleSearchModal);
+// إغلاق النافذة بالضغط على الخلفية
+document.getElementById('wholesaleSearchModal')?.addEventListener('click', function(e) {
+    if (e.target === this) closeWholesaleSearchModal();
+});
 
     updateWholesaleCartBadge();
     updateWholesaleBadges();
