@@ -16,23 +16,31 @@
 
 <header>
     <div class="main-header">
-        
         <div class="header-section header-right">
-    <button id="adminMenuToggle" class="admin-menu-toggle-header">
-        <i class="fas fa-bars"></i>
-    </button>
-</div>
-
+            <div class="header-icons">
+                <a href="favorite.html" class="icon-btn favorite-icon">
+                    <span class="favorite-count">0</span>
+                    <i class="fa-regular fa-heart"></i>
+                </a>
+                <a href="cart.html" class="icon-btn cart-icon">
+                    <span class="cart-count">0</span>
+                    <i class="fa-solid fa-cart-shopping"></i>
+                </a>
+                <button class="icon-btn search-icon" onclick="openSearchModal()">
+                    <i class="fa-solid fa-magnifying-glass"></i>
+                </button>
+            </div>
+        </div>
         <div class="header-section header-center logo-section">
             <div class="logo-circle">
-                <img src="/asset/images/logo.png">
+                <img src="asset/images/logo.png" alt="Logo">
             </div>
             <span class="web-name">Elixir</span>
         </div>
-
-        <div class="header-section header-left"></div>
+        <div class="header-section header-left">
+            <button class="wholesale-btn" onclick="window.location.href='login.html'">دخول تجار الجملة</button>
+            <button class="orders-history-btn" onclick="window.location.href='orders-history.html'">طلباتي السابقة</button>
         </div>
-
     </div>
 </header>
 
