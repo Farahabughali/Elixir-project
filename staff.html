@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+    <title>Elixir | بوابة الموظفين - المهام والطلبات</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link rel="stylesheet" href="staff.css">
+</head>
+<body class="bg-gradient-to-br from-[#f4fbf7] to-[#eef3ef]">
+
+    <div id="toastContainer" class="fixed bottom-6 left-1/2 -translate-x-1/2 z-50 flex flex-col gap-3 pointer-events-none"></div>
+
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 md:py-12">
+        <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-10">
+            <div>
+                <div class="flex items-center gap-3">
+                    <div class="w-10 h-10 rounded-full bg-white flex items-center justify-center shadow-md overflow-hidden">
+                      <img src="asset/images/logo.png" alt="Elixir Logo" class="w-full h-full object-cover">
+                    </div>
+                    <h1 class="text-3xl md:text-4xl font-black text-[#1a2e21] tracking-tight">بوابة الموظفين</h1>
+                </div>
+                <p class="text-slate-500 mt-2 mr-12 text-sm font-medium">أنجز مهامك • تابع الطلبات • تعاون مع الفريق</p>
+            </div>
+            <div class="bg-white/70 backdrop-blur-sm px-5 py-2 rounded-2xl shadow-sm border border-white/40">
+                <div class="flex items-center gap-2 text-sm text-slate-600">
+                    <i class="fas fa-calendar-alt text-[#438e56]"></i>
+                    <span id="currentDate" class="font-semibold"></span>
+                </div>
+            </div>
+        </div>
+
+        <!-- اختيار الموظف -->
+        <div class="bg-white rounded-3xl shadow-md border border-slate-100 p-6 md:p-8 mb-10 transition-all hover:shadow-lg">
+            <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-5">
+                <div class="flex items-center gap-4">
+                    <div class="w-14 h-14 rounded-2xl bg-[#438e56]/10 flex items-center justify-center text-[#438e56]">
+                        <i class="fas fa-user-tie text-2xl"></i>
+                    </div>
+                    <div>
+                        <h2 class="text-xl font-bold text-slate-800">مرحباً في لوحة العمل</h2>
+                        <p class="text-slate-400 text-sm">اختر اسمك لإظهار المهام والطلبات المسندة إليك</p>
+                    </div>
+                </div>
+                <div class="w-full md:w-72 relative">
+                    <select id="employeeSelect" class="appearance-none w-full bg-slate-50 border-2 border-slate-200 rounded-2xl py-3.5 px-5 pr-12 text-slate-700 font-semibold focus:border-[#438e56] focus:outline-none transition cursor-pointer">
+                        <option value="">-- اختر الموظف --</option>
+                    </select>
+                    <i class="fas fa-chevron-down absolute left-5 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none"></i>
+                </div>
+            </div>
+        </div>
+
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+            <!-- العمود الأيسر: المهام -->
+            <div class="lg:col-span-2 space-y-6">
+                <div class="bg-white rounded-3xl shadow-sm border border-slate-100 overflow-hidden">
+                    <div class="bg-[#1a2e21] px-6 py-5 flex justify-between items-center">
+                        <div class="flex items-center gap-3">
+                            <i class="fas fa-tasks text-white text-xl"></i>
+                            <h3 class="text-white font-bold text-xl">مهامي النشطة</h3>
+                        </div>
+                        <span id="tasksCounter" class="bg-white/20 text-white text-sm font-bold px-3 py-1 rounded-full">0</span>
+                    </div>
+                    <div id="tasksContainer" class="divide-y divide-slate-100 min-h-[280px] transition-all">
+                        <div class="p-10 text-center text-slate-400 flex flex-col items-center gap-3">
+                            <i class="fas fa-user-slash text-4xl opacity-40"></i>
+                            <p>يرجى اختيار موظف لعرض المهام المسندة</p>
+                        </div>
+                    </div>
+                </div>
+
+                
+                <div class="bg-emerald-50/40 rounded-2xl p-5 border border-emerald-100 flex items-start gap-3">
+                    <i class="fas fa-lightbulb text-emerald-600 text-xl mt-0.5"></i>
+                    <div>
+                        <p class="text-sm font-bold text-emerald-800">💡 تذكير ذكي</p>
+                        <p class="text-xs text-emerald-700">بعد إنجاز مهمة "إعادة تعبئة"، سيتم تحديث المخزون تلقائياً. ويمكنك تغيير حالة الطلبات من القائمة المنسدلة.</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- العمود الأيمن: معلومات الموظف + تنبيهات المخزون + الطلبات -->
+            <div class="space-y-6">
+                <!-- بطاقة الموظف الحالي -->
+                <div id="currentEmployeeCard" class="bg-gradient-to-br from-white to-slate-50 rounded-2xl p-6 border border-slate-100 shadow-sm hidden">
+                    <div class="flex items-center gap-4 border-b border-slate-100 pb-4 mb-4">
+                        <div class="w-16 h-16 rounded-2xl bg-[#438e56] flex items-center justify-center text-white text-2xl font-bold shadow-md" id="employeeAvatar">س</div>
+                        <div>
+                            <p class="text-xs text-slate-400 uppercase tracking-wide">الموظف الحالي</p>
+                            <h4 id="currentEmpName" class="text-xl font-black text-[#1a2e21]">—</h4>
+                            <p id="currentEmpRole" class="text-sm text-slate-500">—</p>
+                        </div>
+                    </div>
+                    <div class="flex justify-between items-center">
+                        <div class="text-center flex-1">
+                            <p class="text-2xl font-black text-[#438e56]" id="pendingCountStat">0</p>
+                            <p class="text-[10px] text-slate-400">مهام معلقة</p>
+                        </div>
+                        <div class="h-8 w-px bg-slate-200"></div>
+                        <div class="text-center flex-1">
+                            <i class="fas fa-check-circle text-slate-300 text-xl"></i>
+                            <p class="text-xs text-slate-400 mt-1">جاهز للإنجاز</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- قسم الطلبات الموكلة ) -->
+                <div class="bg-white rounded-2xl shadow-sm border border-indigo-100 overflow-hidden">
+                    <div class="bg-indigo-50 px-5 py-4 flex items-center gap-2 border-b border-indigo-100">
+                        <i class="fas fa-truck text-indigo-600 text-lg"></i>
+                        <h4 class="font-bold text-indigo-800">الطلبات الموكلة إليّ</h4>
+                    </div>
+                    <div id="staffOrdersContainer" class="p-3 space-y-3 max-h-80 overflow-y-auto">
+                        <div class="text-center text-slate-400 text-sm py-6">اختر موظفاً لعرض الطلبات</div>
+                    </div>
+                </div>
+
+                <!-- تنبيهات المخزون -->
+                <div class="bg-white rounded-2xl shadow-sm border border-amber-100 overflow-hidden">
+                    <div class="bg-amber-50 px-5 py-4 flex items-center gap-2 border-b border-amber-100">
+                        <i class="fas fa-exclamation-triangle text-amber-600 text-lg"></i>
+                        <h4 class="font-bold text-amber-800">تنبيهات المخزون</h4>
+                    </div>
+                    <div id="lowStockList" class="p-4 space-y-3 max-h-52 overflow-y-auto">
+                        <div class="text-center text-slate-400 text-sm py-6">تحميل البيانات...</div>
+                    </div>
+                </div>
+
+                <!-- زر تحديث -->
+                <button id="refreshDataBtn" class="w-full bg-white/80 border border-slate-200 hover:bg-slate-50 text-slate-600 rounded-2xl py-3 flex items-center justify-center gap-2 transition font-medium shadow-sm">
+                    <i class="fas fa-sync-alt text-sm"></i> تحديث البيانات من المدير
+                </button>
+            </div>
+        </div>
+
+        <div class="mt-16 text-center text-xs text-slate-400 border-t border-slate-200 pt-8">
+            <i class="fas fa-shield-alt text-[#438e56] mx-1"></i> Elixir Staff Portal • المهام والطلبات محدثة لحظياً
+        </div>
+    </div>
+
+    <script src="staff.js"></script>
+</body>
+</html>
