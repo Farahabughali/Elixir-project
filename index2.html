@@ -594,6 +594,38 @@ function showToast(message) {
 }
    
 
+// ==========إضافة إلى السلة==========
+document.addEventListener('click', function(e) {
+    const btn = e.target.closest('.add-cart');
+    if (!btn) return;
+    e.preventDefault();
+    const id = parseInt(btn.getAttribute('data-id'));
+    const name = btn.getAttribute('data-name');
+    const price = parseFloat(btn.getAttribute('data-price'));
+    const img = btn.getAttribute('data-img');
+    if (!id || !name || !price) {
+        console.warn('الزر يفتقد البيانات المطلوبة');
+        return;
+    }
+    let cart = JSON.parse(localStorage.getItem('elixir_cart') || '[]');
+    const existing = cart.find(item => item.id === id);
+    if (existing) {
+        existing.quantity++;
+        showToast(`🧴 تمت زيادة الكمية: ${name} (${existing.quantity})`);
+    } else {
+        cart.push({ id, name, price, img, quantity: 1 });
+        showToast(`تمت إضافة ${name} إلى السلة 😊`);
+    }
+    localStorage.setItem('elixir_cart', JSON.stringify(cart));
+    const headerBadge = document.querySelector('.cart-count');
+    if (headerBadge) {
+        const total = cart.reduce((sum, i) => sum + i.quantity, 0);
+        headerBadge.innerText = total;
+    }
+    if (window.updateFloatingCart) window.updateFloatingCart();
+});
+
+
 function updateCartCount() {
     let cart = JSON.parse(localStorage.getItem('elixir_cart') || '[]');
     const total = cart.reduce((sum, item) => sum + item.quantity, 0);
@@ -601,6 +633,7 @@ function updateCartCount() {
     if (badge) badge.innerText = total;
 }
 updateCartCount();
+
 
 // ==========تأثير الظهور==========
 (function() {
