@@ -1,0 +1,481 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Elixir | بكجاتنا</title>
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <link rel="stylesheet" href="packages.css">
+</head>
+<body>
+
+<!-- الهيدر -->
+<header>
+    <div class="main-header">
+        <div class="header-right">
+            <a href="index2.html" style="display: flex; align-items: center; gap: 15px; text-decoration: none;">
+                <div class="logo-circle">
+                    <img src="asset/images/logo.png" alt="Logo">
+                </div>
+                <span class="web-name">Elixir</span>
+            </a>
+            <a href="packages2.html" style="display: flex; align-items: center; gap: 15px; text-decoration: none;">
+                <span class="page-title-in-header">البكجات</span>
+            </a>
+        </div>
+        <div class="header-left">
+            <span class="help-text">🎁 اختر البكج المناسب لك</span>
+            <a href="chatbot.html" class="ai-consult-link">
+                <i class="fas fa-robot"></i> استشر الذكاء الاصطناعي
+            </a>
+        </div>
+    </div>
+</header>
+
+<div class="container">
+    <div class="filter-bar">
+        <span class="filter-label">🔍 اكتشف البكجات:</span>
+        <div class="filter-buttons">
+            <button class="filter-btn active" data-filter="all">الكل</button>
+            <button class="filter-btn" data-filter="نشاط">النشاط والتوازن</button>
+            <button class="filter-btn" data-filter="ورد">جوهر الورد</button>
+            <button class="filter-btn" data-filter="بهارات">عالم البهارات</button>
+            <button class="filter-btn" data-filter="نضارة">النضارة والإشراقة</button>
+            <button class="filter-btn" data-filter="هدوء">الهدوء والتأمل</button>
+            <button class="filter-btn" data-filter="عناية">العناية الفاخرة للبشرة</button>
+            <button class="filter-btn" data-filter="شفاء">الشفاء الطبيعي</button>
+            <button class="filter-btn" data-filter="شعر">العناية بالشعر</button>
+        </div>
+    </div>
+
+    <div class="packages-grid" id="packagesGrid"></div>
+
+    <div class="back-home">
+        <a href="index2.html"><i class="fas fa-arrow-right"></i> العودة إلى الرئيسية</a>
+    </div>
+</div>
+
+<div id="customToast" class="toast-message">
+    <i class="fas fa-check-circle"></i>
+    <span id="toastText"></span>
+</div>
+
+<button id="scrollTopBtn" class="scroll-top-btn" style="display:none;">
+    <i class="fas fa-arrow-up"></i>
+</button>
+
+<link rel="stylesheet" href="floating-cart.css">
+<script src="floating-cart.js"></script>
+
+<script>
+    // ========== بيانات البكجات ==========
+    const packagesData = [
+        { id: 1001, name: "بكج النشاط والتوازن", category: "نشاط", desc: "منتجات تمنحك الطاقة والنشاط، مع زيت النعناع المنعش والعسل الطبيعي وزيت الليمون وإكليل الجبل.", price: 65, img: "asset/images/balance-package.png", bgColor: "#fff3e0", btnColor: "#ef6c00", section: "packages", catText: "بكج نشاط" },
+        { id: 1002, name: "بكج جوهر الورد", category: "ورد", desc: "زيت الورد الجوري، ماء الورد، مرطب الورد وبتلات الورد المجففة للعناية الفاخرة.", price: 110, img: "asset/images/roseessence-package.png", bgColor: "#fce4ec", btnColor: "#c2185b", section: "packages", catText: "بكج ورد" },
+        { id: 1003, name: "بكج عالم البهارات", category: "بهارات", desc: "بهارات مشكلة، غارام ماسالا، شاورما وبابريكا – جولة في مطابخ العالم.", price: 45, img: "asset/images/spices-package.jpg", bgColor: "#efebe9", btnColor: "#8d6e63", section: "packages", catText: "بكج بهارات" },
+        { id: 1004, name: "بكج النضارة والإشراقة", category: "نضارة", desc: "تونر ماء الورد، صابون زيتون، كريم ورد وزيت لوز حلو لنضارة فائقة.", price: 75, img: "asset/images/freshness-package.jpg", bgColor: "#e0f7fa", btnColor: "#00838f", section: "packages", catText: "بكج نضارة" },
+        { id: 1005, name: "بكج الهدوء والتأمل", category: "هدوء", desc: "زيت اللافندر، شاي البابونج، زيت الياسمين وبتلات الورد للاسترخاء العميق.", price: 46, img: "asset/images/calm-package.jpg", bgColor: "#e8eaf6", btnColor: "#3949ab", section: "packages", catText: "بكج هدوء" },
+        { id: 1006, name: "بكج العناية الفاخرة للبشرة", category: "عناية", desc: "صابونة طين أبيض، زيت أركان، تونر ماء ورد ومرطب ورد لبشرة فاخرة.", price: 80, img: "asset/images/luxury-package.jpg", bgColor: "#ffe0f0", btnColor: "#d81b60", section: "packages", catText: "بكج عناية" },
+        { id: 1007, name: "بكج الشفاء الطبيعي", category: "شفاء", desc: "عسل أعشاب، زيت حبة سوداء، تونر بابونج وزيت شجرة الشاي للشفاء الطبيعي.", price: 68, img: "asset/images/healing-package.jpg", bgColor: "#e0f2e0", btnColor: "#43a047", section: "packages", catText: "بكج شفاء" },
+        { id: 1008, name: "بكج العناية بالشعر", category: "شعر", desc: "زيت إكليل الجبل، زيت جوز الهند، زيت الخروع وزيت الأرجان للعناية الفائقة بالشعر.", price: 85, img: "asset/images/hair-package.jpg", bgColor: "#fef3e8", btnColor: "#c47a3a", section: "packages", catText: "بكج شعر" }
+    ];
+
+    let currentFilter = "all";
+
+    // جلب العروض من localStorage
+    function getOffers() {
+        return JSON.parse(localStorage.getItem('elixir_offers')) || [];
+    }
+
+    // ========== عرض البكجات مع دعم العروض ==========
+    function renderPackages() {
+        const grid = document.getElementById("packagesGrid");
+        let filtered = packagesData;
+        if (currentFilter !== "all") {
+            filtered = packagesData.filter(pkg => pkg.category === currentFilter);
+        }
+        
+        const offers = getOffers();
+        
+        if (filtered.length === 0) {
+            grid.innerHTML = `<div class="no-results"><i class="fas fa-search"></i> لا توجد بكجات مطابقة للفلتر</div>`;
+            return;
+        }
+        
+        grid.innerHTML = filtered.map(pkg => {
+            let isFav = false;
+            let favorites = JSON.parse(localStorage.getItem('elixir_favorites')) || [];
+            if (favorites.includes(pkg.id)) isFav = true;
+            
+            // التحقق من وجود عرض
+            const offer = offers.find(o => o.productId === pkg.id && o.section === "packages");
+            const displayPrice = offer ? offer.newPrice : pkg.price;
+            const hasOffer = !!offer;
+            
+            return `
+            <div class="package-card" data-category="${pkg.category}" data-id="${pkg.id}" style="background: ${pkg.bgColor}; border-bottom: 4px solid ${pkg.btnColor}; position:relative;">
+                <div class="fav-icon ${isFav ? 'active' : ''}" data-id="${pkg.id}">
+                    <i class="fa-${isFav ? 'solid' : 'regular'} fa-heart"></i>
+                </div>
+                ${hasOffer ? `<span class="offer-badge-small" style="position:absolute; top:12px; left:12px; background:#e74c3c; color:white; padding:3px 8px; border-radius:20px; font-size:11px; z-index:5;">-${offer.discount}%</span>` : ''}
+                <img class="package-img" src="${pkg.img}" alt="${pkg.name}" onerror="this.src='asset/images/placeholder.png'">
+                <div class="package-info">
+                    <div class="package-title">${pkg.name}</div>
+                    <div class="package-desc">${pkg.desc}</div>
+                    <div class="price-row">
+                        <span class="price">${displayPrice} ₪</span>
+                        <div class="btn-group">
+                            <button class="view-details" data-id="${pkg.id}" data-name="${pkg.name}">📄 عرض التفاصيل</button>
+                            <button class="add-package-cart" data-id="${pkg.id}" data-name="${pkg.name}" data-price="${displayPrice}" data-img="${pkg.img}" style="background: ${pkg.btnColor};">🛒 إضافة إلى السلة</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            `;
+        }).join('');
+        
+        bindPackageEvents();
+        addAdminButtons();
+    }
+
+    // ========== ربط الأحداث الأساسية ==========
+    function bindPackageEvents() {
+        document.querySelectorAll('.fav-icon').forEach(icon => {
+            icon.onclick = (e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                const productId = parseInt(icon.dataset.id);
+                const rect = icon.getBoundingClientRect();
+                burstHearts(rect.left + rect.width / 2, rect.top + rect.height / 2);
+                updateFavorite(icon, productId);
+            };
+        });
+        
+        document.querySelectorAll('.add-package-cart').forEach(btn => {
+            btn.onclick = (e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                addToCartPackage(btn);
+            };
+        });
+        
+        document.querySelectorAll('.view-details').forEach(btn => {
+            btn.onclick = (e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                window.location.href = `package-details.html?id=${btn.dataset.id}`;
+            };
+        });
+    }
+
+    // ========== إضافة أزرار الإدارة (زائد) ==========
+    function addAdminButtons() {
+        document.querySelectorAll('.package-card').forEach(card => {
+            const addCartBtn = card.querySelector('.add-package-cart');
+            const packageId = addCartBtn ? parseInt(addCartBtn.dataset.id) : null;
+            if (packageId && !card.querySelector('.admin-product-btn')) {
+                const adminBtn = document.createElement('div');
+                adminBtn.className = 'admin-product-btn';
+                adminBtn.innerHTML = '<i class="fas fa-plus"></i>';
+                adminBtn.onclick = (e) => {
+                    e.stopPropagation();
+                    showAdminDropdown(packageId, adminBtn);
+                };
+                card.appendChild(adminBtn);
+            }
+        });
+    }
+
+    // ========== إدارة الأدمن (زائد) مع تاريخ الانتهاء ==========
+    let currentPackageForDiscount = null;
+
+    function showAdminDropdown(packageId, btnElement) {
+        document.querySelectorAll('.admin-dropdown').forEach(d => d.classList.remove('show'));
+        
+        let dropdown = btnElement.parentElement.querySelector('.admin-dropdown');
+        if (!dropdown) {
+            dropdown = document.createElement('div');
+            dropdown.className = 'admin-dropdown';
+            dropdown.innerHTML = `
+                <a href="#" onclick="addToNewArrivalsPackage(${packageId}); return false;">
+                    <i class="fas fa-star"></i> إضافة إلى جديدنا
+                </a>
+                <a href="#" onclick="openDiscountModalPackage(${packageId}); return false;">
+                    <i class="fas fa-percent"></i> إضافة إلى العروض
+                </a>
+            `;
+            btnElement.parentElement.appendChild(dropdown);
+        }
+        
+        dropdown.classList.toggle('show');
+        
+        setTimeout(() => {
+            document.addEventListener('click', function closeDropdown(e) {
+                if (!dropdown.contains(e.target) && !btnElement.contains(e.target)) {
+                    dropdown.classList.remove('show');
+                    document.removeEventListener('click', closeDropdown);
+                }
+            });
+        }, 10);
+    }
+
+    // ========== إضافة المنتج إلى جديدنا (النسخة المصححة مع حفظ جميع البيانات) ==========
+    window.addToNewArrivalsPackage = function(packageId) {
+        const pkg = packagesData.find(p => p.id === packageId);
+        if (!pkg) {
+            showToastMessage("❌ المنتج غير موجود");
+            return;
+        }
+        
+        console.log("➕ جاري إضافة البكج:", pkg.name);
+        
+        let newArrivals = JSON.parse(localStorage.getItem('elixir_new_arrivals')) || [];
+        
+        if (newArrivals.some(p => p.id === packageId)) {
+            showToastMessage(`⚠️ "${pkg.name}" موجود بالفعل في جديدنا`);
+            document.querySelectorAll('.admin-dropdown').forEach(d => d.classList.remove('show'));
+            return;
+        }
+        
+        // حفظ جميع بيانات البكج (بما في ذلك الألوان)
+        newArrivals.push({
+            id: pkg.id,
+            name: pkg.name,
+            price: pkg.price,
+            img: pkg.img,
+            category: pkg.category,
+            section: "packages",
+            catText: pkg.catText || "بكج",
+            desc: pkg.desc,
+            bgColor: pkg.bgColor,
+            btnColor: pkg.btnColor,
+            addedAt: new Date().toISOString()
+        });
+        
+        localStorage.setItem('elixir_new_arrivals', JSON.stringify(newArrivals));
+        
+        console.log("✅ تم الحفظ، عدد المنتجات في جديدنا:", newArrivals.length);
+        showToastMessage(`✅ تم إضافة "${pkg.name}" إلى قسم جديدنا`);
+        
+        document.querySelectorAll('.admin-dropdown').forEach(d => d.classList.remove('show'));
+    };
+
+    // فتح نافذة إدخال نسبة الخصم مع تاريخ الانتهاء
+    window.openDiscountModalPackage = function(packageId) {
+        const pkg = packagesData.find(p => p.id === packageId);
+        if (!pkg) return;
+        currentPackageForDiscount = pkg;
+        
+        document.querySelectorAll('.admin-dropdown').forEach(d => d.classList.remove('show'));
+        
+        // الحصول على تاريخ الغد كحد أدنى
+        const tomorrow = new Date();
+        tomorrow.setDate(tomorrow.getDate() + 1);
+        const minDate = tomorrow.toISOString().split('T')[0];
+        
+        // تاريخ بعد 30 يوم كقيمة افتراضية
+        const defaultEndDate = new Date();
+        defaultEndDate.setDate(defaultEndDate.getDate() + 30);
+        const defaultDate = defaultEndDate.toISOString().split('T')[0];
+        
+        const overlay = document.createElement('div');
+        overlay.className = 'discount-modal-overlay';
+        overlay.innerHTML = `
+            <div class="discount-modal">
+                <h3>🎯 إضافة "${pkg.name}" إلى العروض</h3>
+                <input type="number" id="discountPercent" placeholder="نسبة الخصم (%)" min="1" max="90" style="width:100%; padding:10px; margin:10px 0; border-radius:12px; border:1px solid #ddd;">
+                <label style="display:block; text-align:right; font-size:14px; margin-top:10px;">📅 تاريخ انتهاء العرض:</label>
+                <input type="date" id="endDate" value="${defaultDate}" min="${minDate}" style="width:100%; padding:10px; margin:10px 0; border-radius:12px; border:1px solid #ddd;">
+                <p style="font-size:12px; color:#888; text-align:right;">⚠️ إذا تركت التاريخ فارغاً سيكون العرض دائماً</p>
+                <div style="display: flex; gap: 10px; justify-content: center; margin-top: 15px;">
+                    <button id="confirmDiscountBtn" style="background: #438e56; color: white; border: none; padding: 8px 20px; border-radius: 30px; cursor: pointer;">تأكيد</button>
+                    <button id="cancelDiscountBtn" style="background: #ccc; color: #333; border: none; padding: 8px 20px; border-radius: 30px; cursor: pointer;">إلغاء</button>
+                </div>
+            </div>
+        `;
+        document.body.appendChild(overlay);
+        
+        const confirmBtn = overlay.querySelector('#confirmDiscountBtn');
+        const cancelBtn = overlay.querySelector('#cancelDiscountBtn');
+        
+        confirmBtn.onclick = function() {
+            const discountPercent = parseInt(overlay.querySelector('#discountPercent').value);
+            if (!discountPercent || discountPercent < 1 || discountPercent > 90) {
+                showToastMessage("⚠️ الرجاء إدخال نسبة خصم صحيحة (1-90)");
+                return;
+            }
+            
+            const endDate = overlay.querySelector('#endDate').value;
+            
+            if (!currentPackageForDiscount) return;
+            
+            let offers = JSON.parse(localStorage.getItem('elixir_offers')) || [];
+            const existingIndex = offers.findIndex(o => o.productId === currentPackageForDiscount.id && o.section === "packages");
+            
+            const newPrice = (currentPackageForDiscount.price * (100 - discountPercent) / 100).toFixed(2);
+            
+            const offerData = {
+                id: Date.now(),
+                productId: currentPackageForDiscount.id,
+                productName: currentPackageForDiscount.name,
+                productPrice: currentPackageForDiscount.price,
+                productImg: currentPackageForDiscount.img,
+                discount: discountPercent,
+                newPrice: newPrice,
+                startDate: new Date().toISOString().split('T')[0],
+                endDate: endDate || "",
+                active: true,
+                createdAt: new Date().toISOString(),
+                section: "packages",
+                category: currentPackageForDiscount.category,
+                desc: currentPackageForDiscount.desc || "بكج طبيعي متكامل"
+            };
+            
+            if (existingIndex !== -1) {
+                offers[existingIndex] = { ...offers[existingIndex], ...offerData };
+                showToastMessage(`✅ تم تحديث خصم "${currentPackageForDiscount.name}" إلى ${discountPercent}%`);
+            } else {
+                offers.push(offerData);
+                showToastMessage(`✅ تم إضافة "${currentPackageForDiscount.name}" إلى العروض بخصم ${discountPercent}%`);
+            }
+            
+            localStorage.setItem('elixir_offers', JSON.stringify(offers));
+            overlay.remove();
+            currentPackageForDiscount = null;
+            
+            // إعادة التصيير لتحديث الأسعار
+            renderPackages();
+            
+            // تحديث صفحة العروض إذا كانت مفتوحة
+            if (window.refreshOffersPage) window.refreshOffersPage();
+        };
+        
+        cancelBtn.onclick = function() {
+            overlay.remove();
+            currentPackageForDiscount = null;
+        };
+        
+        overlay.onclick = function(e) {
+            if (e.target === overlay) {
+                overlay.remove();
+                currentPackageForDiscount = null;
+            }
+        };
+    };
+
+    function closeDiscountModalPackage() {
+        const overlay = document.querySelector('.discount-modal-overlay');
+        if (overlay) overlay.remove();
+        currentPackageForDiscount = null;
+    }
+
+    // ========== دوال مساعدة ==========
+    function addToCartPackage(btn) {
+        let cart = JSON.parse(localStorage.getItem('elixir_cart')) || [];
+        const id = parseInt(btn.dataset.id);
+        const name = btn.dataset.name;
+        const price = parseFloat(btn.dataset.price);
+        const img = btn.dataset.img;
+        const existing = cart.find(item => item.id === id);
+        if (existing) existing.quantity++;
+        else cart.push({ id, name, price, img, quantity: 1 });
+        localStorage.setItem('elixir_cart', JSON.stringify(cart));
+        updateCartBadge();
+        showToastMessage(`✅ تمت إضافة ${name} بنجاح`);
+    }
+
+    function updateCartBadge() {
+        const cart = JSON.parse(localStorage.getItem('elixir_cart')) || [];
+        const total = cart.reduce((sum, item) => sum + item.quantity, 0);
+        const badge = document.querySelector('.cart-count');
+        if (badge) badge.innerText = total;
+        if (window.updateFloatingCart) window.updateFloatingCart();
+    }
+
+    function updateFavorite(icon, productId) {
+        let favorites = JSON.parse(localStorage.getItem('elixir_favorites')) || [];
+        const index = favorites.indexOf(productId);
+        if (index === -1) {
+            favorites.push(productId);
+            icon.classList.add('active');
+            icon.innerHTML = '<i class="fa-solid fa-heart"></i>';
+        } else {
+            favorites.splice(index, 1);
+            icon.classList.remove('active');
+            icon.innerHTML = '<i class="fa-regular fa-heart"></i>';
+        }
+        localStorage.setItem('elixir_favorites', JSON.stringify(favorites));
+        const favCount = document.querySelector('.favorite-count');
+        if (favCount) favCount.innerText = favorites.length;
+    }
+
+    function burstHearts(x, y) {
+        for (let i = 0; i < 10; i++) {
+            const heart = document.createElement('div');
+            heart.innerHTML = '❤️';
+            heart.classList.add('heart-particle');
+            const offsetX = (Math.random() - 0.5) * 50;
+            const offsetY = (Math.random() - 0.5) * 40;
+            heart.style.left = (x + offsetX) + 'px';
+            heart.style.top = (y + offsetY) + 'px';
+            heart.style.animationDelay = (Math.random() * 0.2) + 's';
+            document.body.appendChild(heart);
+            setTimeout(() => heart.remove(), 1000);
+        }
+    }
+
+    function showToastMessage(message) {
+        const toast = document.getElementById('customToast');
+        if (toast) {
+            document.getElementById('toastText').innerHTML = message;
+            toast.style.display = 'flex';
+            setTimeout(() => toast.style.display = 'none', 3000);
+        }
+    }
+
+    // ========== الفلتر ==========
+    document.querySelectorAll('.filter-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+            document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+            currentFilter = btn.dataset.filter;
+            renderPackages();
+        });
+    });
+
+    // ========== تأثير تغيير لون الخلفية ==========
+    const body = document.body;
+    const originalBg = window.getComputedStyle(body).background;
+
+    document.addEventListener('mouseover', (e) => {
+        const card = e.target.closest('.package-card');
+        if (card) {
+            body.style.transition = "background 0.4s ease";
+            body.style.background = window.getComputedStyle(card).backgroundColor;
+        }
+    });
+
+    document.addEventListener('mouseout', (e) => {
+        const card = e.target.closest('.package-card');
+        if (!card) {
+            body.style.transition = "background 0.4s ease";
+            body.style.background = originalBg;
+        }
+    });
+
+    // ========== زر الرجوع للأعلى ==========
+    const scrollBtn = document.getElementById('scrollTopBtn');
+    window.addEventListener('scroll', () => {
+        scrollBtn.style.display = window.scrollY > 300 ? 'flex' : 'none';
+    });
+    scrollBtn.addEventListener('click', () => {
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+    });
+
+    // ========== بدء التشغيل ==========
+    updateCartBadge();
+    renderPackages();
+</script>
+</body>
+</html>
