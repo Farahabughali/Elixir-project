@@ -1,0 +1,381 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Elixir | منتجات العناية الشخصية</title>
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <link rel="stylesheet" href="personal-care.css">
+    <style>
+        .discount-modal-overlay {
+            position: fixed; top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(0,0,0,0.5); backdrop-filter: blur(4px);
+            z-index: 10000; display: flex; align-items: center; justify-content: center;
+        }
+        .discount-modal { background: white; border-radius: 28px; padding: 30px; width: 350px; text-align: center; }
+        .discount-modal h3 { font-size: 1.3rem; color: #1a2e21; }
+        .discount-modal input { width: 100%; padding: 12px; margin: 15px 0; border: 1px solid #ddd; border-radius: 12px; }
+        .discount-modal button { background: #d696a8; color: white; border: none; padding: 10px 25px; border-radius: 40px; cursor: pointer; margin: 5px; }
+        .discount-modal .cancel-btn { background: #ccc; color: #333; }
+        .custom-toast { position: fixed; bottom: 30px; right: 30px; background: #2c5f2d; color: white; padding: 12px 24px; border-radius: 50px; display: flex; align-items: center; gap: 10px; animation: slideIn 0.3s ease; z-index: 9999; }
+        @keyframes slideIn { from { transform: translateX(100px); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
+    </style>
+</head>
+<body>
+
+<header>
+    <div class="main-header">
+        <div class="header-right">
+            <a href="index2.html" style="display: flex; align-items: center; gap: 15px; text-decoration: none;">
+                <div class="logo-circle"><img src="asset/images/logo.png" alt="Logo"></div>
+                <span class="web-name">Elixir</span>
+            </a>
+            <a href="personal-care2.html" style="display: flex; align-items: center; gap: 15px; text-decoration: none;">
+                <span class="page-title-in-header">العناية الشخصية & الورد</span>
+            </a>
+        </div>
+        <div class="header-left">
+            <span class="help-text">🌸 هل تحتاجين مساعدة في اختيار منتج العناية المناسب؟</span>
+            <a href="chatbot.html" class="ai-consult-link"><i class="fas fa-robot"></i> استشر الذكاء الاصطناعي</a>
+        </div>
+    </div>
+</header>
+
+<div class="container">
+    <div class="filter-bar">
+        <span class="filter-label"> تصفية المنتجات:</span>
+        <select id="filterSelect" class="filter-select">
+            <option value="all">الكل</option>
+            <option value="تونر">تونر منعش</option>
+            <option value="صابون">صابون طبيعي</option>
+            <option value="مقشر">مقشرات طبيعية</option>
+            <option value="مرطب">مرطبات وكريمات</option>
+            <option value="أخرى">أخرى</option>
+        </select>
+        <button id="resetFilter" class="reset-filter"> إعادة ضبط</button>
+    </div>
+    <div class="products-grid" id="careGrid"></div>
+    <div class="back-home"><a href="index2.html"><i class="fas fa-arrow-right"></i> العودة إلى الرئيسية</a></div>
+</div>
+
+<div id="customToast" class="toast-message"><i class="fas fa-check-circle"></i><span id="toastText"></span></div>
+<button id="scrollTopBtn" class="scroll-top-btn" style="display:none;"><i class="fas fa-arrow-up"></i></button>
+
+<link rel="stylesheet" href="floating-cart.css">
+<script src="floating-cart.js"></script>
+
+<script>
+     const careData = [
+        { id: 1, name: "تونر ماء الورد وإكليل الجبل", category: "تونر", desc: "تونر منعش ومنقي للبشرة، يجمع بين فوائد ماء الورد المهدئة وزيت إكليل الجبل المنشط للدورة الدموية.", price: 28, rating: 4.8, img: "asset/images/toner-rosemary-rose.jpg" },
+        { id: 2, name: "تونر النعناع والشاي الأخضر", category: "تونر", desc: "تونر منعش للبشرة الدهنية والمختلطة، يقلل من إفراز الزيوت، يساعد على تقليل اللمعان وتضييق المسام مع شعور بالانتعاش.", price: 22, rating: 4.7, img: "asset/images/toner-mint.jpg" },
+        { id: 3, name: "تونر البابونج", category: "تونر", desc: "تونر مهدئ ولطيف للبشرة الحساسة، يساعد في تهدئة الالتهابات وتقليل الاحمرار بفضل خلاصة البابونج الطبيعية.", price: 24, rating: 4.8, img: "asset/images/chamomiletoner.png" },
+        { id: 4, name: "صابون زيت الزيتون الطبيعي", category: "صابون", desc: "صابون طبيعي مصنوع من زيت الزيتون البكر، يُستخدم للعناية بالبشرة، يتميز بخصائصه المرطبة والمغذية.", price: 18, rating: 4.7, img: "asset/images/olive-soap.jpg" },
+        { id: 5, name: "صابونة الفحم النشط", category: "صابون", desc: "صابونة تحتوي على فحم نشط بخصائص امتصاص عالية، تُستخدم لتنظيف البشرة بعمق وإزالة الزيوت والشوائب.", price: 22, rating: 4.8, img: "asset/images/charcoal-soap.jpg" },
+        { id: 6, name: "صابون العسل الطبيعي", category: "صابون", desc: "صابون طبيعي مصنوع من العسل، لاحتوائه على عناصر غذائية ومضادات أكسدة.", price: 20, rating: 4.9, img: "asset/images/honey-soap.jpg" },
+        { id: 7, name: "صابون الصبار الطبيعي (الألوفيرا)", category: "صابون", desc: "صابون طبيعي غني بهلام الألوفيرا، يعمل على تنظيف البشرة بلطف مع ترطيب عميق، وتهدئة التهيج.", price: 21, rating: 4.7, img: "asset/images/aloe-soap.jpg" },
+        { id: 8, name: "صابون الشوفان الطبيعي", category: "صابون", desc: "صابون طبيعي غني بالشوفان، يتميز بخصائصه المغذية والمهدئة، مناسب للبشرة الحساسة والجافة.", price: 19, rating: 4.8, img: "asset/images/oat-soap.jpg" },
+        { id: 9, name: "صابون الطين الأبيض المغربي", category: "صابون", desc: "صابون طبيعي صلب غني بالطين الأبيض المغربي، يُستخدم لتنقية وتنظيف البشرة بعمق.", price: 24, rating: 4.6, img: "asset/images/ghassoul-soap.jpg" },
+        { id: 10, name: "صابون الكركم الطبيعية", category: "صابون", desc: "صابونة طبيعية غنية بالكركم، تساعد في علاج مشاكل البشرة مثل حب الشباب والتصبغات.", price: 23, rating: 4.7, img: "asset/images/turmeric-soap.jpg" },
+        { id: 11, name: "صابون فيتامين سي المبيّضة", category: "صابون", desc: "صابون طبيعي يحتوي على فيتامين سي، يُستخدم لتنظيف البشرة وتفتيحها ومنحها إشراقة.", price: 25, rating: 4.8, img: "asset/images/vitc-soap.jpg" },
+        { id: 12, name: "الصابون الأفريقي الأسود التقليدي", category: "صابون", desc: "صابون طبيعي عضوي يصنع يدوياً من مواد خام من أفريقيا، يعتبر غذاءً متكاملاً للبشرة والشعر.", price: 28, rating: 4.9, img: "asset/images/african-soap.jpg" },
+        { id: 13, name: "ماسك السكر وزيت الزيتون (مقشر طبيعي)", category: "مقشر", desc: "مقشر طبيعي مكوّن من السكر وزيت الزيتون، يُستخدم لتنظيف البشرة وتقشيرها بلطف.", price: 15, rating: 4.6, img: "asset/images/sugar-scrub.jpg" },
+        { id: 14, name: "مقشر القهوة للجسم", category: "مقشر", desc: "مقشر طبيعي مصنوع من القهوة يُستخدم لإزالة خلايا الجلد الميتة وتنشيط الدورة الدموية.", price: 18, rating: 4.7, img: "asset/images/coffee-scrub.jpg" },
+        { id: 15, name: "ماسك العسل والشوفان والزبادي", category: "مقشر", desc: "ماسك طبيعي مغذي للبشرة، يساعد على ترطيبها وتنظيفها وتغذيتها.", price: 16, rating: 4.8, img: "asset/images/honey-oat-mask.jpg" },
+        { id: 16, name: "مقشر السكر والليمون", category: "مقشر", desc: "مقشر طبيعي يُستخدم لتنظيف البشرة وتقشيرها، يساعد على إزالة الخلايا الميتة.", price: 14, rating: 4.5, img: "asset/images/lemon-scrub.jpg" },
+        { id: 17, name: "مقشر السكر بالورد وزيت جوز الهند", category: "مقشر", desc: "منتج فعال لتنظيف وتجديد البشرة يجمع بين فوائد زهرة الورد وزيت جوز الهند.", price: 22, rating: 4.9, img: "asset/images/rose-scrub.jpg" },
+        { id: 18, name: "زبدة الشيا", category: "مرطب", desc: "مادة طبيعية مستخرجة من شجرة الشيا، تُستخدم لترطيب البشرة وعلاج مشاكلها.", price: 30, rating: 4.9, img: "asset/images/shea-butter.jpg" },
+        { id: 19, name: "كريم الورد المركز", category: "مرطب", desc: "كريم منعش يحتوي على 70% ماء ورد طبيعي، يعمل على تبييض وتنعيم وترطيب البشرة.", price: 28, rating: 4.8, img: "asset/images/rose-cream.jpg" },
+        { id: 20, name: "لوشن الورد المرطب للجسم", category: "مرطب", desc: "لوشن خفيف القوام وسريع الامتصاص، يجمع بين انتعاش ماء الورد وفوائد الشاي الأبيض.", price: 40, rating: 4.6, img: "asset/images/rose-lotion-body.jpg" },
+        { id: 21, name: "فازلين الورد الطبيعي للترطيب", category: "مرطب", desc: "مرطب كثيف القوام معزز بخلاصة الورد، مثالي للعناية بالمناطق التي تعاني من جفاف شديد.", price: 12, rating: 4.7, img: "asset/images/rose-vaseline.jpg" },
+        { id: 22, name: "شمع الورد المرطب", category: "مرطب", desc: "قوالب شمعية صغيرة تذوب بمجرد ملامستها لحرارة الجلد، مصممة لعلاج جفاف المفاصل واليدين.", price: 25, rating: 4.5, img: "asset/images/rose-wax.jpg" },
+        { id: 23, name: "جل الصبار (الألوفيرا)", category: "مرطب", desc: "جل طبيعي يُستخرج من أوراق الألوفيرا، يتميز بخصائصه المرطبة والمهدئة.", price: 18, rating: 4.8, img: "asset/images/aloe-gel.jpg" },
+        { id: 24, name: "ماء الورد المقطر الطبيعي", category: "أخرى", desc: "ماء عطري طبيعي مستخلص من تقطير بتلات الورد، يُستخدم كتونر طبيعي وبخاخ منعش.", price: 15, rating: 4.7, img: "asset/images/rose-water.jpg" },
+        { id: 25, name: "الليفة المغربية الأصلية", category: "أخرى", desc: "ليفة فاخرة مصممة خصيصاً للتقشير العميق ومساعدة البشرة على امتصاص الزيوت والكريمات بشكل أفضل.", price: 25, rating: 4.9, img: "asset/images/moroccan-loofah.png" },
+        { id: 26, name: "طين الغسول المغربي الطبيعي", category: "أخرى", desc: "مستحضر تجميل طبيعي عبارة عن طين معدني يستخدم منذ قرون للعناية بالبشرة والشعر.", price: 20, rating: 4.6, img: "asset/images/ghassoul-clay.jpg" },
+        { id: 27, name: "الحجر الخفاف الطبيعي", category: "أخرى", desc: "أداة تجميل طبيعية تستخدم لتقشير البشرة وتنظيفها وإزالة الجلد الميت.", price: 12, rating: 4.5, img: "asset/images/pumice-stone.jpg" },
+        { id: 28, name: "بتلات الورد الطبيعية المجففة", category: "أخرى", desc: "أوراق ورد طبيعية مجففة بعناية، تستخدم في الاسترخاء والعناية الشخصية.", price: 10, rating: 4.8, img: "asset/images/rose-petals.jpg" },
+        { id: 29, name: "كحل الإثمد الأصفهاني بماء الورد وماء زمزم", category: "أخرى", desc: "منتج تقليدي فاخر محضر من حجر الإثمد الأصلي، يمنح العين برودة وانتعاشاً.", price: 35, rating: 4.9, img: "asset/images/kohl.jpg" },
+        { id: 30, name: "مرطب بلون دم الغزال للشفاه والخدود", category: "مرطب", desc: "منتج طبيعي مزدوج المفعول يجمع بين الترطيب واللون الوردي الطبيعي.", price: 30, rating: 4.7, img: "asset/images/ghazal.jpg" },
+        { id: 31, name: "بودرة الورد الطبيعي", category: "أخرى", desc: "منتج طبيعي 100% متعدد الاستخدامات، يستخلص من الورد الطبيعي.", price: 18, rating: 4.6, img: "asset/images/rose-powder.jpg" },
+        { id: 32, name: "الليفة الطبيعية (اللوفا)", category: "أخرى", desc: "ليفة فاخرة من قلب الطبيعة مصممة خصيصاً للتنظيف العميق للحصول على بشرة منتعشة.", price: 25, rating: 4.9, img: "asset/images/nature-loofah.png" },
+    ];
+
+
+    let currentProductForDiscount = null;
+
+    function showNiceToast(message, type = 'success') {
+        const oldToast = document.querySelector('.custom-toast');
+        if (oldToast) oldToast.remove();
+        const toast = document.createElement('div');
+        toast.className = 'custom-toast';
+        const icon = type === 'success' ? 'fa-check-circle' : 'fa-exclamation-circle';
+        toast.innerHTML = `<i class="fas ${icon}"></i><span>${message}</span>`;
+        document.body.appendChild(toast);
+        setTimeout(() => {
+            toast.style.opacity = '0';
+            toast.style.transform = 'translateX(100px)';
+            setTimeout(() => toast.remove(), 300);
+        }, 3000);
+    }
+
+    function renderProducts() {
+        const grid = document.getElementById("careGrid");
+        const filterVal = document.getElementById('filterSelect').value;
+        let filtered = filterVal === 'all' ? careData : careData.filter(c => c.category === filterVal);
+        
+        const offers = JSON.parse(localStorage.getItem('elixir_offers')) || [];
+        const favorites = JSON.parse(localStorage.getItem('elixir_favorites')) || [];
+        
+        if (filtered.length === 0) {
+            grid.innerHTML = '<div class="no-results">لا توجد منتجات</div>';
+            return;
+        }
+        
+        grid.innerHTML = filtered.map(item => {
+            let catText = "";
+            switch(item.category) {
+                case "تونر": catText = "تونر منعش"; break;
+                case "صابون": catText = "صابون طبيعي"; break;
+                case "مقشر": catText = "مقشر طبيعي"; break;
+                case "مرطب": catText = "مرطب وكريم"; break;
+                default: catText = "عناية شخصية";
+            }
+            const offer = offers.find(o => o.productId === item.id && o.section === "care");
+            const displayPrice = offer ? offer.newPrice : item.price;
+            const hasOffer = !!offer;
+            const isFav = favorites.includes(item.id);
+            
+            return `
+                <div class="care-card" data-id="${item.id}" style="position:relative;">
+                    <div class="fav-icon ${isFav ? 'active' : ''}" data-id="${item.id}">
+                        <i class="fa-${isFav ? 'solid' : 'regular'} fa-heart"></i>
+                    </div>
+                    ${hasOffer ? `<span class="offer-badge-small" style="position:absolute; top:12px; left:12px; background:#e74c3c; color:white; padding:3px 8px; border-radius:20px;">-${offer.discount}%</span>` : ''}
+                    <img class="care-img" src="${item.img}" onerror="this.src='asset/images/placeholder.png'">
+                    <div class="care-info">
+                        <div class="care-cat">${catText}</div>
+                        <div class="care-title">${item.name}</div>
+                        <div class="care-desc">${item.desc}</div>
+                        <div class="price-row">
+                            <span class="price">${displayPrice} ₪</span>
+                            <div class="btn-group">
+                                <button class="view-details" data-id="${item.id}" data-name="${item.name}"> عرض التفاصيل</button>
+                                <button class="add-cart" data-id="${item.id}" data-name="${item.name}" data-price="${displayPrice}" data-img="${item.img}"> إضافة إلى السلة</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }).join('');
+        addAdminButtons();
+    }
+
+    function addAdminButtons() {
+        document.querySelectorAll('.care-card').forEach(card => {
+            if (!card.querySelector('.admin-product-btn')) {
+                const btn = document.createElement('div');
+                btn.className = 'admin-product-btn';
+                btn.innerHTML = '<i class="fas fa-plus"></i>';
+                btn.onclick = (e) => {
+                    e.stopPropagation();
+                    const addCartBtn = card.querySelector('.add-cart');
+                    const productId = addCartBtn ? parseInt(addCartBtn.dataset.id) : null;
+                    if (productId) showAdminDropdown(productId, btn);
+                };
+                card.appendChild(btn);
+            }
+        });
+    }
+
+    function showAdminDropdown(productId, btnElement) {
+        document.querySelectorAll('.admin-dropdown').forEach(d => d.classList.remove('show'));
+        let dropdown = btnElement.parentElement.querySelector('.admin-dropdown');
+        if (!dropdown) {
+            dropdown = document.createElement('div');
+            dropdown.className = 'admin-dropdown';
+            dropdown.innerHTML = `
+                <a href="#" onclick="addToNewArrivals(${productId}); return false;">
+                    <i class="fas fa-star"></i> إضافة إلى جديدنا
+                </a>
+                <a href="#" onclick="openDiscountModal(${productId}); return false;">
+                    <i class="fas fa-percent"></i> إضافة إلى العروض
+                </a>
+            `;
+            btnElement.parentElement.appendChild(dropdown);
+        }
+        dropdown.classList.toggle('show');
+        setTimeout(() => {
+            document.addEventListener('click', function closeDropdown(e) {
+                if (!dropdown.contains(e.target) && !btnElement.contains(e.target)) {
+                    dropdown.classList.remove('show');
+                    document.removeEventListener('click', closeDropdown);
+                }
+            });
+        }, 10);
+    }
+
+    window.addToNewArrivals = function(productId) {
+        const product = careData.find(p => p.id === productId);
+        if (!product) { showNiceToast("❌ المنتج غير موجود", "error"); return; }
+        
+        let newArrivals = JSON.parse(localStorage.getItem('elixir_new_arrivals')) || [];
+        if (newArrivals.some(p => p.id === productId)) {
+            showNiceToast(`⚠️ "${product.name}" موجود بالفعل في جديدنا`, "error");
+            document.querySelectorAll('.admin-dropdown').forEach(d => d.classList.remove('show'));
+            return;
+        }
+        
+        let catText = "";
+        switch(product.category) {
+            case "تونر": catText = "تونر منعش"; break;
+            case "صابون": catText = "صابون طبيعي"; break;
+            case "مقشر": catText = "مقشر طبيعي"; break;
+            case "مرطب": catText = "مرطب وكريم"; break;
+            default: catText = "عناية شخصية";
+        }
+        
+        newArrivals.push({
+            id: product.id, name: product.name, price: product.price, img: product.img,
+            category: product.category, section: "care", catText: catText,
+            desc: product.desc, addedAt: new Date().toISOString()
+        });
+        localStorage.setItem('elixir_new_arrivals', JSON.stringify(newArrivals));
+        showNiceToast(`✅ تم إضافة "${product.name}" إلى قسم جديدنا ✨`);
+        document.querySelectorAll('.admin-dropdown').forEach(d => d.classList.remove('show'));
+    };
+
+    window.openDiscountModal = function(productId) {
+        const product = careData.find(p => p.id === productId);
+        if (!product) return;
+        currentProductForDiscount = product;
+        document.querySelectorAll('.admin-dropdown').forEach(d => d.classList.remove('show'));
+        
+        const tomorrow = new Date();
+        tomorrow.setDate(tomorrow.getDate() + 1);
+        const minDate = tomorrow.toISOString().split('T')[0];
+        const defaultEndDate = new Date();
+        defaultEndDate.setDate(defaultEndDate.getDate() + 30);
+        const defaultDate = defaultEndDate.toISOString().split('T')[0];
+        
+        const overlay = document.createElement('div');
+        overlay.className = 'discount-modal-overlay';
+        overlay.innerHTML = `
+            <div class="discount-modal">
+                <h3>🎯 إضافة "${product.name}" إلى العروض</h3>
+                <input type="number" id="discountPercent" placeholder="نسبة الخصم (%)" min="1" max="90" style="width:100%; padding:10px; margin:10px 0; border-radius:12px;">
+                <label style="display:block; text-align:right; margin-top:10px;">📅 تاريخ انتهاء العرض:</label>
+                <input type="date" id="endDate" value="${defaultDate}" min="${minDate}" style="width:100%; padding:10px; margin:10px 0; border-radius:12px;">
+                <p style="font-size:12px; color:#888; text-align:right;">⚠️ إذا تركت التاريخ فارغاً سيكون العرض دائماً</p>
+                <div style="display: flex; gap: 10px; justify-content: center; margin-top: 15px;">
+                    <button id="confirmDiscountBtn" style="background: #d696a8; color: white; border: none; padding: 8px 20px; border-radius: 30px; cursor: pointer;">تأكيد</button>
+                    <button id="cancelDiscountBtn" style="background: #ccc; color: #333; border: none; padding: 8px 20px; border-radius: 30px; cursor: pointer;">إلغاء</button>
+                </div>
+            </div>
+        `;
+        document.body.appendChild(overlay);
+        
+        const confirmBtn = overlay.querySelector('#confirmDiscountBtn');
+        const cancelBtn = overlay.querySelector('#cancelDiscountBtn');
+        
+        confirmBtn.onclick = function() {
+            const discountPercent = parseInt(overlay.querySelector('#discountPercent').value);
+            if (!discountPercent || discountPercent < 1 || discountPercent > 90) {
+                showNiceToast("⚠️ الرجاء إدخال نسبة خصم صحيحة (1-90)", "error");
+                return;
+            }
+            const endDate = overlay.querySelector('#endDate').value;
+            if (!currentProductForDiscount) return;
+            
+            let offers = JSON.parse(localStorage.getItem('elixir_offers')) || [];
+            const existingIndex = offers.findIndex(o => o.productId === currentProductForDiscount.id);
+            const newPrice = (currentProductForDiscount.price * (100 - discountPercent) / 100).toFixed(2);
+            const offerData = {
+                id: Date.now(), productId: currentProductForDiscount.id,
+                productName: currentProductForDiscount.name,
+                productPrice: currentProductForDiscount.price,
+                productImg: currentProductForDiscount.img,
+                discount: discountPercent, newPrice: newPrice,
+                startDate: new Date().toISOString().split('T')[0],
+                endDate: endDate || "", active: true,
+                createdAt: new Date().toISOString(),
+                section: "care", category: currentProductForDiscount.category,
+                desc: currentProductForDiscount.desc
+            };
+            if (existingIndex !== -1) offers[existingIndex] = { ...offers[existingIndex], ...offerData };
+            else offers.push(offerData);
+            localStorage.setItem('elixir_offers', JSON.stringify(offers));
+            overlay.remove();
+            currentProductForDiscount = null;
+            renderProducts();
+        };
+        cancelBtn.onclick = () => overlay.remove();
+        overlay.onclick = (e) => { if (e.target === overlay) overlay.remove(); };
+    };
+
+    document.addEventListener('click', function(e) {
+        const btn = e.target.closest('.add-cart');
+        if (!btn) return;
+        e.preventDefault();
+        let cart = JSON.parse(localStorage.getItem('elixir_cart')) || [];
+        let existing = cart.find(item => item.id == btn.dataset.id);
+        if (existing) existing.quantity++;
+        else cart.push({ id: parseInt(btn.dataset.id), name: btn.dataset.name, price: parseFloat(btn.dataset.price), img: btn.dataset.img, quantity: 1 });
+        localStorage.setItem('elixir_cart', JSON.stringify(cart));
+        if (window.updateFloatingCart) window.updateFloatingCart();
+        let badge = document.querySelector('.cart-count');
+        if (badge) badge.innerText = cart.reduce((s,i) => s + i.quantity, 0);
+        showNiceToast(`✅ تمت إضافة ${btn.dataset.name} إلى السلة 🛒`);
+    });
+
+    document.addEventListener('click', function(e) {
+        const btn = e.target.closest('.view-details');
+        if (btn) {
+            e.preventDefault();
+            window.location.href = `product-details.html?id=${btn.dataset.id}`;
+        }
+    });
+
+    document.addEventListener('click', function(e) {
+        const icon = e.target.closest('.fav-icon');
+        if (!icon) return;
+        e.preventDefault();
+        e.stopPropagation();
+        const id = parseInt(icon.dataset.id);
+        let fav = JSON.parse(localStorage.getItem('elixir_favorites')) || [];
+        let idx = fav.indexOf(id);
+        if (idx === -1) {
+            fav.push(id);
+            icon.classList.add('active');
+            icon.innerHTML = '<i class="fa-solid fa-heart"></i>';
+        } else {
+            fav.splice(idx, 1);
+            icon.classList.remove('active');
+            icon.innerHTML = '<i class="fa-regular fa-heart"></i>';
+        }
+        localStorage.setItem('elixir_favorites', JSON.stringify(fav));
+    });
+
+    document.getElementById('filterSelect').addEventListener('change', () => renderProducts());
+    document.getElementById('resetFilter').addEventListener('click', () => {
+        document.getElementById('filterSelect').value = 'all';
+        renderProducts();
+    });
+
+    const scrollBtn = document.getElementById('scrollTopBtn');
+    window.addEventListener('scroll', () => scrollBtn.style.display = window.scrollY > 300 ? 'flex' : 'none');
+    scrollBtn.addEventListener('click', () => window.scrollTo({ top: 0, behavior: 'smooth' }));
+
+    function initCartBadge() {
+        const cart = JSON.parse(localStorage.getItem('elixir_cart')) || [];
+        const total = cart.reduce((s,i) => s + i.quantity, 0);
+        const badge = document.querySelector('.cart-count');
+        if (badge) badge.innerText = total;
+        if (window.updateFloatingCart) window.updateFloatingCart();
+    }
+    
+    initCartBadge();
+    renderProducts();
+</script>
+</body>
+</html>
