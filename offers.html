@@ -1,0 +1,399 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Elixir | العروض والخصومات</title>
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    
+    <!-- ربط جميع ملفات CSS الأصلية - كل فئة لها شكلها -->
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="herbs.css">
+    <link rel="stylesheet" href="oils.css">
+    <link rel="stylesheet" href="spices.css">
+    <link rel="stylesheet" href="personal-care.css">
+    <link rel="stylesheet" href="packages.css">
+    
+    <style>
+        /* تنسيقات الصفحة العامة فقط */
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { 
+            font-family: 'Cairo', sans-serif; 
+            background: linear-gradient(135deg, #eef5e9 0%, #d4e2c6 100%); 
+            min-height: 100vh; 
+            padding-top: 90px; 
+        }
+        
+        .main-header { 
+            display: flex; justify-content: space-between; align-items: center; 
+            padding: 5px 40px; height: 80px; background-color: rgb(253, 253, 252); 
+            border-bottom: 1px solid #eee; position: fixed; top: 0; right: 0; left: 0; 
+            z-index: 1000; box-shadow: 0 2px 10px rgba(0,0,0,0.1); direction: rtl; 
+            flex-wrap: wrap; 
+        }
+        .header-right { display: flex; align-items: center; gap: 15px; }
+        .logo-circle img { width: 44px; height: 44px; border-radius: 50%; border: 2px solid #e8f5e9; }
+        .web-name { color: #3e6d44; font-weight: bold; font-size: 1.3rem; font-family: "Playfair Display", serif; }
+        .page-title-in-header { font-size: 1rem; color: #438e56; font-weight: 500; margin-right: 10px; padding-right: 10px; border-right: 1px solid #ccc; }
+        .header-left { display: flex; align-items: center; gap: 15px; flex-wrap: wrap; }
+        .help-text { color: #438e56; font-size: 0.9rem; font-weight: 500; }
+        .ai-consult-link { background: linear-gradient(95deg, #438e56, #5aad6a); color: white; text-decoration: none; padding: 6px 16px; border-radius: 30px; font-size: 0.85rem; font-weight: 600; display: inline-flex; align-items: center; gap: 8px; transition: 0.3s; }
+        .ai-consult-link:hover { background: linear-gradient(95deg, #2d6a3a, #438e56); transform: translateY(-2px); }
+        
+        .offers-header { text-align: center; margin: 30px 0 40px; }
+        .offers-header h1 { font-size: 2rem; color: #438e56; font-family: "Playfair Display", serif; }
+        .offers-header p { color: #888; font-size: 1rem; }
+        
+        .container { max-width: 1400px; margin: 0 auto; padding: 0 1.5rem; }
+        .products-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 30px; }
+        
+        /* شارة الخصم - موحدة للجميع فوق البطاقة */
+        .offer-badge-red { 
+            position: absolute; top: 12px; right: 12px; background: #e74c3c; 
+            color: white; font-weight: bold; padding: 5px 12px; border-radius: 30px; 
+            font-size: 13px; z-index: 15; box-shadow: 0 2px 5px rgba(0,0,0,0.2); 
+        }
+        
+        .old-price-cross { text-decoration: line-through; color: #999; font-size: 0.8rem; margin-right: 5px; }
+        
+        .empty-state { text-align: center; padding: 4rem 2rem; background: rgba(255,255,255,0.7); backdrop-filter: blur(10px); border-radius: 2rem; grid-column: 1 / -1; }
+        .empty-state i { font-size: 4rem; color: #438e56; margin-bottom: 1rem; opacity: 0.5; }
+        .empty-state h3 { font-size: 1.5rem; color: #438e56; margin-bottom: 0.5rem; }
+        
+        .back-home { text-align: center; margin: 2rem 0; }
+        .back-home a { background: rgba(67,142,86,0.1); padding: 10px 25px; border-radius: 40px; color: #438e56; text-decoration: none; transition: 0.2s; display: inline-block; }
+        .back-home a:hover { background: #438e56; color: white; }
+        
+        .toast-message { position: fixed; bottom: 30px; right: 30px; background: #27ae60; color: white; padding: 12px 24px; border-radius: 50px; font-size: 0.9rem; z-index: 9999; display: none; align-items: center; gap: 10px; }
+        .scroll-top-btn { position: fixed; bottom: 30px; left: 30px; width: 50px; height: 50px; background: #438e56; color: white; border: none; border-radius: 50%; cursor: pointer; font-size: 1.5rem; z-index: 99; transition: 0.3s; display: flex; align-items: center; justify-content: center; box-shadow: 0 5px 15px rgba(0,0,0,0.2); }
+        .scroll-top-btn:hover { background: #2d6a3a; transform: translateY(-5px); }
+        
+        @media (max-width: 768px) { .main-header { flex-direction: column; height: auto; gap: 10px; padding: 10px; } body { padding-top: 130px; } .products-grid { grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 20px; } }
+    </style>
+</head>
+<body>
+
+<header>
+    <div class="main-header">
+        <div class="header-right">
+            <a href="index.html" style="display: flex; align-items: center; gap: 15px; text-decoration: none;">
+                <div class="logo-circle"><img src="asset/images/logo.png" alt="Logo"></div>
+                <span class="web-name">Elixir</span>
+            </a>
+            <span class="page-title-in-header">🔥 العروض والخصومات</span>
+        </div>
+        <div class="header-left">
+            <span class="help-text">🔥 خصومات تصل إلى 50% لفترة محدودة!</span>
+            <a href="chatbot.html" class="ai-consult-link"><i class="fas fa-robot"></i> استشر الذكاء الاصطناعي</a>
+        </div>
+    </div>
+</header>
+
+<div class="container">
+    <div class="offers-header">
+        <h1>🔥 عروض حصرية</h1>
+        <p>استفد من تخفيضات تصل إلى 50% على منتجات مختارة لفترة محدودة</p>
+    </div>
+    <div class="products-grid" id="offersGrid"></div>
+    <div class="back-home">
+        <a href="index.html"><i class="fas fa-arrow-right"></i> العودة إلى الرئيسية</a>
+    </div>
+</div>
+
+<div id="customToast" class="toast-message"><i class="fas fa-check-circle"></i><span id="toastText"></span></div>
+<button id="scrollTopBtn" class="scroll-top-btn"><i class="fas fa-arrow-up"></i></button>
+
+<script>
+    // ============================================================
+    // الحل النهائي: نفس شكل البطاقة حسب القسم (herbs/oils/spices/care/packages)
+    // مع الحفاظ على التنسيق الأصلي لكل فئة كما في ملفاتك الأصلية
+    // ============================================================
+    
+    function showToast(message) {
+        const toast = document.getElementById('customToast');
+        if (toast) {
+            document.getElementById('toastText').innerHTML = message;
+            toast.style.display = 'flex';
+            setTimeout(() => toast.style.display = 'none', 3000);
+        }
+    }
+    
+    function isOfferValid(offer) {
+        if (!offer.endDate || offer.endDate === "") return true;
+        const today = new Date();
+        today.setHours(0, 0, 0, 0);
+        const endDate = new Date(offer.endDate);
+        endDate.setHours(0, 0, 0, 0);
+        return today <= endDate;
+    }
+    
+    function removeExpiredOffers() {
+        let offers = JSON.parse(localStorage.getItem('elixir_offers')) || [];
+        const validOffers = offers.filter(offer => isOfferValid(offer));
+        if (validOffers.length !== offers.length) {
+            localStorage.setItem('elixir_offers', JSON.stringify(validOffers));
+        }
+        return validOffers;
+    }
+    
+    // ========== بطاقة الأعشاب (نفس شكل herbs.html) ==========
+    function getHerbCard(offer) {
+        let isFav = (JSON.parse(localStorage.getItem('elixir_favorites')) || []).includes(offer.productId);
+        let catText = offer.catText || "عشبة طبية";
+        let descText = offer.desc || "منتج طبيعي 100%";
+        
+        return `
+            <div class="herb-card" data-id="${offer.productId}" style="position:relative;">
+                <div class="offer-badge-red">-${offer.discount}%</div>
+                <div class="fav-icon ${isFav ? 'active' : ''}" data-id="${offer.productId}">
+                    <i class="fa-${isFav ? 'solid' : 'regular'} fa-heart"></i>
+                </div>
+                <img class="herb-img" src="${offer.productImg}" onerror="this.src='asset/images/placeholder.png'">
+                <div class="herb-info">
+                    <div class="herb-cat">${catText}</div>
+                    <div class="herb-title">${offer.productName}</div>
+                    <div class="herb-desc">${descText.substring(0, 80)}${descText.length > 80 ? '...' : ''}</div>
+                    <div class="price-row">
+                        <span class="price" style="color:#e74c3c; font-weight:bold;">${offer.newPrice} ₪ <span class="old-price-cross">${offer.productPrice} ₪</span></span>
+                        <div class="btn-group">
+                            <button class="view-details" data-id="${offer.productId}"> عرض التفاصيل</button>
+                            <button class="add-cart" data-id="${offer.productId}" data-name="${offer.productName}" data-price="${offer.newPrice}" data-img="${offer.productImg}"> إضافة إلى السلة</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        `;
+    }
+    
+    // ========== بطاقة الزيوت (نفس شكل oils.html) ==========
+    function getOilCard(offer) {
+        let isFav = (JSON.parse(localStorage.getItem('elixir_favorites')) || []).includes(offer.productId);
+        let catText = offer.catText || "زيت طبيعي";
+        let descText = offer.desc || "زيت طبيعي نقي";
+        
+        return `
+            <div class="oil-card" data-id="${offer.productId}" style="position:relative;">
+                <div class="offer-badge-red">-${offer.discount}%</div>
+                <div class="fav-icon ${isFav ? 'active' : ''}" data-id="${offer.productId}">
+                    <i class="fa-${isFav ? 'solid' : 'regular'} fa-heart"></i>
+                </div>
+                <img class="oil-img" src="${offer.productImg}" onerror="this.src='asset/images/placeholder.png'">
+                <div class="oil-info">
+                    <div class="oil-cat">${catText}</div>
+                    <div class="oil-title">${offer.productName}</div>
+                    <div class="oil-desc">${descText.substring(0, 80)}${descText.length > 80 ? '...' : ''}</div>
+                    <div class="price-row">
+                        <span class="price" style="color:#e74c3c; font-weight:bold;">${offer.newPrice} ₪ <span class="old-price-cross">${offer.productPrice} ₪</span></span>
+                        <div class="btn-group">
+                            <button class="view-details" data-id="${offer.productId}"> عرض التفاصيل</button>
+                            <button class="add-cart" data-id="${offer.productId}" data-name="${offer.productName}" data-price="${offer.newPrice}" data-img="${offer.productImg}"> إضافة إلى السلة</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        `;
+    }
+    
+    // ========== بطاقة البهارات (نفس شكل spices.html) ==========
+    function getSpiceCard(offer) {
+        let isFav = (JSON.parse(localStorage.getItem('elixir_favorites')) || []).includes(offer.productId);
+        let catText = offer.catText || "بهارات";
+        let descText = offer.desc || "بهار طبيعي";
+        
+        return `
+            <div class="spice-card" data-id="${offer.productId}" style="position:relative;">
+                <div class="offer-badge-red">-${offer.discount}%</div>
+                <div class="fav-icon ${isFav ? 'active' : ''}" data-id="${offer.productId}">
+                    <i class="fa-${isFav ? 'solid' : 'regular'} fa-heart"></i>
+                </div>
+                <img class="spice-img" src="${offer.productImg}" onerror="this.src='asset/images/placeholder.png'">
+                <div class="spice-info">
+                    <div class="spice-cat">${catText}</div>
+                    <div class="spice-title">${offer.productName}</div>
+                    <div class="spice-desc">${descText.substring(0, 80)}${descText.length > 80 ? '...' : ''}</div>
+                    <div class="price-row">
+                        <span class="price" style="color:#e74c3c; font-weight:bold;">${offer.newPrice} ₪ <span class="old-price-cross">${offer.productPrice} ₪</span></span>
+                        <div class="btn-group">
+                            <button class="view-details" data-id="${offer.productId}"> عرض التفاصيل</button>
+                            <button class="add-cart" data-id="${offer.productId}" data-name="${offer.productName}" data-price="${offer.newPrice}" data-img="${offer.productImg}"> إضافة إلى السلة</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        `;
+    }
+    
+    // ========== بطاقة العناية الشخصية (نفس شكل personal-care.html) ==========
+    function getCareCard(offer) {
+        let isFav = (JSON.parse(localStorage.getItem('elixir_favorites')) || []).includes(offer.productId);
+        let catText = offer.catText || "عناية شخصية";
+        let descText = offer.desc || "منتج طبيعي للعناية";
+        
+        return `
+            <div class="care-card" data-id="${offer.productId}" style="position:relative;">
+                <div class="offer-badge-red">-${offer.discount}%</div>
+                <div class="fav-icon ${isFav ? 'active' : ''}" data-id="${offer.productId}">
+                    <i class="fa-${isFav ? 'solid' : 'regular'} fa-heart"></i>
+                </div>
+                <img class="care-img" src="${offer.productImg}" onerror="this.src='asset/images/placeholder.png'">
+                <div class="care-info">
+                    <div class="care-cat">${catText}</div>
+                    <div class="care-title">${offer.productName}</div>
+                    <div class="care-desc">${descText.substring(0, 80)}${descText.length > 80 ? '...' : ''}</div>
+                    <div class="price-row">
+                        <span class="price" style="color:#e74c3c; font-weight:bold;">${offer.newPrice} ₪ <span class="old-price-cross">${offer.productPrice} ₪</span></span>
+                        <div class="btn-group">
+                            <button class="view-details" data-id="${offer.productId}"> عرض التفاصيل</button>
+                            <button class="add-cart" data-id="${offer.productId}" data-name="${offer.productName}" data-price="${offer.newPrice}" data-img="${offer.productImg}"> إضافة إلى السلة</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        `;
+    }
+    
+    // ========== بطاقة البكجات (نفس شكل packages.html مع الألوان الخاصة) ==========
+    function getPackageCard(offer) {
+        let isFav = (JSON.parse(localStorage.getItem('elixir_favorites')) || []).includes(offer.productId);
+        let descText = offer.desc || "بكج متكامل";
+        let bgColor = offer.bgColor || "#fff3e0";
+        let btnColor = offer.btnColor || "#ef6c00";
+        
+        return `
+            <div class="package-card" data-id="${offer.productId}" style="position:relative; background: ${bgColor}; border-bottom: 4px solid ${btnColor}; border-radius: 1rem; overflow: hidden;">
+                <div class="offer-badge-red">-${offer.discount}%</div>
+                <div class="fav-icon ${isFav ? 'active' : ''}" data-id="${offer.productId}">
+                    <i class="fa-${isFav ? 'solid' : 'regular'} fa-heart"></i>
+                </div>
+                <img class="package-img" src="${offer.productImg}" onerror="this.src='asset/images/placeholder.png'">
+                <div class="package-info">
+                    <div class="package-title">${offer.productName}</div>
+                    <div class="package-desc">${descText.substring(0, 80)}${descText.length > 80 ? '...' : ''}</div>
+                    <div class="price-row">
+                        <span class="price" style="color:#e74c3c; font-weight:bold;">${offer.newPrice} ₪ <span class="old-price-cross">${offer.productPrice} ₪</span></span>
+                        <button class="add-cart" data-id="${offer.productId}" data-name="${offer.productName}" data-price="${offer.newPrice}" data-img="${offer.productImg}" style="background: ${btnColor};"> إضافة إلى السلة</button>
+                    </div>
+                </div>
+            </div>
+        `;
+    }
+    
+    // اختيار القالب حسب القسم
+    function renderCard(offer) {
+        if (!offer) return '';
+        switch(offer.section) {
+            case 'herbs': return getHerbCard(offer);
+            case 'oils': return getOilCard(offer);
+            case 'spices': return getSpiceCard(offer);
+            case 'care': return getCareCard(offer);
+            case 'packages': return getPackageCard(offer);
+            default: return getHerbCard(offer);
+        }
+    }
+    
+    function renderOffers() {
+        const grid = document.getElementById("offersGrid");
+        if (!grid) return;
+        
+        let validOffers = removeExpiredOffers();
+        
+        if (validOffers.length === 0) {
+            grid.innerHTML = `
+                <div class="empty-state">
+                    <i class="fas fa-tag"></i>
+                    <h3>✨ لا توجد عروض حالياً</h3>
+                    <p>يمكنك إضافة عروض من صفحات الأعشاب، الزيوت، البهارات، العناية، أو البكجات عبر زر +</p>
+                </div>
+            `;
+            return;
+        }
+        
+        let html = '';
+        for (let offer of validOffers) {
+            html += renderCard(offer);
+        }
+        grid.innerHTML = html;
+        bindEvents();
+    }
+    
+    function bindEvents() {
+        // إضافة إلى السلة
+        document.querySelectorAll('.add-cart').forEach(btn => {
+            btn.onclick = (e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                let cart = JSON.parse(localStorage.getItem('elixir_cart')) || [];
+                const existing = cart.find(item => item.id == btn.dataset.id);
+                if (existing) existing.quantity++;
+                else cart.push({ 
+                    id: parseInt(btn.dataset.id), 
+                    name: btn.dataset.name, 
+                    price: parseFloat(btn.dataset.price), 
+                    img: btn.dataset.img, 
+                    quantity: 1 
+                });
+                localStorage.setItem('elixir_cart', JSON.stringify(cart));
+                if (window.updateFloatingCart) window.updateFloatingCart();
+                showToast(`✅ تمت إضافة ${btn.dataset.name} إلى السلة`);
+                const badge = document.querySelector('.cart-count');
+                if (badge) badge.innerText = cart.reduce((s,i) => s + i.quantity, 0);
+            };
+        });
+        
+        // عرض التفاصيل
+        document.querySelectorAll('.view-details').forEach(btn => {
+            btn.onclick = (e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                window.location.href = `product-details.html?id=${btn.dataset.id}`;
+            };
+        });
+        
+        // المفضلة
+        document.querySelectorAll('.fav-icon').forEach(icon => {
+            icon.onclick = (e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                const id = parseInt(icon.dataset.id);
+                let favorites = JSON.parse(localStorage.getItem('elixir_favorites')) || [];
+                const index = favorites.indexOf(id);
+                if (index === -1) {
+                    favorites.push(id);
+                    icon.classList.add('active');
+                    icon.innerHTML = '<i class="fa-solid fa-heart"></i>';
+                } else {
+                    favorites.splice(index, 1);
+                    icon.classList.remove('active');
+                    icon.innerHTML = '<i class="fa-regular fa-heart"></i>';
+                }
+                localStorage.setItem('elixir_favorites', JSON.stringify(favorites));
+            };
+        });
+    }
+    
+    function initCartBadge() {
+        const cart = JSON.parse(localStorage.getItem('elixir_cart')) || [];
+        const total = cart.reduce((s,i) => s + i.quantity, 0);
+        const badge = document.querySelector('.cart-count');
+        if (badge) badge.innerText = total;
+        if (window.updateFloatingCart) window.updateFloatingCart();
+    }
+    
+    const scrollBtn = document.getElementById('scrollTopBtn');
+    window.addEventListener('scroll', () => {
+        scrollBtn.style.display = window.scrollY > 300 ? 'flex' : 'none';
+    });
+    scrollBtn.addEventListener('click', () => {
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+    });
+    
+    initCartBadge();
+    renderOffers();
+    
+    window.addEventListener('storage', function(e) {
+        if (e.key === 'elixir_offers') renderOffers();
+    });
+</script>
+</body>
+</html>
