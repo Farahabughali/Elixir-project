@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+    <title>لوحة المدير | Elixir</title>
+    <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Tajawal', sans-serif;
+            background: linear-gradient(145deg, #e2ecd9 0%, #cfdfc4 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 1.2rem;
+        }
+        .compact-panel {
+            max-width: 500px;
+            width: 100%;
+            background: #ffffff;
+            border-radius: 1.8rem;
+            box-shadow: 0 20px 35px -10px rgba(0, 0, 0, 0.12);
+            overflow: hidden;
+            border: 1px solid rgba(67, 142, 86, 0.25);
+        }
+        .hero-mini {
+            background: #438e56;
+            padding: 1rem 1.5rem;
+            text-align: center;
+        }
+        .hero-mini h2 {
+            font-size: 1.3rem;
+            font-weight: 800;
+            color: #ffffff;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+        .hero-mini p {
+            color: #f9f3cf;
+            font-weight: 500;
+            font-size: 0.8rem;
+            margin-top: 6px;
+        }
+        .dashboard-compact {
+            padding: 1.5rem;
+        }
+        .action-card {
+            background: #fefef7;
+            border-radius: 1.5rem;
+            box-shadow: 0 6px 14px rgba(0, 0, 0, 0.05);
+            cursor: pointer;
+            border: 1px solid #e2e7da;
+            overflow: hidden;
+            transition: all 0.2s ease;
+            text-align: center;
+            padding: 1.5rem;
+        }
+        .action-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 14px 22px -10px rgba(67, 142, 86, 0.2);
+            border-color: #438e56;
+        }
+        .action-card i {
+            font-size: 2.5rem;
+            color: #438e56;
+            background: #eef4e8;
+            padding: 0.8rem;
+            border-radius: 50%;
+            margin-bottom: 1rem;
+        }
+        .action-card h4 {
+            font-size: 1.3rem;
+            font-weight: 800;
+            color: #356e3c;
+            margin-bottom: 0.5rem;
+        }
+        .action-card p {
+            font-size: 0.8rem;
+            color: #5b6e4a;
+            margin-bottom: 1.2rem;
+        }
+        .btn-sm {
+            background: #438e56;
+            border: none;
+            padding: 8px 20px;
+            border-radius: 60px;
+            color: white;
+            font-weight: bold;
+            font-family: 'Tajawal', sans-serif;
+            font-size: 0.85rem;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .btn-sm:hover {
+            background: #2f6b3e;
+        }
+        .footer-note {
+            background: #fafcf7;
+            padding: 0.65rem;
+            text-align: center;
+            font-size: 0.65rem;
+            color: #6f7e64;
+            border-top: 1px solid #e2efda;
+        }
+    </style>
+</head>
+<body>
+<div class="compact-panel">
+    <div class="hero-mini">
+        <h2><i class="fas fa-leaf"></i> لوحة تحكم المدير</h2>
+        <p><i class="fas fa-user-shield"></i> مرحباً أيها المدير | Elixir</p>
+    </div>
+    <div class="dashboard-compact">
+        <div class="action-card" onclick="window.location.href='admin2.html'">
+            <i class="fas fa-chalkboard-user"></i>
+            <h4>لوحة التحكم الكاملة</h4>
+            <p>إدارة المنتجات، الطلبات، الموظفين، تجار الجملة والعروض</p>
+            <button class="btn-sm" onclick="event.stopPropagation(); window.location.href='admin2.html'">
+                <i class="fas fa-arrow-left"></i> دخول إلى لوحة التحكم
+            </button>
+        </div>
+    </div>
+    <div class="footer-note">
+        <i class="fas fa-hand-sparkles"></i> Elixir - إدارة المتجر بالكامل من هنا
+    </div>
+</div>
+<script>
+    // في حال وجود أي أزرار إضافية
+    const btn = document.querySelector('.btn-sm');
+    if (btn) {
+        btn.addEventListener('click', (e) => {
+            e.stopPropagation();
+            window.location.href = 'admin2.html';
+        });
+    }
+</script>
+</body>
+</html>
