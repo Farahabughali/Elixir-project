@@ -66,8 +66,8 @@
 <script src="floating-cart.js"></script>
 
 <script>
-    // بيانات الأعشاب (نفس البيانات مع إزالة التكرارات)
-    const herbsData = [
+    // ====== البيانات الثابتة (الافتراضية) ======
+    const defaultHerbsData = [
         { id: 1, name: "عسل طبيعي متعدد الأعشاب", category: "طبية", desc: "يعتبر مضاداً طبيعياً للأكسدة والبكتيريا، مما يساعد في تقوية الجسم", price: 12, rating: 4.7, img: "asset/images/herbalhoney.png" },
         { id: 2, name: "عشبة البابونج", category: "طبية", desc: "مهدئ طبيعي، يساعد على الاسترخاء والنوم، مفيد للجهاز الهضمي", price: 12, rating: 4.7, img: "asset/images/chamomileherb.jpg" },
         { id: 3, name: "عشبة النعناع الفلفلي", category: "عطرية", desc: "منعش، يخفف عسر الهضم والصداع، يمنح طاقة", price: 10, rating: 4.8, img: "asset/images/peppermintherb.jpg" },
@@ -107,25 +107,88 @@
         { id: 37, name: "القرطم", category: "طبية", desc: "مضاد للالتهابات، مفيد للقلب والشرايين", price: 18, rating: 4.7, img: "asset/images/safflower.jpg" }
     ];
 
+    // جلب المنتجات من localStorage ودمجها مع الافتراضية
+    function getAllHerbs() {
+        // جلب المنتجات من localStorage (التي أضافها الأدمن)
+        const storedProducts = JSON.parse(localStorage.getItem('elixir_products') || '[]');
+        
+        // فلترة المنتجات التي تنتمي لفئة الأعشاب (أعشاب طبيعية)
+        const adminHerbs = storedProducts.filter(p => p.category === 'أعشاب طبيعية' && p.active !== false);
+        
+        // تحويل البيانات الافتراضية إلى نفس الشكل
+        const defaultHerbs = defaultHerbsData.map(herb => ({
+            id: herb.id,
+            name: herb.name,
+            category: herb.category,
+            desc: herb.desc,
+            price: herb.price,
+            img: herb.img,
+            usage: herb.desc,
+            active: true
+        }));
+        
+        const allHerbs = [...defaultHerbs];
+        
+        adminHerbs.forEach(adminHerb => {
+            // التحقق من الاسم فقط لمنع التكرار (أفضل من id)
+            const exists = allHerbs.some(h => h.name === adminHerb.name);
+            
+            if (!exists) {
+                // تحديد الفئة المناسبة من subCategory أو جعلها "طبية" كافتراضي
+                let productCategory = adminHerb.subCategory || "طبية";
+                
+                allHerbs.push({
+                    id: adminHerb.id,
+                    name: adminHerb.name,
+                    category: productCategory,
+                    desc: adminHerb.desc || adminHerb.usage || "منتج طبيعي 100%",
+                    price: adminHerb.price,
+                    img: adminHerb.image || "asset/images/placeholder.png",
+                    usage: adminHerb.usage || adminHerb.desc,
+                    active: adminHerb.active
+                });
+            } else {
+                // إذا كان المنتج موجوداً، قم بتحديث بياناته (السعر مثلاً)
+                const existingIndex = allHerbs.findIndex(h => h.name === adminHerb.name);
+                if (existingIndex !== -1) {
+                    allHerbs[existingIndex] = {
+                        ...allHerbs[existingIndex],
+                        price: adminHerb.price,
+                        desc: adminHerb.desc || adminHerb.usage || allHerbs[existingIndex].desc,
+                        img: adminHerb.image || allHerbs[existingIndex].img,
+                        usage: adminHerb.usage || adminHerb.desc
+                    };
+                }
+            }
+        });
+        
+         return allHerbs.filter(herb => herb.active !== false);
+    }
+
     function renderProducts(selectedCategory = 'all') {
         const grid = document.getElementById("herbsGrid");
+        let herbsData = getAllHerbs();
+        
         let filtered = herbsData;
         if (selectedCategory !== 'all') {
             filtered = herbsData.filter(herb => herb.category === selectedCategory);
         }
+        
+        const favorites = JSON.parse(localStorage.getItem('elixir_favorites') || '[]');
+        
         if (filtered.length === 0) {
             grid.innerHTML = `<div class="no-results"><i class="fas fa-search"></i> لا توجد أعشاب مطابقة للفلتر</div>`;
             return;
         }
+        
         grid.innerHTML = filtered.map(herb => {
             let categoryText = "";
             if (herb.category === "طبية") categoryText = "عشبة طبية";
             else if (herb.category === "عطرية") categoryText = "عشبة عطرية";
             else categoryText = "خلطة خاصة";
             
-            let isFav = false;
-            let favorites = JSON.parse(localStorage.getItem('elixir_favorites')) || [];
-            if (favorites.includes(herb.id)) isFav = true;
+            const description = herb.desc || herb.usage || "منتج طبيعي فاخر";
+            const isFav = favorites.includes(herb.id);
             
             return `
             <div class="herb-card" data-id="${herb.id}">
@@ -136,7 +199,7 @@
                 <div class="herb-info">
                     <div class="herb-cat">${categoryText}</div>
                     <div class="herb-title">${herb.name}</div>
-                    <div class="herb-desc">${herb.desc}</div>
+                    <div class="herb-desc">${description}</div>
                     <div class="price-row">
                         <span class="price">${herb.price} ₪</span>
                         <div class="btn-group">
@@ -150,7 +213,6 @@
         }).join('');
         
         if (window.applyFadeToNewCards) window.applyFadeToNewCards();
-        // تم إزالة bindAddToCartEvents() و bindViewDetailsEvents()
     }
 
     // ========== إضافة المنتج إلى السلة (تفويض الأحداث) ==========
@@ -173,7 +235,6 @@
         }
         localStorage.setItem('elixir_cart', JSON.stringify(cart));
 
-        // تحديث العداد في الهيدر والسلة العائمة
         const headerBadge = document.querySelector('.cart-count');
         if (headerBadge) {
             const total = cart.reduce((sum, item) => sum + item.quantity, 0);
@@ -181,10 +242,9 @@
         }
         if (window.updateFloatingCart) window.updateFloatingCart();
 
-        // إظهار رسالة توست
         const toast = document.getElementById('customToast');
         if (toast) {
-            document.getElementById('toastText').innerHTML = `تمت إضافة ${name} بنجاح، يتمنى ${name} أن ينال إعجابكم 😊`;
+            document.getElementById('toastText').innerHTML = `تمت إضافة ${name} بنجاح`;
             toast.style.display = 'flex';
             setTimeout(() => toast.style.display = 'none', 3000);
         }
@@ -234,7 +294,6 @@
         }
     }
     
-    // تفويض حدث القلب
     const grid = document.getElementById('herbsGrid');
     if (grid) {
         grid.addEventListener('click', (e) => {
