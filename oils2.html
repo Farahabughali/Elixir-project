@@ -7,6 +7,20 @@
     <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <link rel="stylesheet" href="oils.css">
+    <style>
+        .discount-modal-overlay {
+            position: fixed; top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(0,0,0,0.5); backdrop-filter: blur(4px);
+            z-index: 10000; display: flex; align-items: center; justify-content: center;
+        }
+        .discount-modal { background: white; border-radius: 28px; padding: 30px; width: 350px; text-align: center; }
+        .discount-modal h3 { font-size: 1.3rem; color: #1a2e21; }
+        .discount-modal input { width: 100%; padding: 12px; margin: 15px 0; border: 1px solid #ddd; border-radius: 12px; }
+        .discount-modal button { background: #438e56; color: white; border: none; padding: 10px 25px; border-radius: 40px; cursor: pointer; margin: 5px; }
+        .discount-modal .cancel-btn { background: #ccc; color: #333; }
+        .custom-toast { position: fixed; bottom: 30px; right: 30px; background: #2c5f2d; color: white; padding: 12px 24px; border-radius: 50px; display: flex; align-items: center; gap: 10px; animation: slideIn 0.3s ease; z-index: 9999; }
+        @keyframes slideIn { from { transform: translateX(100px); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
+    </style>
 </head>
 <body>
 
@@ -22,7 +36,7 @@
             </a>
         </div>
         <div class="header-left">
-            <span class="help-text"> هل تحتاج لمساعدة في اختيار الزيت المناسب لك؟</span>
+            <span class="help-text">💧 هل تحتاج لمساعدة في اختيار الزيت المناسب؟</span>
             <a href="chatbot.html" class="ai-consult-link"><i class="fas fa-robot"></i> استشر الذكاء الاصطناعي</a>
         </div>
     </div>
@@ -44,14 +58,31 @@
 </div>
 
 <div id="customToast" class="toast-message"><i class="fas fa-check-circle"></i><span id="toastText"></span></div>
-<button id="scrollTopBtn" class="scroll-top-btn" style="display:none;"><i class="fas fa-arrow-up"></i></button>
+<button id="scrollTopBtn" class="scroll-top-btn"><i class="fas fa-arrow-up"></i></button>
 
 <link rel="stylesheet" href="floating-cart.css">
 <script src="floating-cart.js"></script>
 
 <script>
-    // ====== جميع الزيوت (21 منتج) ======
-    const oilsData = [
+    let currentProductForDiscount = null;
+
+    function showNiceToast(message, type = 'success') {
+        const oldToast = document.querySelector('.custom-toast');
+        if (oldToast) oldToast.remove();
+        const toast = document.createElement('div');
+        toast.className = 'custom-toast';
+        const icon = type === 'success' ? 'fa-check-circle' : 'fa-exclamation-circle';
+        toast.innerHTML = `<i class="fas ${icon}"></i><span>${message}</span>`;
+        document.body.appendChild(toast);
+        setTimeout(() => {
+            toast.style.opacity = '0';
+            toast.style.transform = 'translateX(100px)';
+            setTimeout(() => toast.remove(), 300);
+        }, 3000);
+    }
+
+    // ====== البيانات الثابتة للزيوت ======
+    const defaultOilsData = [
         { id: 1, name: "زيت اللافندر العطري", category: "عطري", desc: "مهدئ للأعصاب، يساعد على الاسترخاء والنوم العميق", price: 18, img: "asset/images/lavender.jpg" },
         { id: 2, name: "زيت الورد الجوري", category: "عطري", desc: "مضاد للشيخوخة، مرطب طبيعي للبشرة", price: 55, img: "asset/images/rose.jpg" },
         { id: 3, name: "زيت إكليل الجبل", category: "للشعر", desc: "منشط للدورة الدموية، يقوي بصيلات الشعر، يقلل القشرة", price: 22, img: "asset/images/rosemaryoil.png" },
@@ -75,41 +106,81 @@
         { id: 21, name: "زيت الباتشولي", category: "للشعر", desc: "مضاد للفطريات، يمنح رائحة ترابية دافئة", price: 20, img: "asset/images/patchouli.jpg" }
     ];
 
-    // ====== عرض المنتجات مع دعم العروض ======
+    // جلب جميع الزيوت (من localStorage + الافتراضية)
+    function getAllOils() {
+        const storedProducts = JSON.parse(localStorage.getItem('elixir_products') || '[]');
+        const adminOils = storedProducts.filter(p => p.category === 'زيوت مركزة' && p.active !== false);
+        
+        const defaultOils = defaultOilsData.map(oil => ({
+            id: oil.id,
+            name: oil.name,
+            category: oil.category,
+            desc: oil.desc,
+            price: oil.price,
+            img: oil.img,
+            usage: oil.desc,
+            active: true
+        }));
+        
+        const allOils = [...defaultOils];
+        
+        adminOils.forEach(adminOil => {
+            const exists = allOils.some(o => o.name === adminOil.name);
+            if (!exists) {
+                let productCategory = adminOil.subCategory || adminOil.category;
+                if (productCategory === "زيوت مركزة") productCategory = "عطري";
+                allOils.push({
+                    id: adminOil.id,
+                    name: adminOil.name,
+                    category: productCategory,
+                    desc: adminOil.desc || adminOil.usage || "زيت طبيعي 100%",
+                    price: adminOil.price,
+                    img: adminOil.image || "asset/images/placeholder.png",
+                    usage: adminOil.usage || adminOil.desc,
+                    active: adminOil.active
+                });
+            }
+        });
+         return allOils.filter(oil => oil.active !== false);
+    }
+
     function renderProducts() {
         const grid = document.getElementById("oilsGrid");
         const filterVal = document.getElementById('filterSelect').value;
+        let oilsData = getAllOils();
         let filtered = filterVal === 'all' ? oilsData : oilsData.filter(o => o.category === filterVal);
         
-        const offers = JSON.parse(localStorage.getItem('elixir_offers') || '[]');
+        const offers = JSON.parse(localStorage.getItem('elixir_offers')) || [];
+        const favorites = JSON.parse(localStorage.getItem('elixir_favorites') || '[]');
         
         if (filtered.length === 0) {
-            grid.innerHTML = '<div class="no-results"><i class="fas fa-search"></i> لا توجد زيوت مطابقة للفلتر</div>';
+            grid.innerHTML = '<div class="no-results">لا توجد زيوت</div>';
             return;
         }
         
         grid.innerHTML = filtered.map(oil => {
             let catText = oil.category === "عطري" ? "زيت عطري" : (oil.category === "نباتي" ? "زيت نباتي ثابت" : "للبشرة والشعر");
-            let isFav = JSON.parse(localStorage.getItem('elixir_favorites') || '[]').includes(oil.id);
+            const description = oil.desc || oil.usage || "زيت طبيعي فاخر";
             const offer = offers.find(o => o.productId === oil.id && o.section === "oils");
             const displayPrice = offer ? offer.newPrice : oil.price;
             const hasOffer = !!offer;
+            const isFav = favorites.includes(oil.id);
             
             return `
                 <div class="oil-card" data-id="${oil.id}" style="position:relative;">
                     <div class="fav-icon ${isFav ? 'active' : ''}" data-id="${oil.id}">
                         <i class="fa-${isFav ? 'solid' : 'regular'} fa-heart"></i>
                     </div>
-                    ${hasOffer ? `<span class="offer-badge-small" style="position:absolute; top:12px; left:12px; background:#e74c3c; color:white; padding:3px 8px; border-radius:20px; font-size:11px; z-index:5;">-${offer.discount}%</span>` : ''}
-                    <img class="oil-img" src="${oil.img}" alt="${oil.name}" onerror="this.src='asset/images/placeholder.png'">
+                    ${hasOffer ? `<span class="offer-badge-small" style="position:absolute; top:12px; left:12px; background:#e74c3c; color:white; padding:3px 8px; border-radius:20px;">-${offer.discount}%</span>` : ''}
+                    <img class="oil-img" src="${oil.img}" onerror="this.src='asset/images/placeholder.png'">
                     <div class="oil-info">
                         <div class="oil-cat">${catText}</div>
                         <div class="oil-title">${oil.name}</div>
-                        <div class="oil-desc">${oil.desc}</div>
+                        <div class="oil-desc">${description}</div>
                         <div class="price-row">
                             <span class="price">${displayPrice} ₪</span>
                             <div class="btn-group">
-                                <button class="view-details" data-id="${oil.id}"> عرض التفاصيل</button>
+                                <button class="view-details" data-id="${oil.id}" data-name="${oil.name}"> عرض التفاصيل</button>
                                 <button class="add-cart" data-id="${oil.id}" data-name="${oil.name}" data-price="${displayPrice}" data-img="${oil.img}"> إضافة إلى السلة</button>
                             </div>
                         </div>
@@ -117,34 +188,28 @@
                 </div>
             `;
         }).join('');
-        
         addAdminButtons();
     }
 
-    // ====== إضافة أزرار الإدارة ======
     function addAdminButtons() {
         document.querySelectorAll('.oil-card').forEach(card => {
             if (!card.querySelector('.admin-product-btn')) {
-                const addCartBtn = card.querySelector('.add-cart');
-                const productId = addCartBtn ? parseInt(addCartBtn.dataset.id) : null;
-                if (productId) {
-                    const adminBtn = document.createElement('div');
-                    adminBtn.className = 'admin-product-btn';
-                    adminBtn.innerHTML = '<i class="fas fa-plus"></i>';
-                    adminBtn.onclick = (e) => {
-                        e.stopPropagation();
-                        showAdminDropdown(productId, adminBtn);
-                    };
-                    card.appendChild(adminBtn);
-                }
+                const btn = document.createElement('div');
+                btn.className = 'admin-product-btn';
+                btn.innerHTML = '<i class="fas fa-plus"></i>';
+                btn.onclick = (e) => {
+                    e.stopPropagation();
+                    const addCartBtn = card.querySelector('.add-cart');
+                    const productId = addCartBtn ? parseInt(addCartBtn.dataset.id) : null;
+                    if (productId) showAdminDropdown(productId, btn);
+                };
+                card.appendChild(btn);
             }
         });
     }
 
-    // ====== إدارة الأدمن (جديدنا + عروض) ======
     function showAdminDropdown(productId, btnElement) {
         document.querySelectorAll('.admin-dropdown').forEach(d => d.classList.remove('show'));
-        
         let dropdown = btnElement.parentElement.querySelector('.admin-dropdown');
         if (!dropdown) {
             dropdown = document.createElement('div');
@@ -160,7 +225,6 @@
             btnElement.parentElement.appendChild(dropdown);
         }
         dropdown.classList.toggle('show');
-        
         setTimeout(() => {
             document.addEventListener('click', function closeDropdown(e) {
                 if (!dropdown.contains(e.target) && !btnElement.contains(e.target)) {
@@ -171,62 +235,50 @@
         }, 10);
     }
 
-    // ====== إضافة إلى جديدنا ======
-   // ====== إضافة إلى جديدنا (النسخة المصححة) ======
-window.addToNewArrivals = function(productId) {
-    // البحث عن المنتج في oilsData
-    const product = oilsData.find(p => p.id === productId);
-    if (!product) { 
-        showToast("❌ المنتج غير موجود"); 
-        document.querySelectorAll('.admin-dropdown').forEach(d => d.classList.remove('show'));
-        return;
-    }
-    
-    console.log("➕ جاري إضافة المنتج:", product.name);
-    
-    let newArrivals = JSON.parse(localStorage.getItem('elixir_new_arrivals') || '[]');
-    
-    // التحقق من عدم التكرار
-    if (newArrivals.some(p => p.id === productId)) {
-        showToast(`⚠️ "${product.name}" موجود بالفعل في جديدنا`);
-        document.querySelectorAll('.admin-dropdown').forEach(d => d.classList.remove('show'));
-        return;
-    }
-    
-    // تحديد النص المناسب للتصنيف
-    let catText = "";
-    if (product.category === "عطري") catText = "زيت عطري";
-    else if (product.category === "نباتي") catText = "زيت نباتي ثابت";
-    else catText = "للبشرة والشعر";
-    
-    // إضافة المنتج
-    const newItem = {
-        id: product.id,
-        name: product.name,
-        price: product.price,
-        img: product.img,
-        category: product.category,
-        section: "oils",
-        catText: catText,
-        desc: product.desc,
-        addedAt: new Date().toISOString()
-    };
-    
-    newArrivals.push(newItem);
-    localStorage.setItem('elixir_new_arrivals', JSON.stringify(newArrivals));
-    
-    console.log("✅ تم الحفظ، عدد المنتجات في جديدنا:", newArrivals.length);
-    showToast(`✅ تم إضافة "${product.name}" إلى قسم جديدنا`);
-    
-    // إغلاق القائمة المنسدلة
-    document.querySelectorAll('.admin-dropdown').forEach(d => d.classList.remove('show'));
-};
-
-    // ====== إضافة عرض مع تاريخ انتهاء ======
-    window.openDiscountModal = function(productId) {
-        const product = oilsData.find(p => p.id === productId);
-        if (!product) return;
+    window.addToNewArrivals = function(productId) {
+        let product = defaultOilsData.find(p => p.id === productId);
+        if (!product) {
+            const storedProducts = JSON.parse(localStorage.getItem('elixir_products') || '[]');
+            product = storedProducts.find(p => p.id === productId);
+        }
+        if (!product) { showNiceToast("❌ المنتج غير موجود", "error"); return; }
         
+        let newArrivals = JSON.parse(localStorage.getItem('elixir_new_arrivals')) || [];
+        if (newArrivals.some(p => p.id === productId)) {
+            showNiceToast(`⚠️ "${product.name}" موجود بالفعل في جديدنا`, "error");
+            document.querySelectorAll('.admin-dropdown').forEach(d => d.classList.remove('show'));
+            return;
+        }
+        
+        let catText = "";
+        if (product.category === "عطري") catText = "زيت عطري";
+        else if (product.category === "نباتي") catText = "زيت نباتي ثابت";
+        else catText = "للبشرة والشعر";
+        
+        const expiryDate = new Date();
+        expiryDate.setDate(expiryDate.getDate() + 7);
+        
+        newArrivals.push({
+            id: product.id,
+            name: product.name,
+            price: product.price,
+            img: product.img,
+            category: product.category,
+            section: "oils",
+            catText: catText,
+            desc: product.desc || "زيت طبيعي",
+            addedAt: new Date().toISOString(),
+            expiryDate: expiryDate.toISOString()
+        });
+        localStorage.setItem('elixir_new_arrivals', JSON.stringify(newArrivals));
+        showNiceToast(`✅ تم إضافة "${product.name}" إلى قسم جديدنا لمدة 7 أيام ✨`);
+        document.querySelectorAll('.admin-dropdown').forEach(d => d.classList.remove('show'));
+    };
+
+    window.openDiscountModal = function(productId) {
+        const product = defaultOilsData.find(p => p.id === productId);
+        if (!product) return;
+        currentProductForDiscount = product;
         document.querySelectorAll('.admin-dropdown').forEach(d => d.classList.remove('show'));
         
         const tomorrow = new Date();
@@ -241,26 +293,29 @@ window.addToNewArrivals = function(productId) {
         overlay.innerHTML = `
             <div class="discount-modal">
                 <h3>🎯 إضافة "${product.name}" إلى العروض</h3>
-                <input type="number" id="discountPercent" placeholder="نسبة الخصم (%)" min="1" max="90" style="width:100%; padding:10px; margin:10px 0; border-radius:12px; border:1px solid #ddd;">
-                <label style="display:block; text-align:right; font-size:14px; margin-top:10px;">📅 تاريخ انتهاء العرض:</label>
-                <input type="date" id="endDate" value="${defaultDate}" min="${minDate}" style="width:100%; padding:10px; margin:10px 0; border-radius:12px; border:1px solid #ddd;">
-                <p style="font-size:12px; color:#888; text-align:right;">⚠️ إذا تركت التاريخ فارغاً سيكون العرض دائماً</p>
-                <div style="display: flex; gap: 10px; justify-content: center; margin-top: 15px;">
-                    <button id="confirmDiscountBtn" style="background: #438e56; color: white; border: none; padding: 8px 20px; border-radius: 30px; cursor: pointer;">تأكيد</button>
-                    <button id="cancelDiscountBtn" style="background: #ccc; color: #333; border: none; padding: 8px 20px; border-radius: 30px; cursor: pointer;">إلغاء</button>
+                <input type="number" id="discountPercent" placeholder="نسبة الخصم (%)" min="1" max="90">
+                <label>📅 تاريخ انتهاء العرض:</label>
+                <input type="date" id="endDate" value="${defaultDate}" min="${minDate}">
+                <p>⚠️ إذا تركت التاريخ فارغاً سيكون العرض دائماً</p>
+                <div>
+                    <button id="confirmDiscountBtn">تأكيد</button>
+                    <button id="cancelDiscountBtn">إلغاء</button>
                 </div>
             </div>
         `;
         document.body.appendChild(overlay);
         
-        document.getElementById('confirmDiscountBtn').onclick = () => {
-            const discountPercent = parseInt(document.getElementById('discountPercent').value);
+        const confirmBtn = overlay.querySelector('#confirmDiscountBtn');
+        const cancelBtn = overlay.querySelector('#cancelDiscountBtn');
+        
+        confirmBtn.onclick = function() {
+            const discountPercent = parseInt(overlay.querySelector('#discountPercent').value);
             if (!discountPercent || discountPercent < 1 || discountPercent > 90) {
-                showToast("⚠️ الرجاء إدخال نسبة خصم صحيحة (1-90)");
+                showNiceToast("⚠️ الرجاء إدخال نسبة خصم صحيحة (1-90)", "error");
                 return;
             }
-            const endDate = document.getElementById('endDate').value;
-            let offers = JSON.parse(localStorage.getItem('elixir_offers') || '[]');
+            const endDate = overlay.querySelector('#endDate').value;
+            let offers = JSON.parse(localStorage.getItem('elixir_offers')) || [];
             const existingIndex = offers.findIndex(o => o.productId === productId);
             const newPrice = (product.price * (100 - discountPercent) / 100).toFixed(2);
             const offerData = {
@@ -276,11 +331,10 @@ window.addToNewArrivals = function(productId) {
             overlay.remove();
             renderProducts();
         };
-        document.getElementById('cancelDiscountBtn').onclick = () => overlay.remove();
-        overlay.onclick = (e) => { if (e.target === overlay) overlay.remove(); };
+        cancelBtn.onclick = () => overlay.remove();
     };
 
-    // ====== إضافة إلى السلة ======
+    // أحداث السلة والمفضلة
     document.addEventListener('click', function(e) {
         const btn = e.target.closest('.add-cart');
         if (!btn) return;
@@ -293,49 +347,9 @@ window.addToNewArrivals = function(productId) {
         if (window.updateFloatingCart) window.updateFloatingCart();
         let badge = document.querySelector('.cart-count');
         if (badge) badge.innerText = cart.reduce((s,i) => s + i.quantity, 0);
-        showToast(`✅ تمت إضافة ${btn.dataset.name} إلى السلة`);
+        showNiceToast(`✅ تمت إضافة ${btn.dataset.name} إلى السلة`);
     });
 
-    // ====== المفضلة ======
-    document.addEventListener('click', function(e) {
-        const icon = e.target.closest('.fav-icon');
-        if (!icon) return;
-        e.preventDefault();
-        e.stopPropagation();
-        const id = parseInt(icon.dataset.id);
-        let favorites = JSON.parse(localStorage.getItem('elixir_favorites') || '[]');
-        let index = favorites.indexOf(id);
-        if (index === -1) {
-            favorites.push(id);
-            icon.classList.add('active');
-            icon.innerHTML = '<i class="fa-solid fa-heart"></i>';
-        } else {
-            favorites.splice(index, 1);
-            icon.classList.remove('active');
-            icon.innerHTML = '<i class="fa-regular fa-heart"></i>';
-        }
-        localStorage.setItem('elixir_favorites', JSON.stringify(favorites));
-        
-        // تأثير قلوب متطايرة
-        const rect = icon.getBoundingClientRect();
-        for (let i = 0; i < 8; i++) {
-            const heart = document.createElement('div');
-            heart.innerHTML = '❤️';
-            heart.style.position = 'fixed';
-            heart.style.left = (rect.left + rect.width / 2 + (Math.random() - 0.5) * 40) + 'px';
-            heart.style.top = (rect.top + rect.height / 2 + (Math.random() - 0.5) * 30) + 'px';
-            heart.style.fontSize = (Math.random() * 10 + 12) + 'px';
-            heart.style.pointerEvents = 'none';
-            heart.style.zIndex = '9999';
-            heart.style.opacity = '1';
-            heart.style.transition = 'all 0.8s ease-out';
-            document.body.appendChild(heart);
-            setTimeout(() => { heart.style.opacity = '0'; heart.style.transform = 'translateY(-50px)'; }, 10);
-            setTimeout(() => heart.remove(), 800);
-        }
-    });
-
-    // ====== عرض التفاصيل ======
     document.addEventListener('click', function(e) {
         const btn = e.target.closest('.view-details');
         if (btn) {
@@ -344,29 +358,38 @@ window.addToNewArrivals = function(productId) {
         }
     });
 
-    function showToast(msg) {
-        const toast = document.getElementById('customToast');
-        if (toast) {
-            document.getElementById('toastText').innerText = msg;
-            toast.style.display = 'flex';
-            setTimeout(() => toast.style.display = 'none', 3000);
+    document.addEventListener('click', function(e) {
+        const icon = e.target.closest('.fav-icon');
+        if (!icon) return;
+        e.preventDefault();
+        e.stopPropagation();
+        const id = parseInt(icon.dataset.id);
+        let fav = JSON.parse(localStorage.getItem('elixir_favorites')) || [];
+        let idx = fav.indexOf(id);
+        if (idx === -1) {
+            fav.push(id);
+            icon.classList.add('active');
+            icon.innerHTML = '<i class="fa-solid fa-heart"></i>';
+        } else {
+            fav.splice(idx, 1);
+            icon.classList.remove('active');
+            icon.innerHTML = '<i class="fa-regular fa-heart"></i>';
         }
-    }
+        localStorage.setItem('elixir_favorites', JSON.stringify(fav));
+    });
 
-    // الفلتر
     document.getElementById('filterSelect').addEventListener('change', () => renderProducts());
     document.getElementById('resetFilter').addEventListener('click', () => {
         document.getElementById('filterSelect').value = 'all';
         renderProducts();
     });
 
-    // زر الرجوع للأعلى
     const scrollBtn = document.getElementById('scrollTopBtn');
     window.addEventListener('scroll', () => scrollBtn.style.display = window.scrollY > 300 ? 'flex' : 'none');
     scrollBtn.addEventListener('click', () => window.scrollTo({ top: 0, behavior: 'smooth' }));
 
     function initCartBadge() {
-        const cart = JSON.parse(localStorage.getItem('elixir_cart') || '[]');
+        const cart = JSON.parse(localStorage.getItem('elixir_cart')) || [];
         const total = cart.reduce((s,i) => s + i.quantity, 0);
         const badge = document.querySelector('.cart-count');
         if (badge) badge.innerText = total;
