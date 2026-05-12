@@ -64,21 +64,6 @@
 <script src="floating-cart.js"></script>
 
 <script>
-    const spicesData = [
-        { id: 201, name: "بهارات مشكلة", category: "عربية", desc: "خليط متكامل من البهارات العربية الأصيلة", price: 12, img: "asset/images/spice-mix.jpg" },
-        { id: 202, name: "بهارات الكبسة", category: "عربية", desc: "خليط بهارات الكبسة الخليجية", price: 10, img: "asset/images/kabsa-spice.jpg" },
-        { id: 203, name: "بهارات اللحم", category: "عربية", desc: "مزيج قوي ومناسب للحوم والقدور", price: 14, img: "asset/images/meat-spice.jpg" },
-        { id: 204, name: "بهارات المندي", category: "عربية", desc: "خليط المندي العطري", price: 11, img: "asset/images/mandi-spice.jpg" },
-        { id: 205, name: "سماق", category: "عربية", desc: "بهار حامض قليلًا، يستخدم على اللحوم والسلطات", price: 8, img: "asset/images/sumac.jpg" },
-        { id: 206, name: "كمون", category: "عربية", desc: "من أهم البهارات في المطبخ العربي", price: 7, img: "asset/images/cumin-spice.jpg" },
-        { id: 207, name: "كركم", category: "عالمية", desc: "بهار ذهبي مضاد للأكسدة", price: 9, img: "asset/images/turmeric-spice.jpg" },
-        { id: 208, name: "زنجبيل مطحون", category: "عالمية", desc: "يضفي نكهة حارة ودافئة", price: 10, img: "asset/images/ginger-spice.jpg" },
-        { id: 209, name: "قرفة مطحونة", category: "عالمية", desc: "نكهة دافئة وحلوة", price: 10, img: "asset/images/cinnamon-spice.jpg" },
-        { id: 210, name: "بهارات غارام ماسالا", category: "خلطات", desc: "خليط بهارات هندي دافئ", price: 22, img: "asset/images/garam-masala.jpg" },
-        { id: 211, name: "بهارات شاورما", category: "خلطات", desc: "خليط خاص للشاورما والدجاج المشوي", price: 12, img: "asset/images/shawarma-spice.jpg" },
-        { id: 212, name: "سبع بهارات", category: "خلطات", desc: "بهارات أساسية في المطبخ العربي", price: 10, img: "asset/images/seven-spices.jpg" }
-    ];
-
     let currentProductForDiscount = null;
 
     function showNiceToast(message, type = 'success') {
@@ -96,13 +81,81 @@
         }, 3000);
     }
 
+    // ====== البيانات الثابتة للبهارات ======
+    const defaultSpicesData = [
+        { id: 1, name: "بهارات مشكلة", category: "عربية", desc: "خليط متكامل من البهارات العربية الأصيلة", price: 12, img: "asset/images/spice-mix.jpg" },
+        { id: 2, name: "بهارات الكبسة", category: "عربية", desc: "خليط بهارات الكبسة الخليجية", price: 10, img: "asset/images/kabsa-spice.jpg" },
+        { id: 3, name: "بهارات اللحم", category: "عربية", desc: "مزيج قوي ومناسب للحوم والقدور", price: 14, img: "asset/images/meat-spice.jpg" },
+        { id: 4, name: "بهارات المندي", category: "عربية", desc: "خليط المندي العطري", price: 11, img: "asset/images/mandi-spice.jpg" },
+        { id: 5, name: "سماق", category: "عربية", desc: "بهار حامض قليلًا، يستخدم على اللحوم والسلطات", price: 8, img: "asset/images/sumac.jpg" },
+        { id: 6, name: "كمون", category: "عربية", desc: "من أهم البهارات في المطبخ العربي", price: 7, img: "asset/images/cumin-spice.jpg" },
+        { id: 7, name: "كركم", category: "عالمية", desc: "بهار ذهبي مضاد للأكسدة", price: 9, img: "asset/images/turmeric-spice.jpg" },
+        { id: 8, name: "زنجبيل مطحون", category: "عالمية", desc: "يضفي نكهة حارة ودافئة", price: 10, img: "asset/images/ginger-spice.jpg" },
+        { id: 9, name: "قرفة مطحونة", category: "عالمية", desc: "نكهة دافئة وحلوة", price: 10, img: "asset/images/cinnamon-spice.jpg" },
+        { id: 10, name: "بهارات غارام ماسالا", category: "خلطات", desc: "خليط بهارات هندي دافئ", price: 22, img: "asset/images/garam-masala.jpg" },
+        { id: 11, name: "بهارات شاورما", category: "خلطات", desc: "خليط خاص للشاورما والدجاج المشوي", price: 12, img: "asset/images/shawarma-spice.jpg" },
+        { id: 12, name: "سبع بهارات", category: "خلطات", desc: "بهارات أساسية في المطبخ العربي", price: 10, img: "asset/images/seven-spices.jpg" }
+    ];
+
+    // جلب جميع البهارات (من localStorage + الافتراضية)
+    function getAllSpices() {
+        const storedProducts = JSON.parse(localStorage.getItem('elixir_products') || '[]');
+        const adminSpices = storedProducts.filter(p => p.category === 'بهارات' && p.active !== false);
+        
+        const defaultSpices = defaultSpicesData.map(spice => ({
+            id: spice.id,
+            name: spice.name,
+            category: spice.category,
+            desc: spice.desc,
+            price: spice.price,
+            img: spice.img,
+            usage: spice.desc,
+            active: true
+        }));
+        
+        // نبدأ بالمنتجات الافتراضية
+        const allSpices = [...defaultSpices];
+        
+        adminSpices.forEach(adminSpice => {
+            const exists = allSpices.some(s => s.name === adminSpice.name);
+            if (!exists) {
+                let productCategory = adminSpice.subCategory || adminSpice.category;
+                if (productCategory === "بهارات") productCategory = "عربية";
+                allSpices.push({
+                    id: adminSpice.id,
+                    name: adminSpice.name,
+                    category: productCategory,
+                    desc: adminSpice.desc || adminSpice.usage || "بهار طبيعي 100%",
+                    price: adminSpice.price,
+                    img: adminSpice.image || "asset/images/placeholder.png",
+                    usage: adminSpice.usage || adminSpice.desc,
+                    active: adminSpice.active
+                });
+            } else {
+                // تحديث المنتج الموجود إذا كان الاسم متكرراً
+                const existingIndex = allSpices.findIndex(s => s.name === adminSpice.name);
+                if (existingIndex !== -1) {
+                    allSpices[existingIndex] = {
+                        ...allSpices[existingIndex],
+                        price: adminSpice.price,
+                        desc: adminSpice.desc || adminSpice.usage || allSpices[existingIndex].desc,
+                        img: adminSpice.image || allSpices[existingIndex].img
+                    };
+                }
+            }
+        });
+        
+        return allSpices.filter(spice => spice.active !== false);
+    }
+
     function renderProducts() {
         const grid = document.getElementById("spicesGrid");
         const filterVal = document.getElementById('filterSelect').value;
+        let spicesData = getAllSpices();
         let filtered = filterVal === 'all' ? spicesData : spicesData.filter(s => s.category === filterVal);
         
         const offers = JSON.parse(localStorage.getItem('elixir_offers')) || [];
-        const favorites = JSON.parse(localStorage.getItem('elixir_favorites')) || [];
+        const favorites = JSON.parse(localStorage.getItem('elixir_favorites') || '[]');
         
         if (filtered.length === 0) {
             grid.innerHTML = '<div class="no-results">لا توجد بهارات</div>';
@@ -111,6 +164,7 @@
         
         grid.innerHTML = filtered.map(spice => {
             let catText = spice.category === "عربية" ? "بهارات عربية" : (spice.category === "عالمية" ? "بهارات عالمية" : "خلطة خاصة");
+            const description = spice.desc || spice.usage || "بهار طبيعي فاخر";
             const offer = offers.find(o => o.productId === spice.id && o.section === "spices");
             const displayPrice = offer ? offer.newPrice : spice.price;
             const hasOffer = !!offer;
@@ -126,7 +180,7 @@
                     <div class="spice-info">
                         <div class="spice-cat">${catText}</div>
                         <div class="spice-title">${spice.name}</div>
-                        <div class="spice-desc">${spice.desc}</div>
+                        <div class="spice-desc">${description}</div>
                         <div class="price-row">
                             <span class="price">${displayPrice} ₪</span>
                             <div class="btn-group">
@@ -186,7 +240,11 @@
     }
 
     window.addToNewArrivals = function(productId) {
-        const product = spicesData.find(p => p.id === productId);
+        let product = defaultSpicesData.find(p => p.id === productId);
+        if (!product) {
+            const storedProducts = JSON.parse(localStorage.getItem('elixir_products') || '[]');
+            product = storedProducts.find(p => p.id === productId);
+        }
         if (!product) { showNiceToast("❌ المنتج غير موجود", "error"); return; }
         
         let newArrivals = JSON.parse(localStorage.getItem('elixir_new_arrivals')) || [];
@@ -197,18 +255,29 @@
         }
         
         let catText = product.category === "عربية" ? "بهارات عربية" : (product.category === "عالمية" ? "بهارات عالمية" : "خلطة خاصة");
+        
+        const expiryDate = new Date();
+        expiryDate.setDate(expiryDate.getDate() + 7);
+        
         newArrivals.push({
-            id: product.id, name: product.name, price: product.price, img: product.img,
-            category: product.category, section: "spices", catText: catText,
-            desc: product.desc, addedAt: new Date().toISOString()
+            id: product.id,
+            name: product.name,
+            price: product.price,
+            img: product.img,
+            category: product.category,
+            section: "spices",
+            catText: catText,
+            desc: product.desc || "بهار طبيعي",
+            addedAt: new Date().toISOString(),
+            expiryDate: expiryDate.toISOString()
         });
         localStorage.setItem('elixir_new_arrivals', JSON.stringify(newArrivals));
-        showNiceToast(`✅ تم إضافة "${product.name}" إلى قسم جديدنا ✨`);
+        showNiceToast(`✅ تم إضافة "${product.name}" إلى قسم جديدنا لمدة 7 أيام ✨`);
         document.querySelectorAll('.admin-dropdown').forEach(d => d.classList.remove('show'));
     };
 
     window.openDiscountModal = function(productId) {
-        const product = spicesData.find(p => p.id === productId);
+        const product = defaultSpicesData.find(p => p.id === productId);
         if (!product) return;
         currentProductForDiscount = product;
         document.querySelectorAll('.admin-dropdown').forEach(d => d.classList.remove('show'));
@@ -247,34 +316,26 @@
                 return;
             }
             const endDate = overlay.querySelector('#endDate').value;
-            if (!currentProductForDiscount) return;
-            
             let offers = JSON.parse(localStorage.getItem('elixir_offers')) || [];
-            const existingIndex = offers.findIndex(o => o.productId === currentProductForDiscount.id);
-            const newPrice = (currentProductForDiscount.price * (100 - discountPercent) / 100).toFixed(2);
+            const existingIndex = offers.findIndex(o => o.productId === productId);
+            const newPrice = (product.price * (100 - discountPercent) / 100).toFixed(2);
             const offerData = {
-                id: Date.now(), productId: currentProductForDiscount.id,
-                productName: currentProductForDiscount.name,
-                productPrice: currentProductForDiscount.price,
-                productImg: currentProductForDiscount.img,
-                discount: discountPercent, newPrice: newPrice,
-                startDate: new Date().toISOString().split('T')[0],
-                endDate: endDate || "", active: true,
-                createdAt: new Date().toISOString(),
-                section: "spices", category: currentProductForDiscount.category,
-                desc: currentProductForDiscount.desc
+                id: Date.now(), productId: productId, productName: product.name,
+                productPrice: product.price, productImg: product.img, discount: discountPercent,
+                newPrice: newPrice, startDate: new Date().toISOString().split('T')[0],
+                endDate: endDate || "", active: true, createdAt: new Date().toISOString(),
+                section: "spices", category: product.category, desc: product.desc
             };
             if (existingIndex !== -1) offers[existingIndex] = { ...offers[existingIndex], ...offerData };
             else offers.push(offerData);
             localStorage.setItem('elixir_offers', JSON.stringify(offers));
             overlay.remove();
-            currentProductForDiscount = null;
             renderProducts();
         };
         cancelBtn.onclick = () => overlay.remove();
-        overlay.onclick = (e) => { if (e.target === overlay) overlay.remove(); };
     };
 
+    // أحداث السلة والمفضلة
     document.addEventListener('click', function(e) {
         const btn = e.target.closest('.add-cart');
         if (!btn) return;
@@ -287,7 +348,7 @@
         if (window.updateFloatingCart) window.updateFloatingCart();
         let badge = document.querySelector('.cart-count');
         if (badge) badge.innerText = cart.reduce((s,i) => s + i.quantity, 0);
-        showNiceToast(`✅ تمت إضافة ${btn.dataset.name} إلى السلة 🛒`);
+        showNiceToast(`✅ تمت إضافة ${btn.dataset.name} إلى السلة`);
     });
 
     document.addEventListener('click', function(e) {
