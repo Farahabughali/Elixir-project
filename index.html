@@ -140,7 +140,7 @@
                 <h2 class="section-title">🔥 عروض وخصومات</h2>
                 <p class="section-subtitle">لفترة محدودة – خصم يصل إلى 30% على منتجات مختارة</p>
             </div>
-            <a href="#" class="view-all">تسوق العروض</a>
+            <a href="offers.html" class="view-all">تسوق العروض</a>
         </div>
         <div class="countdown-wrapper">
             <div class="countdown-label">
@@ -214,7 +214,7 @@
                 <h2 class="section-title">جديدنا</h2>
                 <p class="section-subtitle">أحدث المنتجات الطبيعية التي أضفناها لكِ</p>
             </div>
-            <a href="#" class="view-all">عرض الكل</a>
+            <a href="new-arrivals.html" class="view-all">عرض الكل</a>
         </div>
         <div class="product-grid new-grid">
             <div class="product-card new-card">
@@ -646,6 +646,33 @@ updateCartCount();
     }, { threshold: 0.1 });
     elements.forEach(el => observer.observe(el));
 })();
+
+
+
+function getCategoryDescription(categoryName) {
+    const descriptions = {
+        'أعشاب طبيعية': 'علاجات طبيعية بخلاصة الأرض لإشراقة صحية، وصحة أفضل.',
+        'زيوت مركزة': 'زيوت نقية مقطرة بعناية للعناية بالبشرة والشعر وللعلاج.',
+        'بهارات': 'بهارات عالمية منتقاة لتضفي على مائدتك لمسة ساحرة ورائحة لا تُنسى.',
+        'منتجات عناية': 'منتجات طبيعية فاخرة للعناية الشخصية ومستحضرات الورد الفاخرة.'
+    };
+    return descriptions[categoryName] || 'منتجات طبيعية 100% بجودة عالية';
+}
+
+// استدعاء الدالة عند تحميل الصفحة
+document.addEventListener('DOMContentLoaded', function() {
+    loadCategoriesFromAdmin();
+    
+    // الاستماع للتغييرات في localStorage
+    window.addEventListener('storage', function(e) {
+        if (e.key === 'elixir_categories') {
+            loadCategoriesFromAdmin();
+        }
+    });
+});
+
+// دالة لتحديث الفئات من أي مكان
+window.updateHomeCategories = loadCategoriesFromAdmin;
 </script>
 
 </body>
