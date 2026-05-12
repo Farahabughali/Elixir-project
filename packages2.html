@@ -10,7 +10,6 @@
 </head>
 <body>
 
-<!-- الهيدر -->
 <header>
     <div class="main-header">
         <div class="header-right">
@@ -69,17 +68,98 @@
 <script src="floating-cart.js"></script>
 
 <script>
-    // ========== بيانات البكجات ==========
-    const packagesData = [
-        { id: 1001, name: "بكج النشاط والتوازن", category: "نشاط", desc: "منتجات تمنحك الطاقة والنشاط، مع زيت النعناع المنعش والعسل الطبيعي وزيت الليمون وإكليل الجبل.", price: 65, img: "asset/images/balance-package.png", bgColor: "#fff3e0", btnColor: "#ef6c00", section: "packages", catText: "بكج نشاط" },
-        { id: 1002, name: "بكج جوهر الورد", category: "ورد", desc: "زيت الورد الجوري، ماء الورد، مرطب الورد وبتلات الورد المجففة للعناية الفاخرة.", price: 110, img: "asset/images/roseessence-package.png", bgColor: "#fce4ec", btnColor: "#c2185b", section: "packages", catText: "بكج ورد" },
-        { id: 1003, name: "بكج عالم البهارات", category: "بهارات", desc: "بهارات مشكلة، غارام ماسالا، شاورما وبابريكا – جولة في مطابخ العالم.", price: 45, img: "asset/images/spices-package.jpg", bgColor: "#efebe9", btnColor: "#8d6e63", section: "packages", catText: "بكج بهارات" },
-        { id: 1004, name: "بكج النضارة والإشراقة", category: "نضارة", desc: "تونر ماء الورد، صابون زيتون، كريم ورد وزيت لوز حلو لنضارة فائقة.", price: 75, img: "asset/images/freshness-package.jpg", bgColor: "#e0f7fa", btnColor: "#00838f", section: "packages", catText: "بكج نضارة" },
-        { id: 1005, name: "بكج الهدوء والتأمل", category: "هدوء", desc: "زيت اللافندر، شاي البابونج، زيت الياسمين وبتلات الورد للاسترخاء العميق.", price: 46, img: "asset/images/calm-package.jpg", bgColor: "#e8eaf6", btnColor: "#3949ab", section: "packages", catText: "بكج هدوء" },
-        { id: 1006, name: "بكج العناية الفاخرة للبشرة", category: "عناية", desc: "صابونة طين أبيض، زيت أركان، تونر ماء ورد ومرطب ورد لبشرة فاخرة.", price: 80, img: "asset/images/luxury-package.jpg", bgColor: "#ffe0f0", btnColor: "#d81b60", section: "packages", catText: "بكج عناية" },
-        { id: 1007, name: "بكج الشفاء الطبيعي", category: "شفاء", desc: "عسل أعشاب، زيت حبة سوداء، تونر بابونج وزيت شجرة الشاي للشفاء الطبيعي.", price: 68, img: "asset/images/healing-package.jpg", bgColor: "#e0f2e0", btnColor: "#43a047", section: "packages", catText: "بكج شفاء" },
-        { id: 1008, name: "بكج العناية بالشعر", category: "شعر", desc: "زيت إكليل الجبل، زيت جوز الهند، زيت الخروع وزيت الأرجان للعناية الفائقة بالشعر.", price: 85, img: "asset/images/hair-package.jpg", bgColor: "#fef3e8", btnColor: "#c47a3a", section: "packages", catText: "بكج شعر" }
+    // ========== دالة للحصول على ألوان البكج حسب الفئة ==========
+    function getPackageBgColor(category) {
+        const colors = {
+            'نشاط': '#fff3e0',
+            'ورد': '#fce4ec',
+            'بهارات': '#efebe9',
+            'نضارة': '#e0f7fa',
+            'هدوء': '#e8eaf6',
+            'عناية': '#ffe0f0',
+            'شفاء': '#e0f2e0',
+            'شعر': '#fef3e8'
+        };
+        return colors[category] || '#ffffff';
+    }
+
+    function getPackageBtnColor(category) {
+        const colors = {
+            'نشاط': '#ef6c00',
+            'ورد': '#c2185b',
+            'بهارات': '#8d6e63',
+            'نضارة': '#00838f',
+            'هدوء': '#3949ab',
+            'عناية': '#d81b60',
+            'شفاء': '#43a047',
+            'شعر': '#c47a3a'
+        };
+        return colors[category] || '#438e56';
+    }
+
+    function getPackageCatText(category) {
+        const texts = {
+            'نشاط': 'بكج نشاط',
+            'ورد': 'بكج ورد',
+            'بهارات': 'بكج بهارات',
+            'نضارة': 'بكج نضارة',
+            'هدوء': 'بكج هدوء',
+            'عناية': 'بكج عناية',
+            'شفاء': 'بكج شفاء',
+            'شعر': 'بكج شعر'
+        };
+        return texts[category] || 'بكج طبيعي';
+    }
+
+    // ========== البكجات الافتراضية ==========
+    const defaultPackages = [
+        { id: 1001, name: "بكج النشاط والتوازن", category: "نشاط", desc: "منتجات تمنحك الطاقة والنشاط، مع زيت النعناع المنعش والعسل الطبيعي وزيت الليمون وإكليل الجبل.", price: 65, img: "asset/images/balance-package.png" },
+        { id: 1002, name: "بكج جوهر الورد", category: "ورد", desc: "زيت الورد الجوري، ماء الورد، مرطب الورد وبتلات الورد المجففة للعناية الفاخرة.", price: 110, img: "asset/images/roseessence-package.png" },
+        { id: 1003, name: "بكج عالم البهارات", category: "بهارات", desc: "بهارات مشكلة، غارام ماسالا، شاورما وبابريكا – جولة في مطابخ العالم.", price: 45, img: "asset/images/spices-package.jpg" },
+        { id: 1004, name: "بكج النضارة والإشراقة", category: "نضارة", desc: "تونر ماء الورد، صابون زيتون، كريم ورد وزيت لوز حلو لنضارة فائقة.", price: 75, img: "asset/images/freshness-package.jpg" },
+        { id: 1005, name: "بكج الهدوء والتأمل", category: "هدوء", desc: "زيت اللافندر، شاي البابونج، زيت الياسمين وبتلات الورد للاسترخاء العميق.", price: 46, img: "asset/images/calm-package.jpg" },
+        { id: 1006, name: "بكج العناية الفاخرة للبشرة", category: "عناية", desc: "صابونة طين أبيض، زيت أركان، تونر ماء ورد ومرطب ورد لبشرة فاخرة.", price: 80, img: "asset/images/luxury-package.jpg" },
+        { id: 1007, name: "بكج الشفاء الطبيعي", category: "شفاء", desc: "عسل أعشاب، زيت حبة سوداء، تونر بابونج وزيت شجرة الشاي للشفاء الطبيعي.", price: 68, img: "asset/images/healing-package.jpg" },
+        { id: 1008, name: "بكج العناية بالشعر", category: "شعر", desc: "زيت إكليل الجبل، زيت جوز الهند، زيت الخروع وزيت الأرجان للعناية الفائقة بالشعر.", price: 85, img: "asset/images/hair-package.jpg" }
     ];
+
+    // ========== دمج بكجات الأدمن مع البكجات الافتراضية ==========
+    function getAllPackages() {
+        // جلب بكجات الأدمن من localStorage
+        let adminPackages = JSON.parse(localStorage.getItem('elixir_packages')) || [];
+        
+        // تحويل بكجات الأدمن إلى نفس تنسيق البكجات الافتراضية
+        const formattedAdminPackages = adminPackages
+            .filter(pkg => pkg.active !== false) // فقط البكجات المفعلة
+            .map(pkg => ({
+                id: pkg.id,
+                name: pkg.name,
+                category: pkg.category || 'نشاط',
+                desc: pkg.description || pkg.desc || "بكج طبيعي متكامل",
+                price: pkg.price,
+                img: pkg.image || "asset/images/package-placeholder.png",
+                // إذا كان البكج من الأدمن يحمل ألوانه الخاصة نستخدمها، وإلا نحسبها حسب الفئة
+                bgColor: pkg.bgColor || getPackageBgColor(pkg.category || 'نشاط'),
+                btnColor: pkg.btnColor || getPackageBtnColor(pkg.category || 'نشاط'),
+                section: "packages",
+                catText: pkg.catText || getPackageCatText(pkg.category || 'نشاط')
+            }));
+        
+        // تحويل البكجات الافتراضية إلى نفس التنسيق مع ألوانها الثابتة
+        const formattedDefaultPackages = defaultPackages.map(pkg => ({
+            ...pkg,
+            bgColor: getPackageBgColor(pkg.category),
+            btnColor: getPackageBtnColor(pkg.category),
+            catText: getPackageCatText(pkg.category),
+            section: "packages"
+        }));
+        
+        // دمج البكجات (بكجات الأدمن أولاً، ثم الافتراضية التي لا تتعارض معها)
+        const allPackageIds = new Set(formattedAdminPackages.map(p => p.id));
+        const nonConflictingDefaults = formattedDefaultPackages.filter(p => !allPackageIds.has(p.id));
+        
+        return [...formattedAdminPackages, ...nonConflictingDefaults];
+    }
 
     let currentFilter = "all";
 
@@ -88,9 +168,11 @@
         return JSON.parse(localStorage.getItem('elixir_offers')) || [];
     }
 
-    // ========== عرض البكجات مع دعم العروض ==========
+    // ========== عرض البكجات ==========
     function renderPackages() {
         const grid = document.getElementById("packagesGrid");
+        let packagesData = getAllPackages(); // جلب البكجات ديناميكياً
+        
         let filtered = packagesData;
         if (currentFilter !== "all") {
             filtered = packagesData.filter(pkg => pkg.category === currentFilter);
@@ -108,7 +190,6 @@
             let favorites = JSON.parse(localStorage.getItem('elixir_favorites')) || [];
             if (favorites.includes(pkg.id)) isFav = true;
             
-            // التحقق من وجود عرض
             const offer = offers.find(o => o.productId === pkg.id && o.section === "packages");
             const displayPrice = offer ? offer.newPrice : pkg.price;
             const hasOffer = !!offer;
@@ -187,7 +268,7 @@
         });
     }
 
-    // ========== إدارة الأدمن (زائد) مع تاريخ الانتهاء ==========
+    // ========== إدارة الأدمن (زائد) ==========
     let currentPackageForDiscount = null;
 
     function showAdminDropdown(packageId, btnElement) {
@@ -220,155 +301,141 @@
         }, 10);
     }
 
-    // ========== إضافة المنتج إلى جديدنا (النسخة المصححة مع حفظ جميع البيانات) ==========
+    //اضافة البكج لجديدنا 
     window.addToNewArrivalsPackage = function(packageId) {
-        const pkg = packagesData.find(p => p.id === packageId);
-        if (!pkg) {
-            showToastMessage("❌ المنتج غير موجود");
-            return;
-        }
-        
-        console.log("➕ جاري إضافة البكج:", pkg.name);
-        
-        let newArrivals = JSON.parse(localStorage.getItem('elixir_new_arrivals')) || [];
-        
-        if (newArrivals.some(p => p.id === packageId)) {
-            showToastMessage(`⚠️ "${pkg.name}" موجود بالفعل في جديدنا`);
-            document.querySelectorAll('.admin-dropdown').forEach(d => d.classList.remove('show'));
-            return;
-        }
-        
-        // حفظ جميع بيانات البكج (بما في ذلك الألوان)
-        newArrivals.push({
-            id: pkg.id,
-            name: pkg.name,
-            price: pkg.price,
-            img: pkg.img,
-            category: pkg.category,
-            section: "packages",
-            catText: pkg.catText || "بكج",
-            desc: pkg.desc,
-            bgColor: pkg.bgColor,
-            btnColor: pkg.btnColor,
-            addedAt: new Date().toISOString()
-        });
-        
-        localStorage.setItem('elixir_new_arrivals', JSON.stringify(newArrivals));
-        
-        console.log("✅ تم الحفظ، عدد المنتجات في جديدنا:", newArrivals.length);
-        showToastMessage(`✅ تم إضافة "${pkg.name}" إلى قسم جديدنا`);
-        
-        document.querySelectorAll('.admin-dropdown').forEach(d => d.classList.remove('show'));
-    };
-
-    // فتح نافذة إدخال نسبة الخصم مع تاريخ الانتهاء
-    window.openDiscountModalPackage = function(packageId) {
-        const pkg = packagesData.find(p => p.id === packageId);
-        if (!pkg) return;
-        currentPackageForDiscount = pkg;
-        
-        document.querySelectorAll('.admin-dropdown').forEach(d => d.classList.remove('show'));
-        
-        // الحصول على تاريخ الغد كحد أدنى
-        const tomorrow = new Date();
-        tomorrow.setDate(tomorrow.getDate() + 1);
-        const minDate = tomorrow.toISOString().split('T')[0];
-        
-        // تاريخ بعد 30 يوم كقيمة افتراضية
-        const defaultEndDate = new Date();
-        defaultEndDate.setDate(defaultEndDate.getDate() + 30);
-        const defaultDate = defaultEndDate.toISOString().split('T')[0];
-        
-        const overlay = document.createElement('div');
-        overlay.className = 'discount-modal-overlay';
-        overlay.innerHTML = `
-            <div class="discount-modal">
-                <h3>🎯 إضافة "${pkg.name}" إلى العروض</h3>
-                <input type="number" id="discountPercent" placeholder="نسبة الخصم (%)" min="1" max="90" style="width:100%; padding:10px; margin:10px 0; border-radius:12px; border:1px solid #ddd;">
-                <label style="display:block; text-align:right; font-size:14px; margin-top:10px;">📅 تاريخ انتهاء العرض:</label>
-                <input type="date" id="endDate" value="${defaultDate}" min="${minDate}" style="width:100%; padding:10px; margin:10px 0; border-radius:12px; border:1px solid #ddd;">
-                <p style="font-size:12px; color:#888; text-align:right;">⚠️ إذا تركت التاريخ فارغاً سيكون العرض دائماً</p>
-                <div style="display: flex; gap: 10px; justify-content: center; margin-top: 15px;">
-                    <button id="confirmDiscountBtn" style="background: #438e56; color: white; border: none; padding: 8px 20px; border-radius: 30px; cursor: pointer;">تأكيد</button>
-                    <button id="cancelDiscountBtn" style="background: #ccc; color: #333; border: none; padding: 8px 20px; border-radius: 30px; cursor: pointer;">إلغاء</button>
-                </div>
-            </div>
-        `;
-        document.body.appendChild(overlay);
-        
-        const confirmBtn = overlay.querySelector('#confirmDiscountBtn');
-        const cancelBtn = overlay.querySelector('#cancelDiscountBtn');
-        
-        confirmBtn.onclick = function() {
-            const discountPercent = parseInt(overlay.querySelector('#discountPercent').value);
-            if (!discountPercent || discountPercent < 1 || discountPercent > 90) {
-                showToastMessage("⚠️ الرجاء إدخال نسبة خصم صحيحة (1-90)");
-                return;
-            }
-            
-            const endDate = overlay.querySelector('#endDate').value;
-            
-            if (!currentPackageForDiscount) return;
-            
-            let offers = JSON.parse(localStorage.getItem('elixir_offers')) || [];
-            const existingIndex = offers.findIndex(o => o.productId === currentPackageForDiscount.id && o.section === "packages");
-            
-            const newPrice = (currentPackageForDiscount.price * (100 - discountPercent) / 100).toFixed(2);
-            
-            const offerData = {
-                id: Date.now(),
-                productId: currentPackageForDiscount.id,
-                productName: currentPackageForDiscount.name,
-                productPrice: currentPackageForDiscount.price,
-                productImg: currentPackageForDiscount.img,
-                discount: discountPercent,
-                newPrice: newPrice,
-                startDate: new Date().toISOString().split('T')[0],
-                endDate: endDate || "",
-                active: true,
-                createdAt: new Date().toISOString(),
-                section: "packages",
-                category: currentPackageForDiscount.category,
-                desc: currentPackageForDiscount.desc || "بكج طبيعي متكامل"
-            };
-            
-            if (existingIndex !== -1) {
-                offers[existingIndex] = { ...offers[existingIndex], ...offerData };
-                showToastMessage(`✅ تم تحديث خصم "${currentPackageForDiscount.name}" إلى ${discountPercent}%`);
-            } else {
-                offers.push(offerData);
-                showToastMessage(`✅ تم إضافة "${currentPackageForDiscount.name}" إلى العروض بخصم ${discountPercent}%`);
-            }
-            
-            localStorage.setItem('elixir_offers', JSON.stringify(offers));
-            overlay.remove();
-            currentPackageForDiscount = null;
-            
-            // إعادة التصيير لتحديث الأسعار
-            renderPackages();
-            
-            // تحديث صفحة العروض إذا كانت مفتوحة
-            if (window.refreshOffersPage) window.refreshOffersPage();
-        };
-        
-        cancelBtn.onclick = function() {
-            overlay.remove();
-            currentPackageForDiscount = null;
-        };
-        
-        overlay.onclick = function(e) {
-            if (e.target === overlay) {
-                overlay.remove();
-                currentPackageForDiscount = null;
-            }
-        };
-    };
-
-    function closeDiscountModalPackage() {
-        const overlay = document.querySelector('.discount-modal-overlay');
-        if (overlay) overlay.remove();
-        currentPackageForDiscount = null;
+    const allPackages = getAllPackages();
+    const pkg = allPackages.find(p => p.id === packageId);
+    if (!pkg) {
+        showToastMessage("❌ المنتج غير موجود");
+        return;
     }
+    
+    let newArrivals = JSON.parse(localStorage.getItem('elixir_new_arrivals')) || [];
+    
+    if (newArrivals.some(p => p.id === packageId)) {
+        showToastMessage(`⚠️ "${pkg.name}" موجود بالفعل في جديدنا`);
+        document.querySelectorAll('.admin-dropdown').forEach(d => d.classList.remove('show'));
+        return;
+    }
+    
+    newArrivals.push({
+        id: pkg.id,
+        name: pkg.name,
+        price: pkg.price,
+        img: pkg.img,
+        category: pkg.category,
+        section: "packages",  // 🔑 هذا السطر مهم جداً
+        catText: pkg.catText || "بكج",
+        desc: pkg.desc,
+        bgColor: pkg.bgColor,
+        btnColor: pkg.btnColor,
+        addedAt: new Date().toISOString()
+    });
+    
+    localStorage.setItem('elixir_new_arrivals', JSON.stringify(newArrivals));
+    showToastMessage(`✅ تم إضافة "${pkg.name}" إلى قسم جديدنا`);
+    
+    document.querySelectorAll('.admin-dropdown').forEach(d => d.classList.remove('show'));
+};
+
+    // ========== فتح نافذة إضافة عرض ==========
+window.openDiscountModalPackage = function(packageId) {
+    const allPackages = getAllPackages();
+    const pkg = allPackages.find(p => p.id === packageId);
+    if (!pkg) return;
+    currentPackageForDiscount = pkg;
+    
+    document.querySelectorAll('.admin-dropdown').forEach(d => d.classList.remove('show'));
+    
+    const tomorrow = new Date();
+    tomorrow.setDate(tomorrow.getDate() + 1);
+    const minDate = tomorrow.toISOString().split('T')[0];
+    
+    const defaultEndDate = new Date();
+    defaultEndDate.setDate(defaultEndDate.getDate() + 30);
+    const defaultDate = defaultEndDate.toISOString().split('T')[0];
+    
+    const overlay = document.createElement('div');
+    overlay.className = 'discount-modal-overlay';
+    overlay.innerHTML = `
+        <div class="discount-modal">
+            <h3>🎯 إضافة "${pkg.name}" إلى العروض</h3>
+            <input type="number" id="discountPercent" placeholder="نسبة الخصم (%)" min="1" max="90" style="width:100%; padding:10px; margin:10px 0; border-radius:12px; border:1px solid #ddd;">
+            <label style="display:block; text-align:right; font-size:14px; margin-top:10px;">📅 تاريخ انتهاء العرض:</label>
+            <input type="date" id="endDate" value="${defaultDate}" min="${minDate}" style="width:100%; padding:10px; margin:10px 0; border-radius:12px; border:1px solid #ddd;">
+            <p style="font-size:12px; color:#888; text-align:right;">⚠️ إذا تركت التاريخ فارغاً سيكون العرض دائماً</p>
+            <div style="display: flex; gap: 10px; justify-content: center; margin-top: 15px;">
+                <button id="confirmDiscountBtn" style="background: #438e56; color: white; border: none; padding: 8px 20px; border-radius: 30px; cursor: pointer;">تأكيد</button>
+                <button id="cancelDiscountBtn" style="background: #ccc; color: #333; border: none; padding: 8px 20px; border-radius: 30px; cursor: pointer;">إلغاء</button>
+            </div>
+        </div>
+    `;
+    document.body.appendChild(overlay);
+    
+    const confirmBtn = overlay.querySelector('#confirmDiscountBtn');
+    const cancelBtn = overlay.querySelector('#cancelDiscountBtn');
+    
+    confirmBtn.onclick = function() {
+        const discountPercent = parseInt(overlay.querySelector('#discountPercent').value);
+        if (!discountPercent || discountPercent < 1 || discountPercent > 90) {
+            showToastMessage("⚠️ الرجاء إدخال نسبة خصم صحيحة (1-90)");
+            return;
+        }
+        
+        const endDate = overlay.querySelector('#endDate').value;
+        
+        if (!currentPackageForDiscount) return;
+        
+        let offers = JSON.parse(localStorage.getItem('elixir_offers')) || [];
+        const existingIndex = offers.findIndex(o => o.productId === currentPackageForDiscount.id && o.section === "packages");
+        
+        const newPrice = (currentPackageForDiscount.price * (100 - discountPercent) / 100).toFixed(2);
+        
+        const offerData = {
+    id: Date.now(),
+    productId: currentPackageForDiscount.id,
+    productName: currentPackageForDiscount.name,
+    productPrice: currentPackageForDiscount.price,
+    productImg: currentPackageForDiscount.img,
+    discount: discountPercent,
+    newPrice: newPrice,
+    startDate: new Date().toISOString().split('T')[0],
+    endDate: endDate || "",
+    active: true,
+    createdAt: new Date().toISOString(),
+    section: "packages",     // 🔑 هذا السطر مهم جداً
+    category: currentPackageForDiscount.category,
+    desc: currentPackageForDiscount.desc || "بكج طبيعي متكامل",
+    bgColor: currentPackageForDiscount.bgColor,   // 
+    btnColor: currentPackageForDiscount.btnColor  //
+};
+        
+        if (existingIndex !== -1) {
+            offers[existingIndex] = { ...offers[existingIndex], ...offerData };
+            showToastMessage(`✅ تم تحديث خصم "${currentPackageForDiscount.name}" إلى ${discountPercent}%`);
+        } else {
+            offers.push(offerData);
+            showToastMessage(`✅ تم إضافة "${currentPackageForDiscount.name}" إلى العروض بخصم ${discountPercent}%`);
+        }
+        
+        localStorage.setItem('elixir_offers', JSON.stringify(offers));
+        overlay.remove();
+        currentPackageForDiscount = null;
+        renderPackages();
+    };
+    
+    cancelBtn.onclick = function() {
+        overlay.remove();
+        currentPackageForDiscount = null;
+    };
+    
+    overlay.onclick = function(e) {
+        if (e.target === overlay) {
+            overlay.remove();
+            currentPackageForDiscount = null;
+        }
+    };
+};
 
     // ========== دوال مساعدة ==========
     function addToCartPackage(btn) {
@@ -406,8 +473,6 @@
             icon.innerHTML = '<i class="fa-regular fa-heart"></i>';
         }
         localStorage.setItem('elixir_favorites', JSON.stringify(favorites));
-        const favCount = document.querySelector('.favorite-count');
-        if (favCount) favCount.innerText = favorites.length;
     }
 
     function burstHearts(x, y) {
@@ -476,6 +541,13 @@
     // ========== بدء التشغيل ==========
     updateCartBadge();
     renderPackages();
+    
+    // الاستماع للتغييرات في localStorage (عند إضافة بكج من الأدمن)
+    window.addEventListener('storage', function(e) {
+        if (e.key === 'elixir_packages') {
+            renderPackages();
+        }
+    });
 </script>
 </body>
 </html>
