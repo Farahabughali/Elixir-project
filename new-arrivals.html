@@ -26,7 +26,7 @@
         .back-home a { background: rgba(67,142,86,0.1); padding: 10px 25px; border-radius: 40px; color: #438e56; text-decoration: none; transition: 0.2s; display: inline-block; }
         .back-home a:hover { background: #438e56; color: white; }
         .new-badge-red { position: absolute; top: 12px; right: 12px; background: #e74c3c; color: white; font-weight: bold; padding: 4px 12px; border-radius: 30px; font-size: 12px; z-index: 10; box-shadow: 0 2px 5px rgba(0,0,0,0.2); }
-        .toast-message { position: fixed; bottom: 30px; right: 30px; background: #27ae60; color: white; padding: 12px 24px; border-radius: 50px; font-size: 0.9rem; z-index: 9999; display: none; align-items: center; gap: 10px; }
+        .toast-message { position: fixed; bottom: 30px; right: 30px; background: #2c5f2d; color: white; padding: 12px 24px; border-radius: 50px; font-size: 0.9rem; z-index: 9999; display: none; align-items: center; gap: 10px; }
         .scroll-top-btn { position: fixed; bottom: 30px; left: 30px; width: 50px; height: 50px; background: #438e56; color: white; border: none; border-radius: 50%; cursor: pointer; font-size: 1.5rem; z-index: 99; transition: 0.3s; display: flex; align-items: center; justify-content: center; }
         .scroll-top-btn:hover { background: #2c5f2d; transform: translateY(-5px); }
     </style>
@@ -41,6 +41,7 @@
                 <span class="web-name">Elixir</span>
             </a>
             <span class="page-title-in-header">✨ جديدنا</span>
+           
         </div>
         <div class="header-left">
             <span class="help-text">✨ أحدث المنتجات الطبيعية التي أضفناها لكِ</span>
@@ -52,7 +53,7 @@
 <div class="container">
     <div class="new-header">
         <h1>✨ جديدنا</h1>
-        <p>أحدث المنتجات الطبيعية التي أضفناها لكِ</p>
+        <p>أحدث المنتجات الطبيعية التي أضفناها لك</p>
     </div>
     <div class="new-arrivals-grid" id="newArrivalsGrid"></div>
     <div class="back-home">
@@ -68,6 +69,7 @@
         const toast = document.getElementById('customToast');
         if (toast) {
             document.getElementById('toastText').innerHTML = msg;
+            
             toast.style.display = 'flex';
             setTimeout(() => toast.style.display = 'none', 3000);
         }
@@ -177,6 +179,37 @@
         `;
     }
 
+
+
+    // ========== بطاقة البكجات (نفس شكل packages.html) ==========
+// ========== بطاقة البكجات ==========
+function createPackageCard(product) {
+    let isFav = JSON.parse(localStorage.getItem('elixir_favorites') || '[]').includes(product.id);
+    let bgColor = product.bgColor || "#fff3e0";
+    let btnColor = product.btnColor || "#ef6c00";
+    
+    return `
+        <div class="package-card" data-id="${product.id}" style="position:relative; background: ${bgColor}; border-bottom: 4px solid ${btnColor}; border-radius: 1rem; overflow: hidden; min-height: 380px;">
+            <div class="new-badge-red" style="position:absolute; top:12px; right:12px; background:#e74c3c; color:white; padding:4px 12px; border-radius:30px; font-size:12px; z-index:10;">جديد</div>
+            <div class="fav-icon ${isFav ? 'active' : ''}" data-id="${product.id}" style="position:absolute; top:12px; left:12px; z-index:10; cursor:pointer; font-size:1.2rem;">
+                <i class="fa-${isFav ? 'solid' : 'regular'} fa-heart" style="color:${isFav ? '#e74c3c' : '#aaa'}"></i>
+            </div>
+            <img class="package-img" src="${product.img}" onerror="this.src='asset/images/placeholder.png'" style="width:100%; height:180px; object-fit:cover;">
+            <div class="package-info" style="padding:1rem; text-align:right;">
+                <div class="package-title" style="font-size:1.1rem; font-weight:700; margin-bottom:5px;">${product.name}</div>
+                <div class="package-desc" style="font-size:0.75rem; color:#666; line-height:1.4; margin:8px 0;">${(product.desc || "بكج متكامل").substring(0, 80)}</div>
+                <div class="price-row" style="display:flex; justify-content:space-between; align-items:center; margin-top:10px;">
+                    <span class="price" style="font-weight:bold; color:#e74c3c; font-size:1.2rem;">${product.price} ₪</span>
+                    <div class="btn-group" style="display:flex; gap:8px;">
+                        <button class="view-details" data-id="${product.id}" style="background:${btnColor}; color:white; border:none; padding:5px 12px; border-radius:30px; cursor:pointer; font-size:0.7rem;"> عرض التفاصيل</button>
+                        <button class="add-cart" data-id="${product.id}" data-name="${product.name}" data-price="${product.price}" data-img="${product.img}" style="background:${btnColor}; color:white; border:none; padding:5px 12px; border-radius:30px; cursor:pointer; font-size:0.7rem;"> إضافة للسلة</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    `;
+}
+
     function getCard(product) {
         if (!product) return '';
         switch(product.section) {
@@ -184,16 +217,20 @@
             case 'oils': return createOilCard(product);
             case 'spices': return createSpiceCard(product);
             case 'care': return createCareCard(product);
+            case 'packages': return createPackageCard(product);
             default: return createOilCard(product);
         }
     }
+
+
+
 
     function renderNewArrivals() {
         const grid = document.getElementById("newArrivalsGrid");
         let newArrivals = JSON.parse(localStorage.getItem('elixir_new_arrivals')) || [];
         
         if (newArrivals.length === 0) {
-            grid.innerHTML = `<div class="no-results"><i class="fas fa-star"></i> <h3>✨ لا توجد منتجات جديدة</h3><p>أضف منتجات من صفحات المنتجات عبر زر +</p></div>`;
+            grid.innerHTML = `<div class="no-results"><i class="fas fa-star"></i> <h3>✨ لا توجد منتجات جديدة</h3><p>تصفح مجموعاتنا الأخرى لتكتشف كنوز الطبيعة</p></div>`;
             return;
         }
         
