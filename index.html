@@ -140,7 +140,7 @@
                 <h2 class="section-title">🔥 عروض وخصومات</h2>
                 <p class="section-subtitle">لفترة محدودة – خصم يصل إلى 30% على منتجات مختارة</p>
             </div>
-            <a href="offers.html" class="view-all">تسوق العروض</a>
+            <a href="#" class="view-all">تسوق العروض</a>
         </div>
         <div class="countdown-wrapper">
             <div class="countdown-label">
@@ -214,7 +214,7 @@
                 <h2 class="section-title">جديدنا</h2>
                 <p class="section-subtitle">أحدث المنتجات الطبيعية التي أضفناها لكِ</p>
             </div>
-            <a href="new-arrivals.html" class="view-all">عرض الكل</a>
+            <a href="#" class="view-all">عرض الكل</a>
         </div>
         <div class="product-grid new-grid">
             <div class="product-card new-card">
@@ -430,7 +430,7 @@
             <h2 class="footer-logo">Elixir</h2>
             <p>منصة رقمية تجمع بين التراث الفلسطيني الأصيل في التداوي بالأعشاب وأحدث تقنيات الذكاء الاصطناعي لتقديم استشارات صحية موثوقة.</p>
             <div class="social-links">
-                <a href="#"><i class="fa-brands fa-instagram"></i></a>
+                <a href="https://www.instagram.com/elixirr.ps?igsh=Z3p2bXhtZm5wNjUy" target="_blank"><i class="fa-brands fa-instagram"></i></a>
                 <a href="#"><i class="fa-brands fa-whatsapp"></i></a>
             </div>
         </div>
@@ -448,9 +448,11 @@
         </div>
         <div class="footer-column">
             <ul>
-                <li><a href="support.html">الدعم</a></li>
                 <li><a href="careers.html">الوظائف</a></li>
+                <li><a href="support.html">الدعم</a></li>
+                <li><a href="policies.html">سياسات Elixir</a></li>
                 <li><a href="aboutelixir.html">عن Elixir</a></li>
+
             </ul>
         </div>
         <div class="footer-column contact-info">
@@ -646,33 +648,6 @@ updateCartCount();
     }, { threshold: 0.1 });
     elements.forEach(el => observer.observe(el));
 })();
-
-
-
-function getCategoryDescription(categoryName) {
-    const descriptions = {
-        'أعشاب طبيعية': 'علاجات طبيعية بخلاصة الأرض لإشراقة صحية، وصحة أفضل.',
-        'زيوت مركزة': 'زيوت نقية مقطرة بعناية للعناية بالبشرة والشعر وللعلاج.',
-        'بهارات': 'بهارات عالمية منتقاة لتضفي على مائدتك لمسة ساحرة ورائحة لا تُنسى.',
-        'منتجات عناية': 'منتجات طبيعية فاخرة للعناية الشخصية ومستحضرات الورد الفاخرة.'
-    };
-    return descriptions[categoryName] || 'منتجات طبيعية 100% بجودة عالية';
-}
-
-// استدعاء الدالة عند تحميل الصفحة
-document.addEventListener('DOMContentLoaded', function() {
-    loadCategoriesFromAdmin();
-    
-    // الاستماع للتغييرات في localStorage
-    window.addEventListener('storage', function(e) {
-        if (e.key === 'elixir_categories') {
-            loadCategoriesFromAdmin();
-        }
-    });
-});
-
-// دالة لتحديث الفئات من أي مكان
-window.updateHomeCategories = loadCategoriesFromAdmin;
 </script>
 
 </body>

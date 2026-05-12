@@ -129,8 +129,7 @@
             });
         });
         document.querySelector('.wholesale-checkout-btn')?.addEventListener('click', () => {
-            alert('شكراً لتسوقك مع Elixir (طلب جملة). سيتم التواصل معك قريباً.');
-        });
+window.location.href='wholesalecheckout.html';        });
     }
 
     function updateWholesaleCartVisibility() {

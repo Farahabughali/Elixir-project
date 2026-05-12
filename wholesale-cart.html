@@ -69,7 +69,7 @@
             <div class="cart-summary">
                 <h3>إجمالي طلب الجملة</h3>
                 <div class="total-price">${total} ₪</div>
-                <button class="checkout-btn" id="wholesaleCheckoutBtn">إتمام طلب الجملة</button>
+                <button class="checkout-btn" onclick="window.location.href='wholesalecheckout.html'" id="wholesaleCheckoutBtn">إتمام طلب الجملة</button>
             </div>
         `;
         container.innerHTML = html;
@@ -103,9 +103,7 @@
                 renderWholesaleCart();
             });
         });
-        document.getElementById('wholesaleCheckoutBtn')?.addEventListener('click', () => {
-            alert('شكراً لتسوقك مع Elixir (طلب جملة). سيتم التواصل معك قريباً لتأكيد الطلب.');
-        });
+        
     }
 
     renderWholesaleCart();
