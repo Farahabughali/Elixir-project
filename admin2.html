@@ -33,6 +33,154 @@
         @keyframes fadeInScale { from { opacity: 0; transform: scale(0.95); } to { opacity: 1; transform: scale(1); } }
         .custom-confirm-overlay .bg-white { animation: fadeInScale 0.2s ease-out; }
         .activity-log-item { padding: 8px 12px; background: #f8fafc; border-radius: 12px; margin-bottom: 8px; font-size: 13px; border-right: 3px solid #438e56; }
+        /* ========== أنماط بطاقات الطلبات ========== */
+.order-card {
+    background: white;
+    border-radius: 24px;
+    margin-bottom: 20px;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.08);
+    overflow: hidden;
+    border-right: 4px solid #438e56;
+    transition: all 0.2s;
+}
+.order-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 25px rgba(0,0,0,0.12);
+}
+.order-header {
+    background: #fafaf5;
+    padding: 15px 20px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 10px;
+    border-bottom: 1px solid #eee5d8;
+}
+.order-number {
+    font-weight: 800;
+    color: #438e56;
+    font-size: 1rem;
+}
+.order-number i {
+    margin-left: 8px;
+}
+.order-date {
+    color: #b9804b;
+    font-size: 0.8rem;
+}
+.order-status-badge {
+    padding: 4px 12px;
+    border-radius: 30px;
+    font-size: 0.75rem;
+    font-weight: 600;
+}
+.order-body {
+    padding: 20px;
+    display: grid;
+    grid-template-columns: 1fr 1.2fr 0.9fr;
+    gap: 20px;
+}
+@media (max-width: 900px) {
+    .order-body {
+        grid-template-columns: 1fr;
+        gap: 15px;
+    }
+}
+.order-section {
+    background: #f9f9f5;
+    border-radius: 18px;
+    padding: 15px;
+}
+.section-title {
+    font-weight: 700;
+    color: #2c5f2d;
+    font-size: 0.85rem;
+    margin-bottom: 12px;
+    padding-bottom: 8px;
+    border-bottom: 2px solid #e0d5c0;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+.products-list .product-item {
+    display: flex;
+    justify-content: space-between;
+    padding: 8px 0;
+    border-bottom: 1px dashed #e0d5c0;
+    font-size: 0.85rem;
+}
+.product-name { font-weight: 500; }
+.product-qty { color: #438e56; font-weight: 600; }
+.product-price { color: #b9804b; }
+.customer-field {
+    display: flex;
+    justify-content: space-between;
+    padding: 6px 0;
+    font-size: 0.85rem;
+    border-bottom: 1px dashed #e8e0d0;
+}
+.customer-field:last-of-type { border-bottom: none; }
+.field-label { color: #8b7a66; font-weight: 500; }
+.field-value { font-weight: 600; color: #2c3e2f; }
+.total-amount {
+    margin-top: 12px;
+    padding-top: 10px;
+    border-top: 2px solid #438e56;
+    display: flex;
+    justify-content: space-between;
+    font-weight: 800;
+    font-size: 1rem;
+}
+.total-amount span:first-child { color: #2c5f2d; }
+.total-amount span:last-child { color: #438e56; }
+.assigned-info {
+    text-align: center;
+    padding: 10px;
+    background: #e8f5e9;
+    border-radius: 16px;
+    margin-bottom: 15px;
+}
+.assigned-label { font-size: 0.7rem; color: #6b7c6b; }
+.assigned-name { font-weight: 800; color: #438e56; font-size: 0.9rem; }
+.employee-select, .status-select {
+    width: 100%;
+    padding: 8px 12px;
+    border-radius: 40px;
+    border: 1px solid #d4c8b8;
+    font-family: 'Cairo', sans-serif;
+    background: white;
+    cursor: pointer;
+    font-size: 0.8rem;
+    margin-bottom: 8px;
+}
+.employee-select:focus, .status-select:focus {
+    outline: none;
+    border-color: #438e56;
+}
+.order-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 12px;
+    padding: 12px 20px;
+    background: #fafaf5;
+    border-top: 1px solid #eee5d8;
+}
+.btn-delete {
+    background: #e67e22;
+    color: white;
+    border: none;
+    padding: 8px 20px;
+    border-radius: 40px;
+    cursor: pointer;
+    font-size: 0.8rem;
+    font-weight: 600;
+    transition: all 0.2s;
+}
+.btn-delete:hover {
+    background: #c0392b;
+    transform: scale(1.02);
+}
     </style>
 </head>
 <body>
@@ -49,7 +197,7 @@
             <button onclick="window.open('index2.html', '_blank')" class="sidebar-item w-full flex items-center p-4 rounded-2xl font-bold text-emerald-100/60 hover:text-white hover:bg-white/5 transition-all mb-4 border border-emerald-700/30"><i class="fas fa-globe ml-4 text-lg"></i> عرض الموقع</button>
             <button onclick="openTab(event, 'stats')" class="sidebar-item active w-full flex items-center p-4 rounded-2xl font-bold transition-all duration-300"><i class="fas fa-chart-line ml-4 text-lg"></i> الإحصائيات العامة</button>
             <button onclick="openTab(event, 'products')" class="sidebar-item w-full flex items-center p-4 rounded-2xl font-bold text-emerald-100/60 hover:text-white hover:bg-white/5 transition-all"><i class="fas fa-leaf ml-4 text-lg"></i> إدارة المنتجات</button>
-            <button onclick="openTab(event, 'packages')" class="sidebar-item w-full flex items-center p-4 rounded-2xl font-bold text-emerald-100/60 hover:text-white hover:bg-white/5 transition-all"><i class="fas fa-box-open ml-4 text-lg"></i> إدارة المجموعات</button>
+            <button onclick="openTab(event, 'packages')" class="sidebar-item w-full flex items-center p-4 rounded-2xl font-bold text-emerald-100/60 hover:text-white hover:bg-white/5 transition-all"><i class="fas fa-box-open ml-4 text-lg"></i> إدارة البكجات</button>
             <button onclick="openTab(event, 'bestselling')" class="sidebar-item w-full flex items-center p-4 rounded-2xl font-bold text-emerald-100/60 hover:text-white hover:bg-white/5 transition-all"><i class="fas fa-trophy ml-4 text-lg"></i> الأكثر مبيعاً</button>
             <button onclick="openTab(event, 'staff')" class="sidebar-item w-full flex items-center p-4 rounded-2xl font-bold text-emerald-100/60 hover:text-white hover:bg-white/5 transition-all"><i class="fas fa-user-shield ml-4 text-lg"></i> إدارة الموظفين</button>
             <button onclick="openTab(event, 'wholesalers')" class="sidebar-item w-full flex items-center p-4 rounded-2xl font-bold text-emerald-100/60 hover:text-white hover:bg-white/5 transition-all"><i class="fas fa-truck ml-4 text-lg"></i> تجار الجملة</button>
@@ -117,16 +265,46 @@
         <!-- تجار الجملة (قسم منفصل) -->
         <div id="wholesalers" class="tab-content"><div class="bg-white p-10 rounded-[3rem] border border-slate-50 shadow-sm"><div class="flex justify-between items-center mb-6"><div><h3 class="text-2xl font-bold">تجار الجملة</h3><p class="text-slate-400 text-sm mt-1">إدارة حسابات تجار الجملة - إضافة / تعديل / حذف</p></div><button onclick="openWholesaleModal()" class="bg-[#1a2e21] text-white px-6 py-3 rounded-2xl font-bold shadow"><i class="fas fa-plus ml-2"></i> إنشاء حساب تاجر جديد</button></div><div id="wholesalersList" class="space-y-3"></div></div></div>
 
-        <!-- إدارة الطلبات -->
-        <div id="orders" class="tab-content"><div class="bg-white p-10 rounded-[3rem] border border-slate-50 shadow-sm"><div class="flex justify-between items-center mb-6"><div><h3 class="text-2xl font-bold">قائمة الطلبات</h3><p class="text-slate-400 text-sm mt-1">مراجعة وإدارة طلبات العملاء</p></div><div class="text-sm bg-slate-100 px-4 py-2 rounded-2xl" id="ordersCount">0 طلب</div></div><div class="overflow-x-auto"><table class="w-full text-right" id="ordersTable"><thead class="bg-slate-50"><tr class="text-slate-500 border-b"><th class="p-3">رقم الطلب</th><th class="p-3">العميل</th><th class="p-3">المنتجات</th><th class="p-3">الإجمالي (₪)</th><th class="p-3">تاريخ الطلب</th><th class="p-3">الحالة</th><th class="p-3">إجراءات</th></tr></thead><tbody id="ordersTableBody"></tbody></table></div></div></div>
-
-        <!-- إدارة الفئات -->
-        <!-- إدارة الفئات -->
+        <!-- إدارة الطلبات - شكل بطاقات مع تعيين الموظفين -->
+<div id="orders" class="tab-content">
+    <div class="bg-white p-8 rounded-[3rem] border border-slate-50 shadow-sm">
+        <div class="flex justify-between items-center mb-6 flex-wrap gap-4">
+            <div>
+                <h3 class="text-2xl font-bold">📋 إدارة الطلبات</h3>
+                <p class="text-slate-400 text-sm mt-1">مراجعة وإدارة طلبات العملاء - تعيين موظف لكل طلب</p>
+            </div>
+            <div class="flex gap-3 items-center">
+                <button onclick="refreshOrdersData()" class="bg-elixir text-white px-5 py-2 rounded-2xl text-sm hover:bg-emerald-700 transition">
+                    <i class="fas fa-sync-alt ml-1"></i> تحديث
+                </button>
+                <div class="text-sm bg-slate-100 px-4 py-2 rounded-2xl" id="ordersCount">0 طلب</div>
+            </div>
+        </div>
+        
+        <!-- حاوية الطلبات -->
+        <div id="ordersCardsContainer" class="space-y-4 max-h-[70vh] overflow-y-auto pe-2"></div>
+        
+        <!-- رسالة عند عدم وجود طلبات -->
+        <div id="noOrdersMessage" class="text-center py-12 text-slate-400 bg-slate-50 rounded-2xl hidden">
+            <i class="fas fa-box-open text-5xl mb-3 opacity-50"></i>
+            <p class="text-lg">📭 لا توجد طلبات حالياً</p>
+            <p class="text-sm mt-1">الطلبات الجديدة ستظهر هنا تلقائياً</p>
+        </div>
+    </div>
+</div>
+       <!-- إدارة الفئات -->
 <div id="categories" class="tab-content">
     <div class="bg-white p-10 rounded-[3rem] border border-slate-50 shadow-sm">
-        
-        
-        <div id="categoriesList" class="grid grid-cols-2 md:grid-cols-4 gap-4"></div>
+        <div class="flex justify-between items-center mb-6">
+            <div>
+                <h3 class="text-2xl font-bold">إدارة الفئات</h3>
+                <p class="text-slate-400 text-sm mt-1">إضافة / تعديل / حذف الفئات - تظهر تلقائياً في الصفحة الرئيسية مع صورها</p>
+            </div>
+            <button onclick="openCategoryModal()" class="bg-elixir text-white px-6 py-3 rounded-2xl font-bold shadow">
+                <i class="fas fa-plus ml-2"></i> إضافة فئة جديدة
+            </button>
+        </div>
+        <div id="categoriesList" class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6"></div>
     </div>
 </div>
 
@@ -148,9 +326,26 @@
 </div>
 
 <!-- جميع النوافذ المنبثقة (Modals) -->
-<div id="productModal" class="fixed inset-0 bg-[#1a2e21]/80 backdrop-blur-md flex items-center justify-center z-[100] p-6 hidden"><div class="bg-white p-8 rounded-3xl w-full max-w-2xl shadow-2xl relative"><div class="flex justify-between items-center mb-6"><h3 id="modalTitle" class="text-2xl font-bold">إضافة منتج جديد</h3><button onclick="closeProductModal()" class="text-slate-400 hover:text-red-500 text-3xl">&times;</button></div><div class="grid grid-cols-1 md:grid-cols-2 gap-4"><input type="hidden" id="editProductId"><div class="md:col-span-2"><label class="block text-sm font-bold mb-1 text-elixir">صورة المنتج</label><input type="file" id="productImage" accept="image/*" class="w-full border rounded-xl p-2"><div id="imagePreviewContainer" class="mt-3 hidden"><img id="imagePreview" src="" class="w-28 h-28 object-cover rounded-xl border shadow-sm"></div></div><div><label class="block text-sm font-bold mb-1">اسم المنتج</label><input type="text" id="productName" class="w-full border rounded-xl p-2" placeholder="مثال: زيت اللوز"></div><div><label class="block text-sm font-bold mb-1">الفئة</label><select id="productCategory" class="w-full border rounded-xl p-2"><option>أعشاب طبيعية</option><option>زيوت مركزة</option><option>منتجات عناية</option><option>بهارات</option></select></div><div><label class="block text-sm font-bold mb-1">السعر (₪)</label><input type="number" id="productPrice" step="0.01" class="w-full border rounded-xl p-2"></div><div><label class="block text-sm font-bold mb-1">الكمية (المخزون)</label><input type="number" id="productStock" value="10" class="w-full border rounded-xl p-2"></div><div class="md:col-span-2"><label class="block text-sm font-bold mb-1 text-emerald-700">الاستخدام والفوائد</label><textarea id="productUsage" rows="2" class="w-full border rounded-xl p-2" placeholder="الاستخدامات والفوائد..."></textarea></div><div class="md:col-span-2"><label class="block text-sm font-bold mb-1 text-red-500">تحذيرات طبية</label><textarea id="productWarnings" rows="2" class="w-full border rounded-xl p-2" placeholder="تحذيرات مهمة..."></textarea></div></div><div class="mt-6 flex gap-3"><button onclick="saveProduct()" class="flex-1 bg-elixir text-white py-2 rounded-xl font-bold">حفظ</button><button onclick="closeProductModal()" class="flex-1 bg-gray-200 text-gray-700 py-2 rounded-xl font-bold">إلغاء</button></div></div></div>
+<div id="productModal" class="fixed inset-0 bg-[#1a2e21]/80 backdrop-blur-md flex items-center justify-center z-[100] p-6 hidden"><div class="bg-white p-8 rounded-3xl w-full max-w-2xl shadow-2xl relative"><div class="flex justify-between items-center mb-6"><h3 id="modalTitle" class="text-2xl font-bold">إضافة منتج جديد</h3><button onclick="closeProductModal()" class="text-slate-400 hover:text-red-500 text-3xl">&times;</button></div><div class="grid grid-cols-1 md:grid-cols-2 gap-4"><input type="hidden" id="editProductId"><div class="md:col-span-2"><label class="block text-sm font-bold mb-1 text-elixir">صورة المنتج</label><input type="file" id="productImage" accept="image/*" class="w-full border rounded-xl p-2"><div id="imagePreviewContainer" class="mt-3 hidden"><img id="imagePreview" src="" class="w-28 h-28 object-cover rounded-xl border shadow-sm"></div></div><div><label class="block text-sm font-bold mb-1">اسم المنتج</label><input type="text" id="productName" class="w-full border rounded-xl p-2" placeholder="مثال: زيت اللوز"></div><div><label class="block text-sm font-bold mb-1">الفئة</label><select id="productCategory" class="w-full border rounded-xl p-2"><option>أعشاب طبيعية</option><option>زيوت مركزة</option><option>منتجات عناية</option><option>بهارات</option></select></div><div>
+    <label class="block text-sm font-bold mb-1">التصنيف الفرعي (للفلتر)</label>
+    <select id="productSubCategory" class="w-full border rounded-xl p-2">
+        <option value="">اختر التصنيف</option>
+    </select>
+</div><div><label class="block text-sm font-bold mb-1">السعر (₪)</label><input type="number" id="productPrice" step="0.01" class="w-full border rounded-xl p-2"></div><div><label class="block text-sm font-bold mb-1">الكمية (المخزون)</label><input type="number" id="productStock" value="10" class="w-full border rounded-xl p-2"></div><div class="md:col-span-2"><label class="block text-sm font-bold mb-1 text-emerald-700">الاستخدام والفوائد(الوصف)</label><textarea id="productUsage" rows="2" class="w-full border rounded-xl p-2" placeholder="الاستخدامات والفوائد..."></textarea></div><div class="md:col-span-2"><label class="block text-sm font-bold mb-1 text-red-500">تحذيرات طبية</label><textarea id="productWarnings" rows="2" class="w-full border rounded-xl p-2" placeholder="تحذيرات مهمة..."></textarea></div></div><div class="mt-6 flex gap-3"><button onclick="saveProduct()" class="flex-1 bg-elixir text-white py-2 rounded-xl font-bold">حفظ</button><button onclick="closeProductModal()" class="flex-1 bg-gray-200 text-gray-700 py-2 rounded-xl font-bold">إلغاء</button></div></div></div>
 
-<div id="packageModal" class="fixed inset-0 bg-[#1a2e21]/80 backdrop-blur-md flex items-center justify-center z-[100] p-6 hidden"><div class="bg-white p-8 rounded-3xl w-full max-w-lg relative max-h-[90vh] overflow-y-auto"><div class="flex justify-between mb-6"><h3 id="packageModalTitle" class="text-2xl font-bold">إضافة مجموعة جديدة</h3><button onclick="closePackageModal()" class="text-slate-400 hover:text-red-500 text-2xl">&times;</button></div><input type="hidden" id="editPackageId"><div class="mb-4"><label class="block font-bold mb-2">صورة المجموعة</label><input type="file" id="packageImage" accept="image/*" class="w-full border rounded-xl p-2"><div id="packageImagePreviewContainer" class="mt-2 hidden"><img id="packageImagePreview" src="" class="w-24 h-24 object-cover rounded-xl border shadow-sm"></div></div><div class="mb-4"><label class="block font-bold mb-2">اسم المجموعة</label><input type="text" id="packageName" class="w-full border rounded-xl p-2"></div><div class="mb-4"><label class="block font-bold mb-2">السعر (₪)</label><input type="number" id="packagePrice" step="0.01" class="w-full border rounded-xl p-2"></div><div class="mb-4"><label class="block font-bold mb-2">وصف قصير (يظهر في البطاقة)</label><textarea id="packageDesc" rows="2" class="w-full border rounded-xl p-2" placeholder="وصف مختصر"></textarea></div><div class="mb-4"><label class="block font-bold mb-2">وصف طويل (صفحة التفاصيل)</label><textarea id="packageLongDesc" rows="4" class="w-full border rounded-xl p-2" placeholder="وصف مفصل للمجموعة..."></textarea></div><div class="mb-4"><label class="block font-bold mb-2">عدد المنتجات</label><input type="number" id="packageItemsCount" class="w-full border rounded-xl p-2"></div><div class="flex gap-3 mt-6"><button onclick="savePackage()" class="flex-1 bg-elixir text-white py-2 rounded-xl font-bold">حفظ</button><button onclick="closePackageModal()" class="flex-1 bg-gray-200 py-2 rounded-xl">إلغاء</button></div></div></div>
+<div id="packageModal" class="fixed inset-0 bg-[#1a2e21]/80 backdrop-blur-md flex items-center justify-center z-[100] p-6 hidden"><div class="bg-white p-8 rounded-3xl w-full max-w-lg relative max-h-[90vh] overflow-y-auto"><div class="flex justify-between mb-6"><h3 id="packageModalTitle" class="text-2xl font-bold">إضافة مجموعة جديدة</h3><button onclick="closePackageModal()" class="text-slate-400 hover:text-red-500 text-2xl">&times;</button></div><input type="hidden" id="editPackageId"><div class="mb-4"><label class="block font-bold mb-2">صورة المجموعة</label><input type="file" id="packageImage" accept="image/*" class="w-full border rounded-xl p-2"><div id="packageImagePreviewContainer" class="mt-2 hidden"><img id="packageImagePreview" src="" class="w-24 h-24 object-cover rounded-xl border shadow-sm"></div></div><div class="mb-4"><label class="block font-bold mb-2">اسم المجموعة</label><input type="text" id="packageName" class="w-full border rounded-xl p-2"></div><div class="mb-4"><label class="block font-bold mb-2">السعر (₪)</label><input type="number" id="packagePrice" step="0.01" class="w-full border rounded-xl p-2"></div><div class="mb-4"><label class="block font-bold mb-2">وصف قصير (يظهر في البطاقة)</label><textarea id="packageDesc" rows="2" class="w-full border rounded-xl p-2" placeholder="وصف مختصر"></textarea></div><div class="mb-4"><label class="block font-bold mb-2">وصف طويل (صفحة التفاصيل)</label><textarea id="packageLongDesc" rows="4" class="w-full border rounded-xl p-2" placeholder="وصف مفصل للمجموعة..."></textarea></div><div class="mb-4"><label class="block font-bold mb-2">عدد المنتجات</label><input type="number" id="packageItemsCount" class="w-full border rounded-xl p-2"></div><div class="mb-4">
+    <label class="block font-bold mb-2">الفئة (لتحديد اللون تلقائياً)</label>
+    <select id="packageCategory" class="w-full border rounded-xl p-2">
+        <option value="نشاط">النشاط والتوازن</option>
+        <option value="ورد">جوهر الورد</option>
+        <option value="بهارات">عالم البهارات</option>
+        <option value="نضارة">النضارة والإشراقة</option>
+        <option value="هدوء">الهدوء والتأمل</option>
+        <option value="عناية">العناية الفاخرة للبشرة</option>
+        <option value="شفاء">الشفاء الطبيعي</option>
+        <option value="شعر">العناية بالشعر</option>
+    </select>
+</div><div class="flex gap-3 mt-6"><button onclick="savePackage()" class="flex-1 bg-elixir text-white py-2 rounded-xl font-bold">حفظ</button><button onclick="closePackageModal()" class="flex-1 bg-gray-200 py-2 rounded-xl">إلغاء</button></div></div></div>
 
 <div id="employeeModal" class="fixed inset-0 bg-black/40 backdrop-blur-md flex items-center justify-center z-[100] p-6 hidden"><div class="bg-white p-8 rounded-3xl w-full max-w-md"><h3 class="text-2xl font-bold mb-4">إضافة موظف جديد</h3><input type="text" id="empName" placeholder="الاسم الكامل" class="w-full border rounded-xl p-2 mb-3"><input type="text" id="empRole" placeholder="المنصب" class="w-full border rounded-xl p-2 mb-6"><div class="flex gap-3"><button onclick="addNewEmployee()" class="flex-1 bg-elixir text-white py-2 rounded-xl">حفظ</button><button onclick="closeEmployeeModal()" class="flex-1 bg-gray-200 py-2 rounded-xl">إلغاء</button></div></div></div>
 
@@ -160,7 +355,28 @@
 
 <div id="manualTaskModal" class="fixed inset-0 bg-black/50 backdrop-blur-md flex items-center justify-center z-[100] p-6 hidden"><div class="bg-white p-8 rounded-3xl w-full max-w-md"><div class="flex justify-between mb-4"><h3 class="text-2xl font-bold">إضافة مهمة يدوية</h3><button onclick="closeManualTaskModal()" class="text-slate-400 hover:text-red-500 text-2xl">&times;</button></div><input type="hidden" id="targetEmployeeId"><div class="mb-4"><label class="block font-bold mb-2">وصف المهمة</label><textarea id="taskDescription" rows="3" class="w-full border rounded-xl p-2" placeholder="مثال: ترتيب الرفوف"></textarea></div><div class="mb-4"><label class="block font-bold mb-2">نوع المهمة</label><select id="taskType" class="w-full border rounded-xl p-2"><option value="general">📋 مهمة عامة</option><option value="restock">📦 إعادة تعبئة منتج</option></select></div><div id="restockFields" class="mb-4 hidden"><label class="block font-bold mb-2">اختر المنتج</label><select id="restockProductId" class="w-full border rounded-xl p-2"></select><label class="block font-bold mt-3">الكمية</label><input type="number" id="restockAmount" value="5" class="w-full border rounded-xl p-2"></div><div class="flex gap-3 mt-6"><button onclick="addManualTask()" class="flex-1 bg-elixir text-white py-2 rounded-xl font-bold">إضافة</button><button onclick="closeManualTaskModal()" class="flex-1 bg-gray-200 py-2 rounded-xl">إلغاء</button></div></div></div>
 
-<div id="categoryModal" class="fixed inset-0 bg-black/40 backdrop-blur-md flex items-center justify-center z-[100] p-6 hidden"><div class="bg-white p-8 rounded-3xl w-full max-w-md"><h3 class="text-2xl font-bold mb-4" id="categoryModalTitle">إضافة فئة جديدة</h3><input type="hidden" id="editCategoryId"><input type="text" id="categoryName" placeholder="اسم الفئة (مثال: أعشاب طبيعية)" class="w-full border rounded-xl p-2 mb-4"><input type="text" id="categoryIcon" placeholder="رمز الفئة (مثال: fa-leaf)" class="w-full border rounded-xl p-2 mb-6"><div class="flex gap-3"><button onclick="saveCategory()" class="flex-1 bg-elixir text-white py-2 rounded-xl">حفظ</button><button onclick="closeCategoryModal()" class="flex-1 bg-gray-200 py-2 rounded-xl">إلغاء</button></div></div></div>
+<div id="categoryModal" class="fixed inset-0 bg-black/40 backdrop-blur-md flex items-center justify-center z-[100] p-6 hidden">
+    <div class="bg-white p-8 rounded-3xl w-full max-w-md">
+        <h3 class="text-2xl font-bold mb-4" id="categoryModalTitle">إضافة فئة جديدة</h3>
+        <input type="hidden" id="editCategoryId">
+        <input type="text" id="categoryName" placeholder="اسم الفئة (مثال: أعشاب طبيعية)" class="w-full border rounded-xl p-2 mb-4">
+        <input type="text" id="categoryIcon" placeholder="رمز الفئة (مثال: fa-leaf)" class="w-full border rounded-xl p-2 mb-4">
+        
+        <!-- حقل رفع الصورة -->
+        <div class="mb-4">
+            <label class="block text-sm font-bold mb-2">صورة الفئة</label>
+            <input type="file" id="categoryImage" accept="image/*" class="w-full border rounded-xl p-2">
+            <div id="categoryImagePreviewContainer" class="mt-2 hidden">
+                <img id="categoryImagePreview" src="" class="w-24 h-24 object-cover rounded-xl border shadow-sm">
+            </div>
+        </div>
+        
+        <div class="flex gap-3">
+            <button onclick="saveCategory()" class="flex-1 bg-elixir text-white py-2 rounded-xl">حفظ</button>
+            <button onclick="closeCategoryModal()" class="flex-1 bg-gray-200 py-2 rounded-xl">إلغاء</button>
+        </div>
+    </div>
+</div>
 
 <div id="offerModal" class="fixed inset-0 bg-black/40 backdrop-blur-md flex items-center justify-center z-[100] p-6 hidden"><div class="bg-white p-8 rounded-3xl w-full max-w-md"><h3 class="text-2xl font-bold mb-4" id="offerModalTitle">إضافة عرض جديد</h3><input type="hidden" id="editOfferId"><select id="offerProductId" class="w-full border rounded-xl p-2 mb-3"><option value="">اختر المنتج</option></select><input type="number" id="offerDiscount" step="0.01" placeholder="نسبة الخصم (%)" class="w-full border rounded-xl p-2 mb-3"><input type="date" id="offerStartDate" class="w-full border rounded-xl p-2 mb-3"><input type="date" id="offerEndDate" class="w-full border rounded-xl p-2 mb-6"><div class="flex gap-3"><button onclick="saveOffer()" class="flex-1 bg-elixir text-white py-2 rounded-xl">حفظ</button><button onclick="closeOfferModal()" class="flex-1 bg-gray-200 py-2 rounded-xl">إلغاء</button></div></div></div>
 
@@ -175,5 +391,6 @@
 <div id="smsModal" class="fixed inset-0 bg-black/40 backdrop-blur-md flex items-center justify-center z-[100] p-6 hidden"><div class="bg-white p-8 rounded-3xl w-full max-w-md"><h3 class="text-2xl font-bold mb-4">إرسال رسالة SMS</h3><select id="smsRecipient" class="w-full border rounded-xl p-2 mb-3"></select><textarea id="smsMessage" rows="4" placeholder="نص الرسالة..." class="w-full border rounded-xl p-2 mb-3"></textarea><div class="text-sm text-slate-500 mb-3">عدد الأحرف: <span id="smsCharCount">100</span></div><div class="flex gap-3"><button onclick="sendSMS()" class="flex-1 bg-elixir text-white py-2 rounded-xl">إرسال</button><button onclick="closeSMSModal()" class="flex-1 bg-gray-200 py-2 rounded-xl">إلغاء</button></div></div></div>
 
 <script src="admin2.js"></script>
+
 </body>
 </html>
