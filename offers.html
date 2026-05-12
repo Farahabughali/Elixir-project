@@ -65,7 +65,7 @@
         .back-home a { background: rgba(67,142,86,0.1); padding: 10px 25px; border-radius: 40px; color: #438e56; text-decoration: none; transition: 0.2s; display: inline-block; }
         .back-home a:hover { background: #438e56; color: white; }
         
-        .toast-message { position: fixed; bottom: 30px; right: 30px; background: #27ae60; color: white; padding: 12px 24px; border-radius: 50px; font-size: 0.9rem; z-index: 9999; display: none; align-items: center; gap: 10px; }
+        .toast-message { position: fixed; bottom: 30px; right: 30px; background: #2c5f2d; color: white; padding: 12px 24px; border-radius: 50px; font-size: 0.9rem; z-index: 9999; display: none; align-items: center; gap: 10px; }
         .scroll-top-btn { position: fixed; bottom: 30px; left: 30px; width: 50px; height: 50px; background: #438e56; color: white; border: none; border-radius: 50%; cursor: pointer; font-size: 1.5rem; z-index: 99; transition: 0.3s; display: flex; align-items: center; justify-content: center; box-shadow: 0 5px 15px rgba(0,0,0,0.2); }
         .scroll-top-btn:hover { background: #2d6a3a; transform: translateY(-5px); }
         
@@ -106,19 +106,20 @@
 
 <script>
     // ============================================================
-    // الحل النهائي: نفس شكل البطاقة حسب القسم (herbs/oils/spices/care/packages)
-    // مع الحفاظ على التنسيق الأصلي لكل فئة كما في ملفاتك الأصلية
+    // إدارة العروض بشكل موحد - كل فئة تحافظ على شكل بطاقتها الخاصة
     // ============================================================
     
     function showToast(message) {
         const toast = document.getElementById('customToast');
         if (toast) {
             document.getElementById('toastText').innerHTML = message;
+            
             toast.style.display = 'flex';
             setTimeout(() => toast.style.display = 'none', 3000);
         }
     }
     
+    // التحقق من صلاحية العرض
     function isOfferValid(offer) {
         if (!offer.endDate || offer.endDate === "") return true;
         const today = new Date();
@@ -137,7 +138,7 @@
         return validOffers;
     }
     
-    // ========== بطاقة الأعشاب (نفس شكل herbs.html) ==========
+    // ========== بطاقة الأعشاب ==========
     function getHerbCard(offer) {
         let isFav = (JSON.parse(localStorage.getItem('elixir_favorites')) || []).includes(offer.productId);
         let catText = offer.catText || "عشبة طبية";
@@ -166,7 +167,7 @@
         `;
     }
     
-    // ========== بطاقة الزيوت (نفس شكل oils.html) ==========
+    // ========== بطاقة الزيوت ==========
     function getOilCard(offer) {
         let isFav = (JSON.parse(localStorage.getItem('elixir_favorites')) || []).includes(offer.productId);
         let catText = offer.catText || "زيت طبيعي";
@@ -195,28 +196,31 @@
         `;
     }
     
-    // ========== بطاقة البهارات (نفس شكل spices.html) ==========
+    // ========== بطاقة البهارات (تم التصحيح - نستخدم offer وليس product) ==========
     function getSpiceCard(offer) {
         let isFav = (JSON.parse(localStorage.getItem('elixir_favorites')) || []).includes(offer.productId);
-        let catText = offer.catText || "بهارات";
+        let catText = offer.catText || "بهارات عربية";
         let descText = offer.desc || "بهار طبيعي";
         
         return `
-            <div class="spice-card" data-id="${offer.productId}" style="position:relative;">
-                <div class="offer-badge-red">-${offer.discount}%</div>
+            <div class="spice-card" data-id="${offer.productId}" style="position:relative; background: rgba(255,248,235,0.85); border-radius: 1.5rem; overflow: hidden; box-shadow: 0 4px 12px rgba(0,0,0,0.05);">
+                <div class="offer-badge-red" style="position:absolute; top:12px; right:12px; background:#e74c3c; color:white; font-weight:bold; padding:4px 12px; border-radius:30px; font-size:12px; z-index:15;">-${offer.discount}%</div>
                 <div class="fav-icon ${isFav ? 'active' : ''}" data-id="${offer.productId}">
                     <i class="fa-${isFav ? 'solid' : 'regular'} fa-heart"></i>
                 </div>
-                <img class="spice-img" src="${offer.productImg}" onerror="this.src='asset/images/placeholder.png'">
-                <div class="spice-info">
-                    <div class="spice-cat">${catText}</div>
-                    <div class="spice-title">${offer.productName}</div>
-                    <div class="spice-desc">${descText.substring(0, 80)}${descText.length > 80 ? '...' : ''}</div>
-                    <div class="price-row">
-                        <span class="price" style="color:#e74c3c; font-weight:bold;">${offer.newPrice} ₪ <span class="old-price-cross">${offer.productPrice} ₪</span></span>
-                        <div class="btn-group">
-                            <button class="view-details" data-id="${offer.productId}"> عرض التفاصيل</button>
-                            <button class="add-cart" data-id="${offer.productId}" data-name="${offer.productName}" data-price="${offer.newPrice}" data-img="${offer.productImg}"> إضافة إلى السلة</button>
+                <img class="spice-img" src="${offer.productImg}" onerror="this.src='asset/images/placeholder.png'" style="width:100%; height:200px; object-fit:cover;">
+                <div class="spice-info" style="padding:1rem; text-align:right;">
+                    <div class="spice-cat" style="font-size:0.7rem; color:#a67c52;">${catText}</div>
+                    <div class="spice-title" style="font-size:1rem; font-weight:700; color:#6d462a;">${offer.productName}</div>
+                    <div class="spice-desc" style="font-size:0.75rem; color:#8b6844; line-height:1.4; margin:8px 0;">${descText.substring(0, 80)}</div>
+                    <div class="price-row" style="display:flex; justify-content:space-between; align-items:center; margin-top:10px;">
+                        <div>
+                            <span class="old-price" style="text-decoration:line-through; color:#999; font-size:0.8rem;">${offer.productPrice} ₪</span>
+                            <span class="price" style="font-weight:bold; color:#e74c3c; font-size:1.2rem;">${offer.newPrice} ₪</span>
+                        </div>
+                        <div class="btn-group" style="display:flex; gap:8px;">
+                            <button class="view-details" data-id="${offer.productId}" style="background:#b9804b; color:white; border:none; padding:5px 12px; border-radius:30px; cursor:pointer; font-size:0.75rem;"> عرض التفاصيل</button>
+                            <button class="add-cart" data-id="${offer.productId}" data-name="${offer.productName}" data-price="${offer.newPrice}" data-img="${offer.productImg}" style="background:#c47a3a; color:white; border:none; padding:5px 12px; border-radius:30px; cursor:pointer; font-size:0.75rem;"> إضافة إلى السلة</button>
                         </div>
                     </div>
                 </div>
@@ -224,7 +228,7 @@
         `;
     }
     
-    // ========== بطاقة العناية الشخصية (نفس شكل personal-care.html) ==========
+    // ========== بطاقة العناية الشخصية ==========
     function getCareCard(offer) {
         let isFav = (JSON.parse(localStorage.getItem('elixir_favorites')) || []).includes(offer.productId);
         let catText = offer.catText || "عناية شخصية";
@@ -253,7 +257,7 @@
         `;
     }
     
-    // ========== بطاقة البكجات (نفس شكل packages.html مع الألوان الخاصة) ==========
+    // ========== بطاقة البكجات ==========
     function getPackageCard(offer) {
         let isFav = (JSON.parse(localStorage.getItem('elixir_favorites')) || []).includes(offer.productId);
         let descText = offer.desc || "بكج متكامل";
@@ -288,10 +292,19 @@
             case 'spices': return getSpiceCard(offer);
             case 'care': return getCareCard(offer);
             case 'packages': return getPackageCard(offer);
-            default: return getHerbCard(offer);
+            default:
+                // محاولة تحديد القسم من الفئة
+                if (offer.category === 'أعشاب طبيعية') return getHerbCard(offer);
+                if (offer.category === 'زيوت مركزة') return getOilCard(offer);
+                if (offer.category === 'بهارات') return getSpiceCard(offer);
+                if (offer.category === 'منتجات عناية') return getCareCard(offer);
+                return getHerbCard(offer);
         }
     }
     
+
+
+
     function renderOffers() {
         const grid = document.getElementById("offersGrid");
         if (!grid) return;
@@ -303,7 +316,7 @@
                 <div class="empty-state">
                     <i class="fas fa-tag"></i>
                     <h3>✨ لا توجد عروض حالياً</h3>
-                    <p>يمكنك إضافة عروض من صفحات الأعشاب، الزيوت، البهارات، العناية، أو البكجات عبر زر +</p>
+                    <p>يمكنك إضافة عروض من صفحات المنتجات في لوحة التحكم</p>
                 </div>
             `;
             return;
@@ -381,19 +394,27 @@
     }
     
     const scrollBtn = document.getElementById('scrollTopBtn');
-    window.addEventListener('scroll', () => {
-        scrollBtn.style.display = window.scrollY > 300 ? 'flex' : 'none';
-    });
-    scrollBtn.addEventListener('click', () => {
-        window.scrollTo({ top: 0, behavior: 'smooth' });
-    });
+    if (scrollBtn) {
+        window.addEventListener('scroll', () => {
+            scrollBtn.style.display = window.scrollY > 300 ? 'flex' : 'none';
+        });
+        scrollBtn.addEventListener('click', () => {
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        });
+    }
     
-    initCartBadge();
-    renderOffers();
+    // التحقق من العروض منتهية الصلاحية كل 5 دقائق
+    setInterval(() => {
+        removeExpiredOffers();
+        renderOffers();
+    }, 300000);
     
     window.addEventListener('storage', function(e) {
         if (e.key === 'elixir_offers') renderOffers();
     });
+    
+    initCartBadge();
+    renderOffers();
 </script>
 </body>
 </html>
