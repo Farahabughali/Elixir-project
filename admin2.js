@@ -1,4 +1,4 @@
- // ---------- البيانات الأساسية ----------
+// ---------- البيانات الأساسية ----------
 let products = [];
 let packagesList = [];
 let employees = [];
@@ -10,6 +10,20 @@ let categories = [];
 let offers = [];
 let sliders = [];
 let settings = {};
+// دالة لتحديد ألوان البكجات حسب الفئة
+function getPackageColorsByCategory(category) {
+    const colorMap = {
+        'نشاط': { bg: '#fff3e0', btn: '#ef6c00' },
+        'ورد': { bg: '#fce4ec', btn: '#c2185b' },
+        'بهارات': { bg: '#efebe9', btn: '#8d6e63' },
+        'نضارة': { bg: '#e0f7fa', btn: '#00838f' },
+        'هدوء': { bg: '#e8eaf6', btn: '#3949ab' },
+        'عناية': { bg: '#ffe0f0', btn: '#d81b60' },
+        'شفاء': { bg: '#e0f2e0', btn: '#43a047' },
+        'شعر': { bg: '#fef3e8', btn: '#c47a3a' }
+    };
+    return colorMap[category] || { bg: '#ffffff', btn: '#438e56' };
+}
 
 // ---------- تحميل البيانات ----------
 function loadAllData() {
@@ -34,9 +48,9 @@ function loadAllData() {
     // تحميل المجموعات
     if (storedPackages) packagesList = JSON.parse(storedPackages);
     else packagesList = [
-        { id: 101, name: "مجموعة الاسترخاء التام", price: 15.0, description: "لافندر، زيت الأرغان، شمعة", itemsCount: 3, active: true, featured: false, image: "", longDescription: "" },
-        { id: 102, name: "مجموعة النضارة المغربية", price: 22.0, description: "طين مغربي، ليفة، صابون", itemsCount: 4, active: true, featured: false, image: "", longDescription: "" }
-    ];
+    { id: 101, name: "مجموعة الاسترخاء التام", price: 15.0, description: "لافندر، زيت الأرغان، شمعة", itemsCount: 3, active: true, featured: false, image: "", longDescription: "", category: "نشاط", bgColor: "#fff3e0", btnColor: "#ef6c00" },
+    { id: 102, name: "مجموعة النضارة المغربية", price: 22.0, description: "طين مغربي، ليفة، صابون", itemsCount: 4, active: true, featured: false, image: "", longDescription: "", category: "نضارة", bgColor: "#e0f7fa", btnColor: "#00838f" }
+];
 
     packagesList.forEach(pkg => {
         if (pkg.image === undefined) pkg.image = "";
@@ -58,10 +72,7 @@ function loadAllData() {
     // تحميل الطلبات
     if (storedOrders) orders = JSON.parse(storedOrders);
     else {
-        orders = [
-            { id: 1001, customer: "ريما الحسن", items: [{name: "لافندر مجفف", qty: 2, price: 5.0}], total: 10.0, date: "2025-04-01", status: "pending", assignedTo: null },
-            { id: 1002, customer: "ليلى عرفات", items: [{name: "زيت الأرغان", qty: 1, price: 12.5}], total: 12.5, date: "2025-04-02", status: "processing", assignedTo: null },
-            { id: 1003, customer: "نور الشرق", items: [{name: "صابون الغار", qty: 3, price: 4.0}], total: 12.0, date: "2025-04-03", status: "shipped", assignedTo: null }
+        orders = [ 
         ];
     }
 
@@ -167,6 +178,7 @@ function customConfirm(message, onConfirm, onCancel) {
 }
 
 // ---------- عرض المنتجات ----------
+// ---------- عرض المنتجات ----------
 function renderProductsTable() {
     const tbody = document.getElementById('productsTableBody');
     if (!tbody) return;
@@ -185,14 +197,15 @@ function renderProductsTable() {
                 <td class="py-3"><div class="flex items-center gap-3">${imageHtml}<div><div class="font-bold">${prod.name}</div><div class="text-[10px] text-slate-400">${prod.usage?.substring(0, 40) || ''}</div></div></div></td>
                 <td><span class="${catClass} px-3 py-1 rounded-xl text-xs">${prod.category}</span></td>
                 <td>${prod.price.toFixed(2)} ₪</td>
-                <td class="${stockClass} font-bold">${prod.stock}</td>
+               <td class="${stockClass} font-bold">${prod.stock !== undefined ? prod.stock : 0}</td>
                 <td>${warningHtml}</td>
                 <td class="text-left">
-                  <i class="fas ${prod.active ? 'fa-eye' : 'fa-eye-slash'} ${prod.active ? 'text-elixir' : 'text-gray-400'} cursor-pointer ml-2 hover:text-elixir transition" onclick="toggleProductActive(${prod.id})" title="${prod.active ? 'تعطيل المنتج' : 'تفعيل المنتج'}"></i>
-                  <i class="fas fa-star ${isBestSelling(prod.id) ? 'text-elixir' : 'text-slate-300'} cursor-pointer ml-2 hover:text-elixir transition" onclick="toggleBestSelling(${prod.id})" title="${isBestSelling(prod.id) ? 'إزالة من الأكثر مبيعاً' : 'إضافة إلى الأكثر مبيعاً'}"></i>
-                  <i class="fas fa-edit text-slate-500 hover:text-elixir cursor-pointer ml-2" onclick="editProduct(${prod.id})"></i>
-                  <i class="fas fa-trash-alt text-slate-500 hover:text-red-500 cursor-pointer" onclick="deleteProduct(${prod.id})"></i>
-                </td>
+    <i class="fas ${prod.active ? 'fa-eye' : 'fa-eye-slash'} ${prod.active ? 'text-elixir' : 'text-gray-400'} cursor-pointer ml-2 hover:text-elixir transition" onclick="toggleProductActive(${prod.id})" title="${prod.active ? 'تعطيل المنتج' : 'تفعيل المنتج'}"></i>
+    <i class="fas fa-star text-amber-500 cursor-pointer ml-2 hover:text-amber-600 transition" onclick="addToNewArrivalsFromAdmin(${prod.id})" title="إضافة إلى جديدنا 🌟"></i>
+    <i class="fas fa-tag text-blue-500 cursor-pointer ml-2 hover:text-blue-600 transition" onclick="openOfferModalFromAdmin(${prod.id})" title="إضافة إلى العروض 🏷️"></i>
+    <i class="fas fa-edit text-slate-500 hover:text-elixir cursor-pointer ml-2" onclick="editProduct(${prod.id})"></i>
+    <i class="fas fa-trash-alt text-slate-500 hover:text-red-500 cursor-pointer" onclick="deleteProduct(${prod.id})"></i>
+</td>
              </tr>
         `);
     });
@@ -325,6 +338,11 @@ function openProductModal(productId = null) {
             document.getElementById('productStock').value = product.stock;
             document.getElementById('productUsage').value = product.usage || '';
             document.getElementById('productWarnings').value = product.warnings || '';
+            // تعبئة التصنيف الفرعي للمنتج عند التعديل
+           const subCategorySelect = document.getElementById('productSubCategory');
+          if (subCategorySelect && product.subCategory) {
+           subCategorySelect.value = product.subCategory;
+            }
             if (previewContainer && product.image && product.image.startsWith('data:image')) {
                 const imgPreview = document.getElementById('imagePreview');
                 if (imgPreview) imgPreview.src = product.image;
@@ -353,58 +371,65 @@ function closeProductModal() {
 }
 
 async function saveProduct() {
-    // منع التكرار
     const saveButton = document.querySelector('#productModal button.bg-elixir');
     if (saveButton.disabled) return;
     saveButton.disabled = true;
     saveButton.innerHTML = '<i class="fas fa-spinner fa-spin ml-2"></i> جاري الحفظ...';
     
-    const id = document.getElementById('editProductId').value;
-    const name = document.getElementById('productName').value.trim();
-    const category = document.getElementById('productCategory').value;
-    const price = parseFloat(document.getElementById('productPrice').value);
-    const stock = parseInt(document.getElementById('productStock').value);
-    const usage = document.getElementById('productUsage').value;
-    const warnings = document.getElementById('productWarnings').value;
-    
-    let imageBase64 = '';
-    const fileInput = document.getElementById('productImage');
-    if (fileInput && fileInput.files.length > 0) {
-        const file = fileInput.files[0];
-        imageBase64 = await new Promise((resolve) => {
-            const reader = new FileReader();
-            reader.onload = (e) => resolve(e.target.result);
-            reader.readAsDataURL(file);
-        });
-    } else if (id) {
-        const existingProduct = products.find(p => p.id == id);
-        if (existingProduct && existingProduct.image) imageBase64 = existingProduct.image;
-    }
-
-    if (!name || isNaN(price)) {
-        showToast("يرجى إدخال اسم المنتج وسعر صحيح", "error");
-        return;
-    }
-
-    if (id) {
-        const index = products.findIndex(p => p.id == id);
-        if (index !== -1) {
-            products[index] = { ...products[index], name, category, price, stock, usage, warnings, image: imageBase64 };
-            showToast("تم تحديث المنتج", "success");
+    try {
+        const id = document.getElementById('editProductId').value;
+        const name = document.getElementById('productName').value.trim();
+        const category = document.getElementById('productCategory').value;
+        const price = parseFloat(document.getElementById('productPrice').value);
+        const stock = parseInt(document.getElementById('productStock').value) || 0;
+        const usage = document.getElementById('productUsage').value;
+        const warnings = document.getElementById('productWarnings').value;
+        
+        let imageBase64 = '';
+        const fileInput = document.getElementById('productImage');
+        if (fileInput && fileInput.files.length > 0) {
+            const file = fileInput.files[0];
+            imageBase64 = await new Promise((resolve) => {
+                const reader = new FileReader();
+                reader.onload = (e) => resolve(e.target.result);
+                reader.readAsDataURL(file);
+            });
+        } else if (id) {
+            const existingProduct = products.find(p => p.id == id);
+            if (existingProduct && existingProduct.image) imageBase64 = existingProduct.image;
         }
-    } else {
-        const newId = products.length > 0 ? Math.max(...products.map(p => p.id)) + 1 : 1;
-        products.push({ id: newId, name, category, price, stock, usage, warnings, image: imageBase64 });
-        showToast("تم إضافة المنتج", "success");
-    }
-    renderProductsTable();
-    renderOrdersTable();
-    saveAllData();
-    closeProductModal();
 
-    // إعادة تفعيل الزر
-    saveButton.disabled = false;
-    saveButton.innerHTML = 'حفظ';
+        if (!name || isNaN(price)) {
+            showToast("يرجى إدخال اسم المنتج وسعر صحيح", "error");
+            saveButton.disabled = false;
+            saveButton.innerHTML = 'حفظ';
+            return;
+        }
+
+        if (id) {
+            const index = products.findIndex(p => p.id == id);
+            if (index !== -1) {
+                products[index] = { ...products[index], name, category, price, stock, usage, warnings, image: imageBase64 };
+                showToast("تم تحديث المنتج", "success");
+            }
+        } else {
+            const newId = products.length > 0 ? Math.max(...products.map(p => p.id)) + 1 : 1;
+            products.push({ id: newId, name, category, price, stock, usage, warnings, image: imageBase64 });
+            showToast("تم إضافة المنتج", "success");
+        }
+        
+        renderProductsTable();
+        renderOrdersTable();
+        saveAllData();
+        closeProductModal();
+        
+    } catch (error) {
+        console.error("خطأ:", error);
+        showToast("حدث خطأ: " + error.message, "error");
+    } finally {
+        saveButton.disabled = false;
+        saveButton.innerHTML = 'حفظ';
+    }
 }
 
 window.editProduct = function(productId) {
@@ -413,10 +438,23 @@ window.editProduct = function(productId) {
 
 window.deleteProduct = function(productId) {
     customConfirm("هل تريد حذف هذا المنتج نهائياً؟", () => {
+        // 1. حذف المنتج
         products = products.filter(p => p.id !== productId);
+        
+        // 2. حذف العروض المرتبطة بهذا المنتج
+        let offers = JSON.parse(localStorage.getItem('elixir_offers') || '[]');
+        let filteredOffers = offers.filter(o => o.productId !== productId);
+        localStorage.setItem('elixir_offers', JSON.stringify(filteredOffers));
+        
+        // 3. حذف من جديدنا
+        let newArrivals = JSON.parse(localStorage.getItem('elixir_new_arrivals') || '[]');
+        let filteredNew = newArrivals.filter(n => n.id !== productId);
+        localStorage.setItem('elixir_new_arrivals', JSON.stringify(filteredNew));
+        
         renderProductsTable();
         saveAllData();
-        showToast("تم حذف المنتج", "success");
+        
+        showToast(`✅ تم حذف المنتج وجميع العروض المرتبطة به`);
     });
 };
 
@@ -425,10 +463,27 @@ function toggleProductActive(productId) {
     const product = products.find(p => p.id === productId);
     if (product) {
         product.active = !product.active;
+        
+        // ✅ إذا تم إخفاء المنتج، احذف عروضه وجديدنا
+        if (!product.active) {
+            // حذف العروض المرتبطة
+            let offers = JSON.parse(localStorage.getItem('elixir_offers') || '[]');
+            let filteredOffers = offers.filter(o => o.productId !== productId);
+            localStorage.setItem('elixir_offers', JSON.stringify(filteredOffers));
+            
+            // حذف من جديدنا
+            let newArrivals = JSON.parse(localStorage.getItem('elixir_new_arrivals') || '[]');
+            let filteredNew = newArrivals.filter(n => n.id !== productId);
+            localStorage.setItem('elixir_new_arrivals', JSON.stringify(filteredNew));
+            
+            showToast(`⛔ تم إخفاء المنتج "${product.name}" وإزالة عروضه`, "warning");
+        } else {
+            showToast(`✅ تم تفعيل المنتج "${product.name}"`, "success");
+        }
+        
         renderProductsTable();
         saveAllData();
-        showToast(product.active ? `✅ تم تفعيل المنتج "${product.name}"` : `⛔ تم تعطيل المنتج "${product.name}"`, "success");
-        addToActivityLog(`تم ${product.active ? 'تفعيل' : 'تعطيل'} المنتج "${product.name}"`);
+        addToActivityLog(`تم ${product.active ? 'تفعيل' : 'إخفاء'} المنتج "${product.name}"`);
     }
 }
 
@@ -538,11 +593,16 @@ function isBestSelling(productId) {
     return bestSellingProducts.some(p => p.id === productId);
 }
 
+
 // ---------- عرض المجموعات ----------
+// ========== عرض المجموعات - نسخة بسيطة ونظيفة ==========
 function renderPackages() {
     const container = document.getElementById('packagesGridContainer');
     if (!container) return;
-    if (packagesList.length === 0) { container.innerHTML = '<div class="text-center py-20 text-slate-400">لا توجد مجموعات</div>'; return; }
+    if (packagesList.length === 0) { 
+        container.innerHTML = '<div class="text-center py-20 text-slate-400">لا توجد مجموعات</div>'; 
+        return; 
+    }
     
     container.innerHTML = packagesList.map(pkg => `
         <div class="border p-5 rounded-3xl flex gap-5 bg-white package-card ${!pkg.active ? 'opacity-60 bg-gray-100' : ''}">
@@ -557,14 +617,8 @@ function renderPackages() {
                         ${!pkg.active ? '<span class="text-xs bg-red-100 text-red-600 px-2 py-0.5 rounded-full mr-2">غير مفعل</span>' : ''}
                     </div>
                     <div class="flex gap-2">
-                        <button onclick="togglePackageFeatured(${pkg.id})" class="text-gray-500 hover:text-yellow-500" title="${pkg.featured ? 'إزالة من المميز' : 'جعله مميزاً'}">
-                            <i class="fas fa-${pkg.featured ? 'star' : 'star-o'}"></i>
-                        </button>
-                        <button onclick="togglePackageActive(${pkg.id})" class="text-gray-500 hover:text-green-500" title="${pkg.active ? 'تعطيل' : 'تفعيل'}">
-                           <button onclick="togglePackageActive(${pkg.id})" class="${pkg.active ? 'text-green-500' : 'text-gray-400'} hover:text-green-500 transition" title="${pkg.active ? 'تعطيل' : 'تفعيل'}">
-    <i class="fas fa-${pkg.active ? 'eye' : 'eye-slash'}"></i>
-</button>
-                        </button>
+                        <button onclick="togglePackageFeatured(${pkg.id})" class="text-gray-500 hover:text-yellow-500"><i class="fas fa-${pkg.featured ? 'star' : 'star-o'}"></i></button>
+                        <button onclick="togglePackageActive(${pkg.id})" class="${pkg.active ? 'text-green-500' : 'text-gray-400'}"><i class="fas fa-${pkg.active ? 'eye' : 'eye-slash'}"></i></button>
                         <i class="fas fa-edit cursor-pointer hover:text-elixir" onclick="editPackage(${pkg.id})"></i>
                         <i class="fas fa-trash-alt cursor-pointer hover:text-red-500" onclick="deletePackage(${pkg.id})"></i>
                     </div>
@@ -579,13 +633,31 @@ function renderPackages() {
     `).join('');
 }
 
+
 function togglePackageActive(packageId) {
     const pkg = packagesList.find(p => p.id === packageId);
     if (pkg) {
         pkg.active = !pkg.active;
+        
+        // ✅ إذا تم التعطيل، احذف العروض وجديدنا المرتبطة بهذا البكج
+        if (!pkg.active) {
+            // حذف العروض المرتبطة
+            let offers = JSON.parse(localStorage.getItem('elixir_offers') || '[]');
+            let filteredOffers = offers.filter(o => !(o.productId === packageId && o.section === "packages"));
+            localStorage.setItem('elixir_offers', JSON.stringify(filteredOffers));
+            
+            // حذف من جديدنا
+            let newArrivals = JSON.parse(localStorage.getItem('elixir_new_arrivals') || '[]');
+            let filteredNew = newArrivals.filter(n => !(n.id === packageId && n.section === "packages"));
+            localStorage.setItem('elixir_new_arrivals', JSON.stringify(filteredNew));
+            
+            showToast(`⛔ تم تعطيل البكج "${pkg.name}" وإزالة عروضه`, "warning");
+        } else {
+            showToast(`✅ تم تفعيل البكج "${pkg.name}"`, "success");
+        }
+        
         saveAllData();
         renderPackages();
-        showToast(pkg.active ? "تم تفعيل البكج (سيظهر في المتجر)" : "تم تعطيل البكج (لن يظهر في المتجر)", "success");
     }
 }
 
@@ -616,6 +688,7 @@ function openPackageModal(id = null) {
             document.getElementById('packageDesc').value = pkg.description || '';
             document.getElementById('packageLongDesc').value = pkg.longDescription || '';
             document.getElementById('packageItemsCount').value = pkg.itemsCount;
+            document.getElementById('packageCategory').value = pkg.category || 'نشاط';
             if (pkg.image && pkg.image.startsWith('data:image')) {
                 document.getElementById('packageImagePreview').src = pkg.image;
                 previewContainer.classList.remove('hidden');
@@ -646,6 +719,10 @@ async function savePackage() {
     const desc = document.getElementById('packageDesc').value.trim();
     const longDesc = document.getElementById('packageLongDesc').value.trim();
     const items = parseInt(document.getElementById('packageItemsCount').value) || 0;
+    const category = document.getElementById('packageCategory').value;
+    const colors = getPackageColorsByCategory(category);
+    const bgColor = colors.bg;
+    const btnColor = colors.btn;
     
     let imageBase64 = '';
     const fileInput = document.getElementById('packageImage');
@@ -666,14 +743,42 @@ async function savePackage() {
     if (editId) {
         const idx = packagesList.findIndex(p => p.id == editId);
         if (idx !== -1) {
-            packagesList[idx] = { ...packagesList[idx], name, price, description: desc, longDescription: longDesc, itemsCount: items, image: imageBase64 };
+            packagesList[idx] = { 
+                ...packagesList[idx], 
+                name, 
+                price, 
+                description: desc, 
+                longDescription: longDesc, 
+                itemsCount: items, 
+                image: imageBase64,
+                category: category,
+                bgColor: bgColor,
+                btnColor: btnColor
+            };
             showToast("تم تحديث المجموعة", "success");
         }
     } else {
         const newId = packagesList.length > 0 ? Math.max(...packagesList.map(p => p.id)) + 1 : 101;
-        packagesList.push({ id: newId, name, price, description: desc, longDescription: longDesc, itemsCount: items, active: true, featured: false, image: imageBase64 });
+        packagesList.push({ 
+            id: newId, 
+            name, 
+            price, 
+            description: desc, 
+            longDescription: longDesc, 
+            itemsCount: items, 
+            active: true, 
+            featured: false, 
+            image: imageBase64, 
+            category: category, 
+            bgColor: bgColor, 
+            btnColor: btnColor 
+        });
         showToast("تمت إضافة المجموعة", "success");
     }
+    
+    // هذي أهم سطرين - يحفظون البكج في localStorage عشان يظهر في صفحة البكجات
+    localStorage.setItem('elixir_packages', JSON.stringify(packagesList));
+    
     renderPackages();
     closePackageModal();
     saveAllData();
@@ -1190,74 +1295,72 @@ function updateAllCategoriesDropdowns() {
 }
 
 // ---------- إدارة العروض (معدلة للعمل مع جميع المنتجات) ----------
+// ---------- إدارة العروض (معدلة للعمل مع جميع المنتجات) ----------
 function renderOffers() {
     const container = document.getElementById('offersList');
     if (!container) return;
     
-    // جلب العروض من localStorage
-    const offersFromStorage = JSON.parse(localStorage.getItem('elixir_offers')) || [];
+    // جلب العروض من localStorage فقط (المصدر الوحيد الموثوق)
+    let allOffers = JSON.parse(localStorage.getItem('elixir_offers')) || [];
     
-    if (offersFromStorage.length === 0 && offers.length === 0) {
+    // التحقق من صلاحية العروض (تاريخ الانتهاء)
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    
+    allOffers = allOffers.filter(offer => {
+        // إذا لم يكن هناك تاريخ انتهاء، العرض دائم
+        if (!offer.endDate || offer.endDate === "") return true;
+        const endDate = new Date(offer.endDate);
+        endDate.setHours(0, 0, 0, 0);
+        return today <= endDate;
+    });
+    
+    // حفظ العروض الصالحة فقط مرة أخرى
+    localStorage.setItem('elixir_offers', JSON.stringify(allOffers));
+    
+    if (allOffers.length === 0) {
         container.innerHTML = '<div class="text-center text-slate-400 py-6">لا توجد عروض حالياً</div>';
         return;
     }
     
-    // دمج العروض من localStorage مع العروض القديمة
-    let allOffers = [...offers, ...offersFromStorage];
-    // إزالة المكررات (نفس المنتج)
-    allOffers = allOffers.filter((offer, index, self) => 
-        index === self.findIndex(o => o.productId === offer.productId)
-    );
-    
     container.innerHTML = allOffers.map(offer => {
-        // البحث عن المنتج أولاً في products (منتجات لوحة التحكم)
+        // البحث عن المنتج في products (لوحة التحكم)
         let product = products.find(p => p.id === offer.productId);
         
-        // إذا لم يوجد، جرب البحث في localStorage of products (المنتجات المضافة من الموقع)
-        if (!product) {
-            const allSiteProducts = JSON.parse(localStorage.getItem('elixir_site_products')) || [];
-            product = allSiteProducts.find(p => p.id === offer.productId);
-        }
-        
-        // إذا كان المنتج من العروض المخزنة في localStorage (من الزيوت/الأعشاب)
-        if (!product && offer.productName) {
-            return `
-                <div class="border p-4 rounded-2xl bg-gradient-to-r from-amber-50 to-white">
-                    <div class="flex justify-between items-start">
-                        <div>
-                            <p class="font-bold text-elixir">${offer.productName}</p>
-                            <p class="text-elixir text-2xl font-bold">-${offer.discount}%</p>
-                            <p class="text-sm text-slate-500">السعر الأصلي: ${offer.productPrice} ₪ → السعر بعد الخصم: ${offer.newPrice} ₪</p>
-                            <p class="text-xs text-slate-400">أضيف في: ${new Date(offer.createdAt).toLocaleDateString('ar-EG')}</p>
-                        </div>
-                        <div class="flex gap-2">
-                            <button onclick="deleteOfferFromLocal(${offer.id})" class="text-red-500 hover:text-red-700" title="حذف">
-                                <i class="fas fa-trash-alt"></i>
-                            </button>
-                        </div>
-                    </div>
-                </div>
-            `;
-        }
-        
-        // المنتج موجود في لوحة التحكم
         return `
             <div class="border p-4 rounded-2xl bg-gradient-to-r from-amber-50 to-white">
                 <div class="flex justify-between items-start">
                     <div>
-                        <p class="font-bold">${product?.name || offer.productName || 'منتج غير موجود'}</p>
-                        <p class="text-elixir text-2xl font-bold">-${offer.discount}%</p>
-                        <p class="text-sm text-slate-500">${offer.startDate || ''} → ${offer.endDate || ''}</p>
-                        ${offer.newPrice ? `<p class="text-xs text-green-600">السعر بعد الخصم: ${offer.newPrice} ₪</p>` : ''}
+                        <p class="font-bold text-elixir">${offer.productName || product?.name || 'منتج غير موجود'}</p>
+                        <p class="text-red-600 text-2xl font-bold">-${offer.discount}%</p>
+                        <p class="text-sm text-slate-500">
+                            السعر الأصلي: ${offer.productPrice || product?.price} ₪ → 
+                            السعر بعد الخصم: ${offer.newPrice} ₪
+                        </p>
+                        ${offer.endDate ? `<p class="text-xs text-slate-400">⏰ ينتهي في: ${new Date(offer.endDate).toLocaleDateString('ar-EG')}</p>` : '<p class="text-xs text-green-500">✨ عرض دائم</p>'}
+                        <p class="text-xs text-slate-400">أضيف في: ${new Date(offer.createdAt).toLocaleDateString('ar-EG')}</p>
                     </div>
                     <div class="flex gap-2">
-                        <button onclick="editOffer(${offer.id})" class="text-blue-500 hover:text-blue-700" title="تعديل"><i class="fas fa-edit"></i></button>
-                        <button onclick="deleteOffer(${offer.id})" class="text-red-500 hover:text-red-700" title="حذف"><i class="fas fa-trash-alt"></i></button>
+                        <button onclick="deleteOfferFromAdmin(${offer.id})" class="text-red-500 hover:text-red-700 p-2 rounded-full hover:bg-red-50 transition" title="حذف العرض">
+                            <i class="fas fa-trash-alt"></i>
+                        </button>
                     </div>
                 </div>
             </div>
         `;
     }).join('');
+}
+
+// دالة حذف العرض من صفحة الأدمن
+function deleteOfferFromAdmin(offerId) {
+    customConfirm("هل تريد حذف هذا العرض نهائياً؟", () => {
+        let offers = JSON.parse(localStorage.getItem('elixir_offers')) || [];
+        offers = offers.filter(o => o.id !== offerId);
+        localStorage.setItem('elixir_offers', JSON.stringify(offers));
+        renderOffers();
+        showToast("✅ تم حذف العرض بنجاح", "success");
+        addToActivityLog("تم حذف عرض من قائمة العروض");
+    });
 }
 
 // دالة جديدة لحذف العروض من localStorage
@@ -1540,7 +1643,7 @@ function openTab(evt, tabName) {
     if (tabName === 'wholesalers') { renderWholesalers(); }
     if (tabName === 'products') renderProductsTable();
     if (tabName === 'packages') renderPackages();
-    if (tabName === 'orders') renderOrdersTable();
+    if (tabName === 'orders') renderOrdersCards();
     if (tabName === 'categories') renderCategories();
     if (tabName === 'offers') { renderOffers(); renderSliders(); }
     if (tabName === 'settings') loadSettings();
@@ -1743,6 +1846,408 @@ loadSettings();
 addToActivityLog("تم فتح لوحة التحكم");
 
 document.getElementById('current-date').innerText = new Intl.DateTimeFormat('ar-EG', { dateStyle: 'long' }).format(new Date());
+
+
+// دالة لتعبئة التصنيفات الفرعية حسب الفئة الرئيسية
+function updateSubCategoryOptions() {
+    const categorySelect = document.getElementById('productCategory');
+    const subCategorySelect = document.getElementById('productSubCategory');
+    
+    if (!categorySelect || !subCategorySelect) return;
+    
+    const category = categorySelect.value;
+    let options = [];
+    
+    if (category === 'أعشاب طبيعية') {
+        options = ['أعشاب طبية', 'أعشاب عطرية', 'خلطات خاصة'];
+    } 
+    else if (category === 'زيوت مركزة') {
+        options = ['زيوت عطرية', 'زيوت نباتية ثابتة', 'للشعر والبشرة'];
+    }
+    else if (category === 'بهارات') {
+        options = ['بهارات عربية', 'بهارات عالمية', 'خلطات خاصة'];
+    }
+    else if (category === 'منتجات عناية') {
+        options = ['تونر منعش', 'صابون طبيعي', 'مقشرات طبيعية', 'مرطبات وكريمات', 'أخرى'];
+    }
+    else {
+        options = ['عام', 'مميز', 'أخرى'];
+    }
+    
+    subCategorySelect.innerHTML = '<option value="">اختر التصنيف</option>';
+    options.forEach(opt => {
+        subCategorySelect.innerHTML += `<option value="${opt}">${opt}</option>`;
+    });
+}
+
+// ربط الحدث عند تغيير الفئة الرئيسية
+const categorySelect = document.getElementById('productCategory');
+if (categorySelect) {
+    categorySelect.addEventListener('change', updateSubCategoryOptions);
+    updateSubCategoryOptions();
+}
+
+
+
+
+// ========== إضافة منتج إلى جديدنا من لوحة التحكم ==========
+function addToNewArrivalsFromAdmin(productId) {
+    const product = products.find(p => p.id === productId);
+    if (!product) {
+        showToast("❌ المنتج غير موجود", "error");
+        return;
+    }
+    
+    let newArrivals = JSON.parse(localStorage.getItem('elixir_new_arrivals')) || [];
+    if (newArrivals.some(p => p.id === productId)) {
+        showToast(`⚠️ "${product.name}" موجود بالفعل في جديدنا`, "error");
+        return;
+    }
+    
+    let catText = "";
+    if (product.category === "أعشاب طبيعية") catText = "عشبة طبية";
+    else if (product.category === "زيوت مركزة") catText = "زيت عطري";
+    else if (product.category === "بهارات") catText = "بهارات عربية";
+    else if (product.category === "منتجات عناية") catText = "عناية شخصية";
+    else catText = "منتج طبيعي";
+    
+    let section = "herbs";
+    if (product.category === "زيوت مركزة") section = "oils";
+    else if (product.category === "بهارات") section = "spices";
+    else if (product.category === "منتجات عناية") section = "care";
+    
+    const expiryDate = new Date();
+    expiryDate.setDate(expiryDate.getDate() + 7);
+    
+    newArrivals.push({
+        id: product.id,
+        name: product.name,
+        price: product.price,
+        img: product.image || "asset/images/placeholder.png",
+        category: product.category,
+        section: section,
+        catText: catText,
+        desc: product.usage || "منتج طبيعي",
+        addedAt: new Date().toISOString(),
+        expiryDate: expiryDate.toISOString()
+    });
+    
+    localStorage.setItem('elixir_new_arrivals', JSON.stringify(newArrivals));
+    showToast(`✅ تم إضافة "${product.name}" إلى قسم جديدنا لمدة 7 أيام ✨`);
+}
+
+// ========== إضافة عرض من لوحة التحكم ==========
+function openOfferModalFromAdmin(productId) {
+    const product = products.find(p => p.id === productId);
+    if (!product) {
+        showToast("❌ المنتج غير موجود", "error");
+        return;
+    }
+    
+    let section = "herbs";
+    if (product.category === "زيوت مركزة") section = "oils";
+    else if (product.category === "بهارات") section = "spices";
+    else if (product.category === "منتجات عناية") section = "care";
+    
+    const tomorrow = new Date();
+    tomorrow.setDate(tomorrow.getDate() + 1);
+    const minDate = tomorrow.toISOString().split('T')[0];
+    const defaultEndDate = new Date();
+    defaultEndDate.setDate(defaultEndDate.getDate() + 30);
+    const defaultDate = defaultEndDate.toISOString().split('T')[0];
+    
+    const overlay = document.createElement('div');
+    overlay.className = 'fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-[400]';
+    overlay.innerHTML = `
+        <div class="bg-white rounded-3xl p-8 w-96 text-center shadow-2xl">
+            <h3 class="text-2xl font-bold mb-4">🎯 إضافة "${product.name}" إلى العروض</h3>
+            <input type="number" id="discountPercent" placeholder="نسبة الخصم (%)" min="1" max="90" class="w-full border rounded-xl p-3 mb-4">
+            <label class="block text-right text-sm mb-2">📅 تاريخ انتهاء العرض:</label>
+            <input type="date" id="endDate" value="${defaultDate}" min="${minDate}" class="w-full border rounded-xl p-3 mb-2">
+            <p class="text-xs text-slate-400 text-right mb-4">⚠️ إذا تركت التاريخ فارغاً سيكون العرض دائماً</p>
+            <div class="flex gap-3">
+                <button id="confirmOfferBtn" class="flex-1 bg-elixir text-white py-2 rounded-xl font-bold">تأكيد</button>
+                <button id="cancelOfferBtn" class="flex-1 bg-gray-200 py-2 rounded-xl font-bold">إلغاء</button>
+            </div>
+        </div>
+    `;
+    document.body.appendChild(overlay);
+    
+    document.getElementById('confirmOfferBtn').onclick = () => {
+        const discountPercent = parseInt(document.getElementById('discountPercent').value);
+        if (!discountPercent || discountPercent < 1 || discountPercent > 90) {
+            showToast("⚠️ الرجاء إدخال نسبة خصم صحيحة (1-90)", "error");
+            return;
+        }
+        const endDate = document.getElementById('endDate').value;
+        
+        let offers = JSON.parse(localStorage.getItem('elixir_offers')) || [];
+        const existingIndex = offers.findIndex(o => o.productId === productId);
+        const newPrice = (product.price * (100 - discountPercent) / 100).toFixed(2);
+        
+        const offerData = {
+            id: Date.now(),
+            productId: productId,
+            productName: product.name,
+            productPrice: product.price,
+            productImg: product.image || "asset/images/placeholder.png",
+            discount: discountPercent,
+            newPrice: newPrice,
+            startDate: new Date().toISOString().split('T')[0],
+            endDate: endDate || "",
+            active: true,
+            createdAt: new Date().toISOString(),
+            section: section,
+            category: product.category,
+            desc: product.usage || "منتج طبيعي"
+        };
+        
+        if (existingIndex !== -1) offers[existingIndex] = { ...offers[existingIndex], ...offerData };
+        else offers.push(offerData);
+        
+        localStorage.setItem('elixir_offers', JSON.stringify(offers));
+        overlay.remove();
+        showToast(`✅ تم إضافة "${product.name}" إلى العروض بخصم ${discountPercent}% ✨`);
+        if (typeof renderOffers === 'function') renderOffers();
+    };
+    
+    document.getElementById('cancelOfferBtn').onclick = () => overlay.remove();
+    overlay.onclick = (e) => { if (e.target === overlay) overlay.remove(); };
+}
+
+
+// ========== إدارة الطلبات - نظام البطاقات ==========
+
+// ========== إدارة الطلبات - بطاقات مثل الصورة ==========
+function renderOrdersCards() {
+    const container = document.getElementById('ordersCardsContainer');
+    const noMsg = document.getElementById('noOrdersMessage');
+    if (!container) return;
+    
+    if (orders.length === 0) {
+        if (noMsg) noMsg.classList.remove('hidden');
+        container.innerHTML = '';
+        document.getElementById('ordersCount').innerText = '0 طلب';
+        return;
+    }
+    
+    if (noMsg) noMsg.classList.add('hidden');
+    
+    let html = '';
+    orders.forEach(order => {
+        // حالة الطلب
+        let statusText = order.status || 'جديد';
+        let statusClass = '';
+        switch(statusText) {
+            case 'pending': statusText = '⏳ قيد المعالجة'; statusClass = 'bg-yellow-100 text-yellow-700'; break;
+            case 'processing': statusText = '🔧 قيد التجهيز'; statusClass = 'bg-blue-100 text-blue-700'; break;
+            case 'shipped': statusText = '🚚 تم الشحن'; statusClass = 'bg-purple-100 text-purple-700'; break;
+            case 'delivered': statusText = '✅ تم التسليم'; statusClass = 'bg-green-100 text-green-700'; break;
+            default: statusText = '📋 جديد'; statusClass = 'bg-green-100 text-green-700';
+        }
+        
+        // اسم الموظف المسند
+        let assignedName = 'غير مسند';
+        if (order.assignedTo) {
+            const emp = employees.find(e => e.id === order.assignedTo);
+            assignedName = emp ? emp.name : 'موظف غير موجود';
+        }
+        
+        // عرض المنتجات
+        const itemsHtml = (order.items || []).map(item => `
+            <div class="product-item">
+                <span class="product-name">${item.name}</span>
+                <span class="product-qty">x${item.qty || item.quantity || 1}</span>
+                <span class="product-price">${((item.price || 0) * (item.qty || item.quantity || 1)).toFixed(2)} ₪</span>
+            </div>
+        `).join('');
+        
+        // عرض بيانات العميل
+        const customerFields = [
+            { label: "👤 الاسم", value: order.customer || order.name || 'غير محدد' },
+            { label: "📞 الهاتف", value: order.phone || 'غير محدد' },
+            { label: "📍 العنوان", value: order.address || 'غير محدد' },
+            { label: "💳 طريقة الدفع", value: order.payment || 'غير محدد' }
+        ];
+        
+        const customerHtml = customerFields.map(field => `
+            <div class="customer-field">
+                <span class="field-label">${field.label}</span>
+                <span class="field-value">${field.value}</span>
+            </div>
+        `).join('');
+        
+        html += `
+            <div class="order-card" data-id="${order.id}">
+                <div class="order-header">
+                    <div class="order-number">
+                        <i class="fas fa-clipboard-list"></i> طلب رقم: ${order.id}
+                    </div>
+                    <div class="order-date">
+                        <i class="far fa-calendar-alt"></i> ${order.date}
+                    </div>
+                    <div class="order-status-badge ${statusClass}">${statusText}</div>
+                </div>
+                
+                <div class="order-body">
+                    <div class="order-section products-section">
+                        <div class="section-title">
+                            <i class="fas fa-boxes"></i> المنتجات
+                        </div>
+                        <div class="products-list">
+                            ${itemsHtml || '<div class="text-slate-400 text-center py-2">لا توجد منتجات</div>'}
+                        </div>
+                    </div>
+                    
+                    <div class="order-section customer-section">
+                        <div class="section-title">
+                            <i class="fas fa-user"></i> بيانات العميل
+                        </div>
+                        ${customerHtml}
+                        <div class="total-amount">
+                            <span>💰 الإجمالي</span>
+                            <span>${(order.total || 0).toFixed(2)} ₪</span>
+                        </div>
+                    </div>
+                    
+                    <div class="order-section assignment-section">
+                        <div class="section-title">
+                            <i class="fas fa-user-tie"></i> تعيين الموظف
+                        </div>
+                        <div class="assigned-info">
+                            <div class="assigned-label">مسند إلى</div>
+                            <div class="assigned-name">
+                                <i class="fas fa-user-check"></i> ${assignedName}
+                            </div>
+                        </div>
+                        <select class="employee-select" onchange="updateOrderAssignmentCard(${order.id}, this.value)">
+                            <option value="">-- اختر موظف --</option>
+                            ${employees.map(emp => `<option value="${emp.id}" ${order.assignedTo === emp.id ? 'selected' : ''}>👤 ${emp.name} (${emp.role})</option>`).join('')}
+                        </select>
+                    </div>
+                </div>
+                
+                <div class="order-actions">
+                    <select class="status-select" onchange="updateOrderStatusCard(${order.id}, this.value)">
+                        <option value="pending" ${order.status === 'pending' ? 'selected' : ''}>⏳ قيد المعالجة</option>
+                        <option value="processing" ${order.status === 'processing' ? 'selected' : ''}>🔧 قيد التجهيز</option>
+                        <option value="shipped" ${order.status === 'shipped' ? 'selected' : ''}>🚚 تم الشحن</option>
+                        <option value="delivered" ${order.status === 'delivered' ? 'selected' : ''}>✅ تم التسليم</option>
+                    </select>
+                    <button class="btn-delete" onclick="deleteOrderCard(${order.id})">
+                        <i class="fas fa-trash-alt"></i> حذف الطلب
+                    </button>
+                </div>
+            </div>
+        `;
+    });
+    
+    container.innerHTML = html;
+    document.getElementById('ordersCount').innerText = `${orders.length} طلب`;
+}
+
+// تحديث حالة الطلب (نسخة البطاقات)
+window.updateOrderStatusCard = function(orderId, newStatus) {
+    const order = orders.find(o => o.id === orderId);
+    if (order) {
+        order.status = newStatus;
+        order.lastUpdated = new Date().toISOString();
+        saveAllData();
+        renderOrdersCards();
+        showToast(`✅ تم تحديث حالة الطلب #${orderId}`, "success");
+        addToActivityLog(`تم تحديث حالة الطلب #${orderId} إلى ${newStatus}`);
+    }
+};
+
+// تعيين الطلب لموظف (نسخة البطاقات)
+window.updateOrderAssignmentCard = function(orderId, employeeId) {
+    const order = orders.find(o => o.id === orderId);
+    if (order) {
+        const empId = employeeId ? parseInt(employeeId) : null;
+        order.assignedTo = empId;
+        order.lastUpdated = new Date().toISOString();
+        saveAllData();
+        renderOrdersCards();
+        const empName = empId ? (employees.find(e => e.id === empId)?.name || 'موظف') : 'غير مسند';
+        showToast(`✅ تم تعيين الطلب #${orderId} إلى ${empName}`, "success");
+        addToActivityLog(`تم تعيين الطلب #${orderId} إلى الموظف ${empName}`);
+    }
+};
+
+// عرض تفاصيل الطلب (نسخة البطاقات)
+window.showOrderDetailsCard = function(orderId) {
+    const order = orders.find(o => o.id === orderId);
+    if (!order) return;
+    
+    const itemsDetails = order.items.map(item => `
+        <div class="flex justify-between items-center py-2 border-b border-slate-100">
+            <span>${item.name}</span>
+            <span>× ${item.qty || item.quantity || 1}</span>
+            <span class="font-bold">${((item.price || 0) * (item.qty || item.quantity || 1)).toFixed(2)} ₪</span>
+        </div>
+    `).join('');
+    
+    const content = `
+        <div class="space-y-4">
+            <div class="grid grid-cols-2 gap-4">
+                <div class="bg-slate-50 p-3 rounded-xl">
+                    <p class="text-xs text-slate-400">رقم الطلب</p>
+                    <p class="font-bold">#${order.id}</p>
+                </div>
+                <div class="bg-slate-50 p-3 rounded-xl">
+                    <p class="text-xs text-slate-400">العميل</p>
+                    <p class="font-bold">${order.customer || 'غير محدد'}</p>
+                </div>
+                <div class="bg-slate-50 p-3 rounded-xl">
+                    <p class="text-xs text-slate-400">التاريخ</p>
+                    <p class="font-bold">${order.date}</p>
+                </div>
+                <div class="bg-slate-50 p-3 rounded-xl">
+                    <p class="text-xs text-slate-400">الإجمالي</p>
+                    <p class="font-bold text-elixir">${order.total?.toFixed(2) || '0.00'} ₪</p>
+                </div>
+                ${order.phone ? `<div class="bg-slate-50 p-3 rounded-xl col-span-2">
+                    <p class="text-xs text-slate-400">رقم الهاتف</p>
+                    <p class="font-bold">${order.phone}</p>
+                </div>` : ''}
+                ${order.address ? `<div class="bg-slate-50 p-3 rounded-xl col-span-2">
+                    <p class="text-xs text-slate-400">العنوان</p>
+                    <p class="font-bold">${order.address}</p>
+                </div>` : ''}
+            </div>
+            <div class="bg-slate-50 p-3 rounded-xl">
+                <p class="text-xs text-slate-400 mb-2">المنتجات</p>
+                <div class="space-y-1">
+                    ${itemsDetails || '<p class="text-slate-400">لا توجد منتجات</p>'}
+                </div>
+            </div>
+        </div>
+    `;
+    
+    document.getElementById('orderDetailsContent').innerHTML = content;
+    document.getElementById('orderDetailsModal').classList.remove('hidden');
+};
+
+// حذف الطلب (نسخة البطاقات)
+window.deleteOrderCard = function(orderId) {
+    customConfirm("هل تريد حذف هذا الطلب نهائياً؟", () => {
+        orders = orders.filter(o => o.id !== orderId);
+        saveAllData();
+        renderOrdersCards();
+        showToast("✅ تم حذف الطلب", "success");
+        addToActivityLog(`تم حذف الطلب رقم ${orderId}`);
+    });
+};
+
+// تحديث الطلبات
+function refreshOrdersData() {
+    loadAllData();
+    renderOrdersCards();
+    showToast("🔄 تم تحديث بيانات الطلبات", "success");
+}
+
+
+
 
 new Chart(document.getElementById('mainChart').getContext('2d'), {
     type: 'line',
