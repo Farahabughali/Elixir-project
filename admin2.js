@@ -72,8 +72,11 @@ function loadAllData() {
     // تحميل الطلبات
     if (storedOrders) orders = JSON.parse(storedOrders);
     else {
-        orders = [ 
-        ];
+       orders = [
+    { id: 1001, customer: "ريما الحسن", items: [{name: "لافندر مجفف", qty: 2, price: 5.0}], total: 10.0, date: "2025-04-01", status: "pending", assignedTo: null },
+    { id: 1002, customer: "ليلى عرفات", items: [{name: "زيت الأرغان", qty: 1, price: 12.5}], total: 12.5, date: "2025-04-02", status: "processing", assignedTo: null },
+    { id: 1003, customer: "نور الشرق", items: [{name: "صابون الغار", qty: 3, price: 4.0}], total: 12.0, date: "2025-04-03", status: "shipped", assignedTo: null },
+       ];
     }
 
     // تحميل الفئات
@@ -101,6 +104,36 @@ function loadAllData() {
         privacyPolicy: ""
     };
     updateAllCategoriesDropdowns();
+}
+
+// ========== حساب المنتجات الأكثر مبيعاً من الطلبات ==========
+function getBestSellingProductsFromOrders(limit = 5) {
+    // قاموس لتجميع الكميات المباعة لكل منتج
+    let salesMap = new Map();
+    
+    // المرور على جميع الطلبات
+    orders.forEach(order => {
+        if (order.items && order.items.length > 0) {
+            order.items.forEach(item => {
+                const productName = item.name;
+                const quantity = item.qty || item.quantity || 1;
+                
+                if (salesMap.has(productName)) {
+                    salesMap.set(productName, salesMap.get(productName) + quantity);
+                } else {
+                    salesMap.set(productName, quantity);
+                }
+            });
+        }
+    });
+    
+    // تحويل الخريطة إلى مصفوفة وترتيبها تنازلياً حسب الكمية
+    let sortedProducts = Array.from(salesMap.entries())
+        .map(([name, total]) => ({ name, total }))
+        .sort((a, b) => b.total - a.total)
+        .slice(0, limit);
+    
+    return sortedProducts;
 }
 
 // ---------- حفظ البيانات ----------
@@ -188,9 +221,10 @@ function renderProductsTable() {
         const warningHtml = prod.warnings ? `<span class="text-xs text-red-500 bg-red-50 px-2 py-1 rounded-lg">${prod.warnings}</span>` : '-';
         const stockClass = prod.stock <= 0 ? 'text-red-600 font-bold' : (prod.stock < 5 ? 'text-amber-600' : 'text-green-700');
         
-        const imageHtml = prod.image && prod.image.startsWith('data:image') 
-            ? `<img src="${prod.image}" class="w-12 h-12 object-cover rounded-lg border shadow-sm">` 
-            : '<div class="w-12 h-12 bg-gray-100 rounded-lg flex items-center justify-center text-gray-400"><i class="fas fa-image"></i></div>';
+        const hasImage = prod.image && prod.image !== "";
+const imageHtml = hasImage 
+    ? `<img src="${prod.image}" class="w-12 h-12 object-cover rounded-lg border shadow-sm cursor-pointer hover:opacity-80 transition" onclick="openImagePreview('${prod.image}'); event.stopPropagation();" title="اضغط لتكبير الصورة">` 
+    : '<div class="w-12 h-12 bg-gray-100 rounded-lg flex items-center justify-center text-gray-400"><i class="fas fa-image"></i></div>';
         
         tbody.insertAdjacentHTML('beforeend', `
             <tr class="border-b hover:bg-slate-50 ${!prod.active ? 'opacity-60 bg-gray-50' : ''}">
@@ -413,10 +447,40 @@ async function saveProduct() {
                 showToast("تم تحديث المنتج", "success");
             }
         } else {
-            const newId = products.length > 0 ? Math.max(...products.map(p => p.id)) + 1 : 1;
-            products.push({ id: newId, name, category, price, stock, usage, warnings, image: imageBase64 });
-            showToast("تم إضافة المنتج", "success");
-        }
+    const newId = products.length > 0 ? Math.max(...products.map(p => p.id)) + 1 : 1;
+    products.push({ id: newId, name, category, price, stock, usage, warnings, image: imageBase64, addedAt: new Date().toISOString() });
+    showToast("تم إضافة المنتج", "success");
+    
+    // ✅ إضافة المنتج تلقائياً إلى جديدنا
+    let newArrivals = JSON.parse(localStorage.getItem('elixir_new_arrivals') || '[]');
+    
+    // تحديد القسم والنص المناسب حسب الفئة
+    let section = "herbs";
+    let catText = "منتج طبيعي";
+    if (category === "أعشاب طبيعية") { section = "herbs"; catText = "عشبة طبية"; }
+    else if (category === "زيوت مركزة") { section = "oils"; catText = "زيت عطري"; }
+    else if (category === "بهارات") { section = "spices"; catText = "بهارات عربية"; }
+    else if (category === "منتجات عناية") { section = "care"; catText = "عناية شخصية"; }
+    
+    const expiryDate = new Date();
+    expiryDate.setDate(expiryDate.getDate() + 7);
+    
+    newArrivals.push({
+        id: newId,
+        name: name,
+        price: price,
+        img: imageBase64 || "asset/images/placeholder.png",
+        category: category,
+        section: section,
+        catText: catText,
+        desc: usage || "منتج طبيعي 100%",
+        addedAt: new Date().toISOString(),
+        expiryDate: expiryDate.toISOString()
+    });
+    
+    localStorage.setItem('elixir_new_arrivals', JSON.stringify(newArrivals));
+    showToast(`✅ تم إضافة "${name}" إلى جديدنا تلقائياً ✨`, "success");
+}
         
         renderProductsTable();
         renderOrdersTable();
@@ -758,23 +822,48 @@ async function savePackage() {
             showToast("تم تحديث المجموعة", "success");
         }
     } else {
-        const newId = packagesList.length > 0 ? Math.max(...packagesList.map(p => p.id)) + 1 : 101;
-        packagesList.push({ 
-            id: newId, 
-            name, 
-            price, 
-            description: desc, 
-            longDescription: longDesc, 
-            itemsCount: items, 
-            active: true, 
-            featured: false, 
-            image: imageBase64, 
-            category: category, 
-            bgColor: bgColor, 
-            btnColor: btnColor 
-        });
-        showToast("تمت إضافة المجموعة", "success");
-    }
+    const newId = packagesList.length > 0 ? Math.max(...packagesList.map(p => p.id)) + 1 : 101;
+    packagesList.push({ 
+        id: newId, 
+        name, 
+        price, 
+        description: desc, 
+        longDescription: longDesc, 
+        itemsCount: items, 
+        active: true, 
+        featured: false, 
+        image: imageBase64, 
+        category: category, 
+        bgColor: bgColor, 
+        btnColor: btnColor,
+        addedAt: new Date().toISOString()
+    });
+    showToast("تمت إضافة المجموعة", "success");
+    
+    // ✅ إضافة البكج تلقائياً إلى جديدنا
+    let newArrivals = JSON.parse(localStorage.getItem('elixir_new_arrivals') || '[]');
+    
+    const expiryDate = new Date();
+    expiryDate.setDate(expiryDate.getDate() + 7);
+    
+    newArrivals.push({
+        id: newId,
+        name: name,
+        price: price,
+        img: imageBase64 || "asset/images/placeholder.png",
+        category: category,
+        section: "packages",
+        catText: "🎁 بكج مميز",
+        desc: desc || "بكج متكامل",
+        bgColor: bgColor,
+        btnColor: btnColor,
+        addedAt: new Date().toISOString(),
+        expiryDate: expiryDate.toISOString()
+    });
+    
+    localStorage.setItem('elixir_new_arrivals', JSON.stringify(newArrivals));
+    showToast(`✅ تم إضافة "${name}" إلى جديدنا تلقائياً ✨`, "success");
+}
     
     // هذي أهم سطرين - يحفظون البكج في localStorage عشان يظهر في صفحة البكجات
     localStorage.setItem('elixir_packages', JSON.stringify(packagesList));
@@ -2144,6 +2233,8 @@ function renderOrdersCards() {
     
     container.innerHTML = html;
     document.getElementById('ordersCount').innerText = `${orders.length} طلب`;
+    // تحديث الرسم البياني للأكثر مبيعاً بعد تحديث الطلبات
+if (typeof updateBestSellingChart === 'function') updateBestSellingChart();
 }
 
 // تحديث حالة الطلب (نسخة البطاقات)
@@ -2249,13 +2340,126 @@ function refreshOrdersData() {
 
 
 
-new Chart(document.getElementById('mainChart').getContext('2d'), {
-    type: 'line',
-    data: { labels: ['السبت','الأحد','الاثنين','الثلاثاء','الأربعاء','الخميس','الجمعة'], datasets: [{ label: 'المبيعات', data: [420,680,590,950,720,1200,1050], borderColor: '#438e56', borderWidth: 4, fill: true, backgroundColor: 'rgba(67,142,86,0.1)' }] },
-    options: { responsive: true }
-});
+// ========== رسم بياني للمنتجات الأكثر مبيعاً ==========
+function updateBestSellingChart() {
+    const bestSelling = getBestSellingProductsFromOrders(6); // أول 6 منتجات
+    
+    const labels = bestSelling.map(item => item.name.length > 15 ? item.name.substring(0, 12) + '...' : item.name);
+    const data = bestSelling.map(item => item.total);
+    
+    const ctx = document.getElementById('mainChart').getContext('2d');
+    
+    // تدمير الرسم البياني القديم إذا كان موجوداً
+    if (window.bestSellingChart) {
+        window.bestSellingChart.destroy();
+    }
+    
+    window.bestSellingChart = new Chart(ctx, {
+        type: 'bar',
+        data: {
+            labels: labels,
+            datasets: [{
+                label: 'الكمية المباعة (قطعة)',
+                data: data,
+                backgroundColor: '#438e56',
+                borderRadius: 8,
+                barPercentage: 0.7
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: true,
+            plugins: {
+                legend: {
+                    position: 'top',
+                    labels: { font: { size: 12, family: 'Cairo' } }
+                },
+                tooltip: {
+                    callbacks: {
+                        label: function(context) {
+                            return `الكمية: ${context.raw} قطعة`;
+                        }
+                    }
+                }
+            },
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    title: {
+                        display: true,
+                        text: 'عدد القطع المباعة',
+                        font: { size: 12, family: 'Cairo' }
+                    },
+                    grid: { color: '#e0e0e0' }
+                },
+                x: {
+                    title: {
+                        display: true,
+                        text: 'المنتجات',
+                        font: { size: 12, family: 'Cairo' }
+                    },
+                    ticks: { font: { size: 11, family: 'Cairo' } }
+                }
+            }
+        }
+    });
+}
+
+// استدعاء الدالة عند تحميل الصفحة وبعد كل تحديث للطلبات
+function refreshBestSellingChart() {
+    updateBestSellingChart();
+}
+
+// تحديث الرسم البياني بعد تغيير الطلبات
+window.updateBestSellingChart = updateBestSellingChart;
 new Chart(document.getElementById('categoryChart').getContext('2d'), {
     type: 'doughnut',
     data: { labels: ['أعشاب', 'زيوت', 'عناية', 'بهارات'], datasets: [{ data: [40, 25, 20, 15], backgroundColor: ['#438e56', '#87ba93', '#1a2e21', '#f59e0b'] }] },
     options: { cutout: '70%' }
 });
+
+
+
+
+
+
+// ========== دوال معاينة الصورة ==========
+function openImagePreview(imageUrl) {
+    const modal = document.getElementById('imagePreviewModal');
+    const img = document.getElementById('previewImage');
+    if (modal && img && imageUrl && imageUrl !== "") {
+        img.src = imageUrl;
+        modal.classList.remove('hidden');
+    } else {
+        showToast("⚠️ لا توجد صورة لهذا المنتج", "error");
+    }
+}
+
+function closeImagePreview() {
+    const modal = document.getElementById('imagePreviewModal');
+    if (modal) {
+        modal.classList.add('hidden');
+        document.getElementById('previewImage').src = '';
+    }
+}
+
+// إغلاق بالضغط على ESC
+document.addEventListener('keydown', function(e) {
+    if (e.key === 'Escape') {
+        closeImagePreview();
+    }
+});
+
+
+
+
+// ✅ تأخير إنشاء الرسم البياني للأكثر مبيعاً
+setTimeout(function() {
+    if (typeof updateBestSellingChart === 'function') {
+        updateBestSellingChart();
+    } else {
+        console.log("⚠️ updateBestSellingChart غير معرفة");
+    }
+}, 1000);
+
+
