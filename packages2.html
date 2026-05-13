@@ -124,42 +124,67 @@
     ];
 
     // ========== دمج بكجات الأدمن مع البكجات الافتراضية ==========
-    function getAllPackages() {
-        // جلب بكجات الأدمن من localStorage
-        let adminPackages = JSON.parse(localStorage.getItem('elixir_packages')) || [];
-        
-        // تحويل بكجات الأدمن إلى نفس تنسيق البكجات الافتراضية
-        const formattedAdminPackages = adminPackages
-            .filter(pkg => pkg.active !== false) // فقط البكجات المفعلة
-            .map(pkg => ({
+    // ========== دالة لجلب كل البكجات (من localStorage + الافتراضية) ==========
+function getAllPackages() {
+    // جلب بكجات الأدمن من localStorage
+    let adminPackages = JSON.parse(localStorage.getItem('elixir_packages')) || [];
+    
+    // تحويل بكجات الأدمن إلى نفس تنسيق البكجات الافتراضية
+    let formattedAdminPackages = [];
+    for (let i = 0; i < adminPackages.length; i++) {
+        let pkg = adminPackages[i];
+        // فقط البكجات النشطة
+        if (pkg.active !== false) {
+            formattedAdminPackages.push({
                 id: pkg.id,
                 name: pkg.name,
                 category: pkg.category || 'نشاط',
                 desc: pkg.description || pkg.desc || "بكج طبيعي متكامل",
                 price: pkg.price,
                 img: pkg.image || "asset/images/package-placeholder.png",
-                // إذا كان البكج من الأدمن يحمل ألوانه الخاصة نستخدمها، وإلا نحسبها حسب الفئة
                 bgColor: pkg.bgColor || getPackageBgColor(pkg.category || 'نشاط'),
                 btnColor: pkg.btnColor || getPackageBtnColor(pkg.category || 'نشاط'),
+                catText: pkg.catText || getPackageCatText(pkg.category || 'نشاط'),
                 section: "packages",
-                catText: pkg.catText || getPackageCatText(pkg.category || 'نشاط')
-            }));
-        
-        // تحويل البكجات الافتراضية إلى نفس التنسيق مع ألوانها الثابتة
-        const formattedDefaultPackages = defaultPackages.map(pkg => ({
-            ...pkg,
+                active: true
+            });
+        }
+    }
+    
+    // تحويل البكجات الافتراضية
+    let formattedDefaultPackages = [];
+    for (let i = 0; i < defaultPackages.length; i++) {
+        let pkg = defaultPackages[i];
+        formattedDefaultPackages.push({
+            id: pkg.id,
+            name: pkg.name,
+            category: pkg.category,
+            desc: pkg.desc,
+            price: pkg.price,
+            img: pkg.img,
             bgColor: getPackageBgColor(pkg.category),
             btnColor: getPackageBtnColor(pkg.category),
             catText: getPackageCatText(pkg.category),
-            section: "packages"
-        }));
-        
-        // دمج البكجات (بكجات الأدمن أولاً، ثم الافتراضية التي لا تتعارض معها)
-        const allPackageIds = new Set(formattedAdminPackages.map(p => p.id));
-        const nonConflictingDefaults = formattedDefaultPackages.filter(p => !allPackageIds.has(p.id));
-        
-        return [...formattedAdminPackages, ...nonConflictingDefaults];
+            section: "packages",
+            active: true
+        });
     }
+    
+    // دمج البكجات (بكجات الأدمن أولاً، ثم الافتراضية التي لا تتعارض معها)
+    let allIds = {};
+    for (let i = 0; i < formattedAdminPackages.length; i++) {
+        allIds[formattedAdminPackages[i].id] = true;
+    }
+    
+    let combined = [...formattedAdminPackages];
+    for (let i = 0; i < formattedDefaultPackages.length; i++) {
+        if (!allIds[formattedDefaultPackages[i].id]) {
+            combined.push(formattedDefaultPackages[i]);
+        }
+    }
+    
+    return combined;
+}
 
     let currentFilter = "all";
 
