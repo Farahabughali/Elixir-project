@@ -1,0 +1,539 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Elixir | الأكثر مبيعاً</title>
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="herbs.css">
+    <link rel="stylesheet" href="oils.css">
+    <link rel="stylesheet" href="spices.css">
+    <link rel="stylesheet" href="personal-care.css">
+    <link rel="stylesheet" href="packages.css">
+    <style>
+        .best-header {
+            text-align: center;
+            margin: 30px 0 40px;
+        }
+        .best-header h1 {
+            font-size: 2rem;
+            color: #438e56;
+            font-family: "Playfair Display", serif;
+        }
+        .best-header p {
+            color: #888;
+            font-size: 1rem;
+        }
+        .products-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 25px;
+        }
+        .no-results {
+            text-align: center;
+            padding: 4rem 2rem;
+            background: rgba(255,255,255,0.7);
+            backdrop-filter: blur(10px);
+            border-radius: 2rem;
+            grid-column: 1 / -1;
+        }
+        .no-results i {
+            font-size: 4rem;
+            color: #438e56;
+            margin-bottom: 1rem;
+            opacity: 0.5;
+        }
+        .no-results h3 {
+            font-size: 1.5rem;
+            color: #438e56;
+            margin-bottom: 0.5rem;
+        }
+        .no-results p {
+            color: #888;
+        }
+        .back-home {
+            text-align: center;
+            margin-top: 2rem;
+        }
+        .back-home a {
+            background: rgba(67,142,86,0.1);
+            padding: 10px 25px;
+            border-radius: 40px;
+            color: #438e56;
+            text-decoration: none;
+            transition: 0.2s;
+            display: inline-block;
+        }
+        .back-home a:hover {
+            background: #438e56;
+            color: white;
+        }
+        .toast-message {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            background: #2c5f2d;
+            color: white;
+            padding: 12px 24px;
+            border-radius: 50px;
+            font-size: 0.9rem;
+            z-index: 9999;
+            display: none;
+            align-items: center;
+            gap: 10px;
+        }
+        .scroll-top-btn {
+            position: fixed;
+            bottom: 30px;
+            left: 30px;
+            width: 50px;
+            height: 50px;
+            background: #438e56;
+            color: white;
+            border: none;
+            border-radius: 50%;
+            cursor: pointer;
+            font-size: 1.5rem;
+            z-index: 99;
+            transition: 0.3s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+        }
+        .scroll-top-btn:hover {
+            background: #2c5f2d;
+            transform: translateY(-5px);
+        }
+        @media (max-width: 768px) {
+            .products-grid {
+                grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+                gap: 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+
+<header>
+    <div class="main-header">
+        <div class="header-right">
+            <a href="index2.html" style="display: flex; align-items: center; gap: 15px; text-decoration: none;">
+                <div class="logo-circle"><img src="asset/images/logo.png" alt="Logo"></div>
+                <span class="web-name">Elixir</span>
+            </a>
+            <span class="page-title-in-header">🏆 الأكثر مبيعاً</span>
+        </div>
+        <div class="header-left">
+            <span class="help-text">🏆 اكتشف المنتجات التي أحبها عملاؤنا</span>
+            <a href="chatbot.html" class="ai-consult-link"><i class="fas fa-robot"></i> استشر الذكاء الاصطناعي</a>
+        </div>
+    </div>
+</header>
+
+<div class="container">
+    <div class="best-header">
+        <h1>🏆 الأكثر مبيعاً</h1>
+        <p>المنتجات التي نال إعجاب عملائنا وتم طلبها بكثرة</p>
+    </div>
+    <div class="products-grid" id="bestSellingGrid"></div>
+    <div class="back-home">
+        <a href="index2.html"><i class="fas fa-arrow-right"></i> العودة إلى الرئيسية</a>
+    </div>
+</div>
+
+<div id="customToast" class="toast-message"><i class="fas fa-check-circle"></i><span id="toastText"></span></div>
+<button id="scrollTopBtn" class="scroll-top-btn"><i class="fas fa-arrow-up"></i></button>
+
+<link rel="stylesheet" href="floating-cart.css">
+<script src="floating-cart.js"></script>
+
+<script>
+    function showToast(message) {
+        const toast = document.getElementById('customToast');
+        if (toast) {
+            document.getElementById('toastText').innerHTML = message;
+            toast.style.display = 'flex';
+            setTimeout(() => toast.style.display = 'none', 3000);
+        }
+    }
+
+    // ========== بطاقة الأعشاب ==========
+    function createHerbCard(product) {
+        let isFav = JSON.parse(localStorage.getItem('elixir_favorites') || '[]').includes(product.id);
+        let catText = "عشبة طبية";
+        if (product.category === "أعشاب طبيعية") catText = "عشبة طبية";
+        else if (product.category === "زيوت مركزة") catText = "زيت عطري";
+        else if (product.category === "بهارات") catText = "بهارات عربية";
+        else if (product.category === "منتجات عناية") catText = "عناية شخصية";
+        
+        return `
+            <div class="herb-card" data-id="${product.id}" style="position:relative; background: rgba(255,255,255,0.85); border-radius: 1.5rem; overflow: hidden;">
+                <div class="best-badge" style="position:absolute; top:12px; right:12px; background:#e74c3c; color:white; font-weight:bold; padding:4px 12px; border-radius:30px; font-size:12px; z-index:10;">🏆 #${product.rank}</div>
+                <div class="fav-icon ${isFav ? 'active' : ''}" data-id="${product.id}">
+                    <i class="fa-${isFav ? 'solid' : 'regular'} fa-heart"></i>
+                </div>
+                <img class="herb-img" src="${product.img}" onerror="this.src='asset/images/placeholder.png'" style="width:100%; height:200px; object-fit:cover;">
+                <div class="herb-info" style="padding:1rem; text-align:right;">
+                    <div class="herb-cat" style="font-size:0.7rem; color:#2c5f2d;">${catText}</div>
+                    <div class="herb-title" style="font-size:1.3rem; font-weight:700; color:#2c5f2d;">${product.name}</div>
+                    <div class="herb-desc" style="font-size:1rem; color:#5a7a4a;">${(product.desc || product.usage || "منتج طبيعي").substring(0, 80)}</div>
+                    <div class="price-row" style="display:flex; justify-content:space-between; align-items:center; margin-top:10px;">
+                        <div>
+                            <span class="price" style="font-weight:bold; color:#438e56; font-size:1.3rem;">${product.price} ₪</span>
+                            
+                        </div>
+                        <div class="btn-group" style="display:flex; gap:8px;">
+                            <button class="view-details" data-id="${product.id}" style="background:#528a3a; color:white; border:none; padding:5px 12px; border-radius:30px;"> عرض التفاصيل</button>
+                            <button class="add-cart" data-id="${product.id}" data-name="${product.name}" data-price="${product.price}" data-img="${product.img}" style="background:#438e56; color:white; border:none; padding:5px 12px; border-radius:30px;"> إضافة إلى السلة</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        `;
+    }
+
+    // ========== بطاقة الزيوت ==========
+    function createOilCard(product) {
+        let isFav = JSON.parse(localStorage.getItem('elixir_favorites') || '[]').includes(product.id);
+        return `
+            <div class="oil-card" data-id="${product.id}" style="position:relative; background: rgba(255,255,255,0.85); border-radius: 1.5rem; overflow: hidden;">
+                <div class="best-badge" style="position:absolute; top:12px; right:12px; background:#e74c3c; color:white; font-weight:bold; padding:4px 12px; border-radius:30px; font-size:12px; z-index:10;">🏆 #${product.rank}</div>
+                <div class="fav-icon ${isFav ? 'active' : ''}" data-id="${product.id}">
+                    <i class="fa-${isFav ? 'solid' : 'regular'} fa-heart"></i>
+                </div>
+                <img class="oil-img" src="${product.img}" onerror="this.src='asset/images/placeholder.png'" style="width:100%; height:200px; object-fit:cover;">
+                <div class="oil-info" style="padding:1rem; text-align:right;">
+                    <div class="oil-cat" style="font-size:0.7rem; color:#2c5f2d;">${product.category === "زيوت مركزة" ? "زيت عطري" : "زيت طبيعي"}</div>
+                    <div class="oil-title" style="font-size:1.3rem; font-weight:700; color:#2c5f2d;">${product.name}</div>
+                    <div class="oil-desc" style="font-size:1rem; color:#5a7a4a;">${(product.desc || product.usage || "زيت طبيعي نقي").substring(0, 80)}</div>
+                    <div class="price-row" style="display:flex; justify-content:space-between; align-items:center; margin-top:10px;">
+                        <div>
+                            <span class="price" style="font-weight:bold; color:#438e56; font-size:1.3rem;">${product.price} ₪</span>
+                            
+                        </div>
+                        <div class="btn-group" style="display:flex; gap:8px;">
+                            <button class="view-details" data-id="${product.id}" style="background:#528a3a; color:white; border:none; padding:5px 12px; border-radius:30px;"> عرض التفاصيل</button>
+                            <button class="add-cart" data-id="${product.id}" data-name="${product.name}" data-price="${product.price}" data-img="${product.img}" style="background:#438e56; color:white; border:none; padding:5px 12px; border-radius:30px;"> إضافة إلى السلة</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        `;
+    }
+
+    // ========== بطاقة البهارات ==========
+    function createSpiceCard(product) {
+        let isFav = JSON.parse(localStorage.getItem('elixir_favorites') || '[]').includes(product.id);
+        return `
+            <div class="spice-card" data-id="${product.id}" style="position:relative; background: rgba(255,248,235,0.85); border-radius: 1.5rem; overflow: hidden;">
+                <div class="best-badge" style="position:absolute; top:12px; right:12px; background:#e74c3c; color:white; font-weight:bold; padding:4px 12px; border-radius:30px; font-size:12px; z-index:10;">🏆 #${product.rank}</div>
+                <div class="fav-icon ${isFav ? 'active' : ''}" data-id="${product.id}">
+                    <i class="fa-${isFav ? 'solid' : 'regular'} fa-heart"></i>
+                </div>
+                <img class="spice-img" src="${product.img}" onerror="this.src='asset/images/placeholder.png'" style="width:100%; height:200px; object-fit:cover;">
+                <div class="spice-info" style="padding:1rem; text-align:right;">
+                    <div class="spice-cat" style="font-size:0.7rem; color:#a67c52;">بهارات عربية</div>
+                    <div class="spice-title" style="font-size:1rem; font-weight:700; color:#6d462a;">${product.name}</div>
+                    <div class="spice-desc" style="font-size:0.75rem; color:#8b6844;">${(product.desc || product.usage || "بهار طبيعي").substring(0, 80)}</div>
+                    <div class="price-row" style="display:flex; justify-content:space-between; align-items:center; margin-top:10px;">
+                        <div>
+                            <span class="price" style="font-weight:bold; color:#c47a3a; font-size:1.2rem;">${product.price} ₪</span>
+                            
+                        </div>
+                        <div class="btn-group" style="display:flex; gap:8px;">
+                            <button class="view-details" data-id="${product.id}" style="background:#b9804b; color:white; border:none; padding:5px 12px; border-radius:30px;"> عرض التفاصيل</button>
+                            <button class="add-cart" data-id="${product.id}" data-name="${product.name}" data-price="${product.price}" data-img="${product.img}" style="background:#c47a3a; color:white; border:none; padding:5px 12px; border-radius:30px;"> إضافة إلى السلة</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        `;
+    }
+
+    // ========== بطاقة العناية الشخصية ==========
+    function createCareCard(product) {
+        let isFav = JSON.parse(localStorage.getItem('elixir_favorites') || '[]').includes(product.id);
+        return `
+            <div class="care-card" data-id="${product.id}" style="position:relative; background: rgba(255,250,252,0.85); border-radius: 1.5rem; overflow: hidden;">
+                <div class="best-badge" style="position:absolute; top:12px; right:12px; background:#e74c3c; color:white; font-weight:bold; padding:4px 12px; border-radius:30px; font-size:12px; z-index:10;">🏆 #${product.rank}</div>
+                <div class="fav-icon ${isFav ? 'active' : ''}" data-id="${product.id}">
+                    <i class="fa-${isFav ? 'solid' : 'regular'} fa-heart"></i>
+                </div>
+                <img class="care-img" src="${product.img}" onerror="this.src='asset/images/placeholder.png'" style="width:100%; height:200px; object-fit:cover;">
+                <div class="care-info" style="padding:1rem; text-align:right;">
+                    <div class="care-cat" style="font-size:0.7rem; color:#d696a8;">عناية شخصية</div>
+                    <div class="care-title" style="font-size:1rem; font-weight:700; color:#b06b7e;">${product.name}</div>
+                    <div class="care-desc" style="font-size:0.75rem; color:#a06b7a;">${(product.desc || product.usage || "منتج طبيعي للعناية").substring(0, 80)}</div>
+                    <div class="price-row" style="display:flex; justify-content:space-between; align-items:center; margin-top:10px;">
+                        <div>
+                            <span class="price" style="font-weight:bold; color:#d696a8; font-size:1.2rem;">${product.price} ₪</span>
+                            
+                        </div>
+                        <div class="btn-group" style="display:flex; gap:8px;">
+                            <button class="view-details" data-id="${product.id}" style="background:#d696a8; color:white; border:none; padding:5px 12px; border-radius:30px;"> عرض التفاصيل</button>
+                            <button class="add-cart" data-id="${product.id}" data-name="${product.name}" data-price="${product.price}" data-img="${product.img}" style="background:#d696a8; color:white; border:none; padding:5px 12px; border-radius:30px;"> إضافة إلى السلة</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        `;
+    }
+
+    // ========== بطاقة البكجات ==========
+    function createPackageCard(product) {
+        let isFav = JSON.parse(localStorage.getItem('elixir_favorites') || '[]').includes(product.id);
+        let bgColor = product.bgColor || "#fff3e0";
+        let btnColor = product.btnColor || "#ef6c00";
+        
+        return `
+            <div class="package-card" data-id="${product.id}" style="position:relative; background: ${bgColor}; border-bottom: 4px solid ${btnColor}; border-radius: 1rem; overflow: hidden;">
+                <div class="best-badge" style="position:absolute; top:12px; right:12px; background:#e74c3c; color:white; font-weight:bold; padding:4px 12px; border-radius:30px; font-size:12px; z-index:10;">🏆 #${product.rank}</div>
+                <div class="fav-icon ${isFav ? 'active' : ''}" data-id="${product.id}" style="position:absolute; top:12px; left:12px; z-index:10; cursor:pointer;">
+                    <i class="fa-${isFav ? 'solid' : 'regular'} fa-heart"></i>
+                </div>
+                <img class="package-img" src="${product.img}" onerror="this.src='asset/images/placeholder.png'" style="width:100%; height:180px; object-fit:cover;">
+                <div class="package-info" style="padding:1rem; text-align:right;">
+                    <div class="package-title" style="font-size:1.1rem; font-weight:700;">${product.name}</div>
+                    <div class="package-desc" style="font-size:0.75rem; color:#666; margin:8px 0;">${(product.desc || "بكج متكامل").substring(0, 80)}</div>
+                    <div class="price-row" style="display:flex; justify-content:space-between; align-items:center; margin-top:10px;">
+                        <div>
+                            <span class="price" style="font-weight:bold; color:#e74c3c; font-size:1.2rem;">${product.price} ₪</span>
+                            
+                        </div>
+                        <div class="btn-group" style="display:flex; gap:8px;">
+                            <button class="view-details" data-id="${product.id}" style="background:${btnColor}; color:white; border:none; padding:5px 12px; border-radius:30px;"> عرض التفاصيل</button>
+                            <button class="add-cart" data-id="${product.id}" data-name="${product.name}" data-price="${product.price}" data-img="${product.img}" style="background:${btnColor}; color:white; border:none; padding:5px 12px; border-radius:30px;"> إضافة إلى السلة</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        `;
+    }
+
+    // اختيار البطاقة المناسبة حسب القسم أو الفئة
+    function getCard(product) {
+        if (!product) return '';
+        
+        // إذا كان بكج
+        if (product.section === 'packages') {
+            return createPackageCard(product);
+        }
+        
+        // حسب الفئة
+        if (product.category === 'أعشاب طبيعية') return createHerbCard(product);
+        if (product.category === 'زيوت مركزة') return createOilCard(product);
+        if (product.category === 'بهارات') return createSpiceCard(product);
+        if (product.category === 'منتجات عناية') return createCareCard(product);
+        
+        return createHerbCard(product);
+    }
+
+    // ========== حساب المنتجات الأكثر مبيعاً من الطلبات ==========
+    function getBestSellingProductsFromOrders(limit = 12) {
+        let allOrders = JSON.parse(localStorage.getItem('elixir_orders')) || [];
+        let allProducts = JSON.parse(localStorage.getItem('elixir_products')) || [];
+        let allPackages = JSON.parse(localStorage.getItem('elixir_packages')) || [];
+        
+        // دمج المنتجات والبكجات معاً
+        let allItems = [...allProducts, ...allPackages.map(pkg => ({ ...pkg, isPackage: true, section: "packages" }))];
+        
+        let salesMap = new Map();
+        
+        allOrders.forEach(order => {
+            if (order.items && order.items.length > 0) {
+                order.items.forEach(item => {
+                    const productName = item.name;
+                    const quantity = item.qty || item.quantity || 1;
+                    salesMap.set(productName, (salesMap.get(productName) || 0) + quantity);
+                });
+            }
+        });
+        
+        let sortedProducts = Array.from(salesMap.entries())
+            .map(([name, total]) => ({ name, total }))
+            .sort((a, b) => b.total - a.total)
+            .slice(0, limit);
+        
+        let bestSellingWithDetails = [];
+        for (let i = 0; i < sortedProducts.length; i++) {
+            let item = sortedProducts[i];
+            let product = allItems.find(p => p.name === item.name);
+            
+            if (product) {
+                bestSellingWithDetails.push({
+                    id: product.id,
+                    name: product.name,
+                    price: product.price,
+                    img: product.image || product.img || "asset/images/placeholder.png",
+                    category: product.category,
+                    desc: product.description || product.desc || product.usage,
+                    usage: product.usage,
+                    bgColor: product.bgColor,
+                    btnColor: product.btnColor,
+                    section: product.section || (product.isPackage ? "packages" : "herbs"),
+                    totalSold: item.total,
+                    rank: i + 1
+                });
+            } else {
+                bestSellingWithDetails.push({
+                    id: null,
+                    name: item.name,
+                    price: 0,
+                    img: "asset/images/placeholder.png",
+                    category: "منتجات",
+                    desc: "",
+                    totalSold: item.total,
+                    rank: i + 1
+                });
+            }
+        }
+        
+        return bestSellingWithDetails;
+    }
+
+    // ========== عرض المنتجات الأكثر مبيعاً ==========
+    function renderBestSelling() {
+        const grid = document.getElementById("bestSellingGrid");
+        if (!grid) return;
+        
+        const bestSellingProducts = getBestSellingProductsFromOrders(12);
+        
+        if (bestSellingProducts.length === 0) {
+            grid.innerHTML = `
+                <div class="no-results">
+                    <i class="fas fa-trophy"></i>
+                    <h3>🏆 لا توجد منتجات مباعة بعد</h3>
+                    <p>عندما يقوم العملاء بتقديم طلبات، ستظهر المنتجات الأكثر مبيعاً هنا تلقائياً</p>
+                </div>
+            `;
+            return;
+        }
+        
+        let html = '';
+        for (let product of bestSellingProducts) {
+            html += getCard(product);
+        }
+        grid.innerHTML = html;
+        bindFavEvents(); 
+        
+        // ربط الأحداث
+        document.querySelectorAll('.add-cart').forEach(btn => {
+            btn.addEventListener('click', function(e) {
+                e.preventDefault();
+                let cart = JSON.parse(localStorage.getItem('elixir_cart')) || [];
+                let existing = cart.find(item => item.id == this.dataset.id);
+                if (existing) existing.quantity++;
+                else cart.push({ 
+                    id: parseInt(this.dataset.id), 
+                    name: this.dataset.name, 
+                    price: parseFloat(this.dataset.price), 
+                    img: this.dataset.img, 
+                    quantity: 1 
+                });
+                localStorage.setItem('elixir_cart', JSON.stringify(cart));
+                showToast(`✅ تمت إضافة ${this.dataset.name} إلى السلة`);
+                updateCartBadge();
+                if (window.updateFloatingCart) window.updateFloatingCart();
+            });
+        });
+        
+        document.querySelectorAll('.view-details').forEach(btn => {
+            btn.addEventListener('click', function(e) {
+                e.preventDefault();
+                window.location.href = `product-details.html?id=${this.dataset.id}`;
+            });
+        });
+        
+       // ========== دوال المفضلة (مثل الأعشاب) ==========
+function updateFavorite(icon, productId) {
+    let favorites = JSON.parse(localStorage.getItem('elixir_favorites')) || [];
+    const index = favorites.indexOf(productId);
+    if (index === -1) {
+        favorites.push(productId);
+        icon.classList.add('active');
+        icon.innerHTML = '<i class="fa-solid fa-heart"></i>';
+        showToast('❤️ تم إضافة المنتج إلى المفضلة');
+    } else {
+        favorites.splice(index, 1);
+        icon.classList.remove('active');
+        icon.innerHTML = '<i class="fa-regular fa-heart"></i>';
+        showToast('💔 تم إزالة المنتج من المفضلة');
+    }
+    localStorage.setItem('elixir_favorites', JSON.stringify(favorites));
+    
+    // تحديث العدد في الهيدر
+    const favCount = document.querySelector('.favorite-count');
+    if (favCount) favCount.innerText = favorites.length;
+}
+
+function burstHearts(x, y) {
+    for (let i = 0; i < 10; i++) {
+        const heart = document.createElement('div');
+        heart.innerHTML = '❤️';
+        heart.classList.add('heart-particle');
+        const offsetX = (Math.random() - 0.5) * 50;
+        const offsetY = (Math.random() - 0.5) * 40;
+        heart.style.left = (x + offsetX) + 'px';
+        heart.style.top = (y + offsetY) + 'px';
+        heart.style.animationDelay = (Math.random() * 0.2) + 's';
+        document.body.appendChild(heart);
+        setTimeout(() => heart.remove(), 1000);
+    }
+}
+
+// ربط أحداث المفضلة (مثل الأعشاب - باستخدام delegation على الحاوية)
+function bindFavEvents() {
+    const container = document.getElementById('bestSellingGrid');
+    if (!container) return;
+    
+    container.addEventListener('click', (e) => {
+        const heartIcon = e.target.closest('.fav-icon');
+        if (!heartIcon) return;
+        e.preventDefault();
+        e.stopPropagation();
+        
+        const rect = heartIcon.getBoundingClientRect();
+        burstHearts(rect.left + rect.width / 2, rect.top + rect.height / 2);
+        
+        const productId = parseInt(heartIcon.getAttribute('data-id'));
+        updateFavorite(heartIcon, productId);
+    });
+}
+    }
+
+    function updateCartBadge() {
+        const cart = JSON.parse(localStorage.getItem('elixir_cart')) || [];
+        const total = cart.reduce((sum, item) => sum + item.quantity, 0);
+        const badge = document.querySelector('.cart-count');
+        if (badge) badge.innerText = total;
+    }
+
+    // زر الرجوع للأعلى
+    const scrollBtn = document.getElementById('scrollTopBtn');
+    if (scrollBtn) {
+        window.addEventListener('scroll', () => {
+            scrollBtn.style.display = window.scrollY > 300 ? 'flex' : 'none';
+        });
+        scrollBtn.addEventListener('click', () => {
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        });
+    }
+    
+    // تحديث عدد السلة
+    updateCartBadge();
+    
+    // عرض المنتجات
+    renderBestSelling();
+    
+    // الاستماع للتغييرات في localStorage
+    window.addEventListener('storage', function(e) {
+        if (e.key === 'elixir_orders' || e.key === 'elixir_products' || e.key === 'elixir_packages') {
+            renderBestSelling();
+        }
+    });
+</script>
+</body>
+</html>
