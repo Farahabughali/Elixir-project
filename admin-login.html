@@ -31,20 +31,33 @@
             padding: 1.8rem 1.5rem;
             text-align: center;
         }
-        .hero-login h2 {
-            font-size: 1.6rem;
-            font-weight: 800;
-            color: #ffffff;
+        .logo-circle {
+            width: 70px;
+            height: 70px;
+            background: white;
+            border-radius: 50%;
             display: flex;
             align-items: center;
             justify-content: center;
-            gap: 12px;
+            margin: 0 auto 12px auto;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+        }
+        .logo-circle img {
+            width: 55px;
+            height: 55px;
+            object-fit: contain;
+            border-radius: 50%;
+        }
+        .hero-login h2 {
+            font-size: 1.5rem;
+            font-weight: 800;
+            color: #ffffff;
         }
         .hero-login p {
             color: #f9f3cf;
             font-weight: 500;
-            font-size: 0.85rem;
-            margin-top: 8px;
+            font-size: 0.8rem;
+            margin-top: 6px;
         }
         .login-form {
             padding: 2rem 1.8rem;
@@ -61,7 +74,6 @@
         }
         .input-group label i {
             margin-left: 8px;
-            color: #438e56;
         }
         .input-group input {
             width: 100%;
@@ -117,6 +129,20 @@
             background: #2f6b3e;
             transform: translateY(-2px);
         }
+        .forgot-link {
+            text-align: center;
+            margin-top: 15px;
+        }
+        .forgot-link a {
+            color: #8ba07a;
+            font-size: 0.75rem;
+            text-decoration: none;
+            cursor: pointer;
+        }
+        .forgot-link a:hover {
+            color: #438e56;
+            text-decoration: underline;
+        }
         .error-message {
             background: #fef3e2;
             color: #c0392b;
@@ -128,6 +154,17 @@
             border-right: 4px solid #c0392b;
             display: none;
         }
+        .success-message {
+            background: #e8f5e9;
+            color: #2e7d32;
+            padding: 12px;
+            border-radius: 1rem;
+            font-size: 0.8rem;
+            text-align: center;
+            margin-bottom: 1.5rem;
+            border-right: 4px solid #2e7d32;
+            display: none;
+        }
         .footer-note {
             background: #fafcf7;
             padding: 0.8rem;
@@ -136,38 +173,93 @@
             color: #6f7e64;
             border-top: 1px solid #e2efda;
         }
-        .demo-hint {
-            background: #eef4e8;
-            padding: 10px;
-            border-radius: 1rem;
-            margin-top: 1rem;
-            text-align: center;
-            font-size: 0.75rem;
-            color: #2c5f2d;
-            font-weight: 500;
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0,0,0,0.6);
+            backdrop-filter: blur(4px);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+            visibility: hidden;
+            opacity: 0;
+            transition: all 0.2s;
         }
-        .demo-hint i {
-            margin-left: 5px;
-            color: #438e56;
+        .modal-overlay.active {
+            visibility: visible;
+            opacity: 1;
         }
-        .demo-hint strong {
-            color: #438e56;
+        .reset-modal {
             background: white;
-            padding: 2px 8px;
-            border-radius: 20px;
-            margin: 0 3px;
+            border-radius: 2rem;
+            max-width: 400px;
+            width: 90%;
+            padding: 2rem;
+            text-align: center;
+            box-shadow: 0 25px 45px rgba(0,0,0,0.2);
+        }
+        .reset-modal h3 {
+            color: #2c5f2d;
+            margin-bottom: 0.5rem;
+        }
+        .reset-modal p {
+            color: #6f7e64;
+            font-size: 0.8rem;
+            margin-bottom: 1rem;
+        }
+        .reset-modal input {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #e2e7da;
+            border-radius: 1.2rem;
+            margin: 0.8rem 0;
+            font-family: 'Tajawal', sans-serif;
+        }
+        .reset-modal button {
+            background: #438e56;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 2rem;
+            cursor: pointer;
+            margin: 5px;
+            font-size: 0.9rem;
+        }
+        .reset-modal .close-modal {
+            background: #ccc;
+            color: #333;
+        }
+        hr {
+            margin: 15px 0;
+            border: none;
+            border-top: 1px solid #e2e7da;
+        }
+        .warning-text {
+            color: #f39c12;
+            font-size: 0.7rem;
+            margin-top: 10px;
         }
     </style>
 </head>
 <body>
 <div class="login-panel">
     <div class="hero-login">
-        <h2><i class="fas fa-leaf"></i> Elixir | المدير</h2>
-        <p><i class="fas fa-user-shield"></i> يرجى تسجيل الدخول للمتابعة</p>
+        <div class="logo-circle">
+            <img src="asset/images/logo.png" alt="Elixir Logo" onerror="this.src='https://via.placeholder.com/55?text=E'">
+        </div>
+        <h2>Elixir | المدير</h2>
+        <p>يرجى تسجيل الدخول للمتابعة</p>
     </div>
     <div class="login-form">
         <div id="errorMsg" class="error-message">
             <i class="fas fa-exclamation-triangle"></i> <span>البريد الإلكتروني أو كلمة المرور غير صحيحة</span>
+        </div>
+        <div id="successMsg" class="success-message">
+            <i class="fas fa-check-circle"></i> <span></span>
         </div>
         
         <div class="input-group">
@@ -189,11 +281,8 @@
             <i class="fas fa-arrow-left"></i> دخول إلى لوحة التحكم
         </button>
         
-        <div class="demo-hint">
-            <i class="fas fa-info-circle"></i> بيانات الدخول:
-            <strong>admin@elixir.com</strong> |
-            <strong>•••••••••••</strong>
-            <span style="display: block; font-size: 0.65rem; margin-top: 5px;"></span>
+        <div class="forgot-link">
+            <a onclick="openResetModal()">نسيت كلمة المرور؟</a>
         </div>
     </div>
     <div class="footer-note">
@@ -201,15 +290,39 @@
     </div>
 </div>
 
+<!-- مودال إعادة تعيين كلمة المرور - بدون رقم هاتف -->
+<div id="resetModal" class="modal-overlay">
+    <div class="reset-modal">
+        <i class="fas fa-shield-alt" style="font-size: 2rem; color: #438e56;"></i>
+        <h3>إعادة تعيين كلمة المرور</h3>
+        <p>أدخل كلمة المرور الجديدة</p>
+        
+        <input type="password" id="newPassword" placeholder="كلمة المرور الجديدة">
+        <input type="password" id="confirmPassword" placeholder="تأكيد كلمة المرور الجديدة">
+        
+        <div class="warning-text">
+            <i class="fas fa-info-circle"></i> سيتم تغيير كلمة المرور فوراً
+        </div>
+        
+        <div style="margin-top: 15px;">
+            <button onclick="resetAdminPassword()">تأكيد التغيير</button>
+            <button class="close-modal" onclick="closeResetModal()">إلغاء</button>
+        </div>
+    </div>
+</div>
+
 <script>
-    // ✅ بيانات الدخول الثابتة (مشفرة داخل الكود فقط)
-    const ADMIN_EMAIL = "admin@elixir.com";
-    const ADMIN_PASSWORD = "Elixir2026@";
+    // بيانات الدخول الثابتة (المدير)
+    let ADMIN_EMAIL = "admin@elixir.com";
+    let ADMIN_PASSWORD = "Elixir2026@";
     
     function validateLogin() {
         const email = document.getElementById('loginEmail').value.trim();
         const password = document.getElementById('loginPassword').value;
         const errorDiv = document.getElementById('errorMsg');
+        const successDiv = document.getElementById('successMsg');
+        
+        successDiv.style.display = 'none';
         
         if (email === ADMIN_EMAIL && password === ADMIN_PASSWORD) {
             sessionStorage.setItem('admin_logged_in', 'true');
@@ -238,6 +351,74 @@
         }
     }
     
+    function openResetModal() {
+        document.getElementById('resetModal').classList.add('active');
+        document.getElementById('newPassword').value = '';
+        document.getElementById('confirmPassword').value = '';
+        document.getElementById('errorMsg').style.display = 'none';
+        document.getElementById('successMsg').style.display = 'none';
+    }
+    
+    function closeResetModal() {
+        document.getElementById('resetModal').classList.remove('active');
+    }
+    
+    function resetAdminPassword() {
+        const newPassword = document.getElementById('newPassword').value;
+        const confirmPassword = document.getElementById('confirmPassword').value;
+        const errorDiv = document.getElementById('errorMsg');
+        const successDiv = document.getElementById('successMsg');
+        
+        // التحقق من أن كلمة المرور غير فارغة
+        if (!newPassword) {
+            errorDiv.querySelector('span').innerHTML = '❌ الرجاء إدخال كلمة المرور الجديدة';
+            errorDiv.style.display = 'block';
+            successDiv.style.display = 'none';
+            setTimeout(() => {
+                errorDiv.style.display = 'none';
+            }, 2000);
+            return;
+        }
+        
+        // التحقق من تطابق كلمتي المرور
+        if (newPassword !== confirmPassword) {
+            errorDiv.querySelector('span').innerHTML = '❌ كلمة المرور الجديدة وتأكيدها غير متطابقين';
+            errorDiv.style.display = 'block';
+            successDiv.style.display = 'none';
+            setTimeout(() => {
+                errorDiv.style.display = 'none';
+            }, 2000);
+            return;
+        }
+        
+        // التحقق من طول كلمة المرور
+        if (newPassword.length < 6) {
+            errorDiv.querySelector('span').innerHTML = '❌ كلمة المرور يجب أن تكون 6 أحرف على الأقل';
+            errorDiv.style.display = 'block';
+            successDiv.style.display = 'none';
+            setTimeout(() => {
+                errorDiv.style.display = 'none';
+            }, 2000);
+            return;
+        }
+        
+        // ✅ تغيير كلمة المرور
+        ADMIN_PASSWORD = newPassword;
+        
+        successDiv.querySelector('span').innerHTML = `✅ تم تغيير كلمة المرور بنجاح!<br>يمكنك الآن تسجيل الدخول بكلمة المرور الجديدة.`;
+        successDiv.style.display = 'block';
+        errorDiv.style.display = 'none';
+        
+        // تفريغ حقل كلمة المرور في صفحة الدخول
+        document.getElementById('loginPassword').value = '';
+        
+        // إغلاق المودال بعد 3 ثواني
+        setTimeout(() => {
+            closeResetModal();
+        }, 3000);
+    }
+    
+    // الضغط على Enter
     document.getElementById('loginPassword').addEventListener('keypress', function(e) {
         if (e.key === 'Enter') validateLogin();
     });
