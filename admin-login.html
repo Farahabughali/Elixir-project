@@ -2,7 +2,7 @@
 <html lang="ar" dir="rtl">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>تسجيل الدخول | Elixir Admin</title>
     <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
@@ -15,23 +15,22 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            padding: 1.2rem;
+            padding: 1rem;
         }
-        .login-panel {
+        .login-card {
             max-width: 450px;
             width: 100%;
-            background: #ffffff;
+            background: white;
             border-radius: 2rem;
-            box-shadow: 0 25px 45px -12px rgba(0, 0, 0, 0.2);
             overflow: hidden;
-            border: 1px solid rgba(67, 142, 86, 0.3);
+            box-shadow: 0 20px 35px -10px rgba(0,0,0,0.15);
         }
-        .hero-login {
+        .header {
             background: #438e56;
-            padding: 1.8rem 1.5rem;
+            padding: 2rem 1.5rem;
             text-align: center;
         }
-        .logo-circle {
+        .logo {
             width: 70px;
             height: 70px;
             background: white;
@@ -39,95 +38,59 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            margin: 0 auto 12px auto;
-            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+            margin: 0 auto 12px;
         }
-        .logo-circle img {
+        .logo img {
             width: 55px;
             height: 55px;
-            object-fit: contain;
             border-radius: 50%;
+            object-fit: cover;
         }
-        .hero-login h2 {
-            font-size: 1.5rem;
-            font-weight: 800;
-            color: #ffffff;
+        .header h2 {
+            color: white;
+            font-size: 1.4rem;
         }
-        .hero-login p {
+        .header p {
             color: #f9f3cf;
-            font-weight: 500;
             font-size: 0.8rem;
-            margin-top: 6px;
+            margin-top: 5px;
         }
-        .login-form {
-            padding: 2rem 1.8rem;
+        .form-body {
+            padding: 2rem;
         }
         .input-group {
-            margin-bottom: 1.5rem;
+            margin-bottom: 1.2rem;
         }
         .input-group label {
             display: block;
-            font-weight: 700;
+            font-weight: 600;
             color: #438e56;
             margin-bottom: 8px;
             font-size: 0.85rem;
         }
-        .input-group label i {
-            margin-left: 8px;
-        }
         .input-group input {
             width: 100%;
-            padding: 12px 16px;
+            padding: 12px 15px;
             border: 2px solid #e2e7da;
             border-radius: 1.2rem;
             font-family: 'Tajawal', sans-serif;
             font-size: 1rem;
-            transition: all 0.2s;
-            background: #fefef7;
         }
         .input-group input:focus {
             outline: none;
             border-color: #438e56;
-            box-shadow: 0 0 0 3px rgba(67, 142, 86, 0.15);
-        }
-        .password-wrapper {
-            position: relative;
-        }
-        .password-wrapper input {
-            padding-left: 45px;
-        }
-        .toggle-password {
-            position: absolute;
-            left: 15px;
-            top: 50%;
-            transform: translateY(-50%);
-            cursor: pointer;
-            color: #8ba07a;
-            background: transparent;
-            border: none;
-            font-size: 1.1rem;
         }
         .login-btn {
             width: 100%;
             background: #438e56;
             border: none;
-            padding: 14px;
+            padding: 12px;
             border-radius: 1.5rem;
             color: white;
             font-weight: 800;
             font-size: 1rem;
-            font-family: 'Tajawal', sans-serif;
             cursor: pointer;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 10px;
-            transition: all 0.2s;
             margin-top: 10px;
-        }
-        .login-btn:hover {
-            background: #2f6b3e;
-            transform: translateY(-2px);
         }
         .forgot-link {
             text-align: center;
@@ -138,40 +101,6 @@
             font-size: 0.75rem;
             text-decoration: none;
             cursor: pointer;
-        }
-        .forgot-link a:hover {
-            color: #438e56;
-            text-decoration: underline;
-        }
-        .error-message {
-            background: #fef3e2;
-            color: #c0392b;
-            padding: 12px;
-            border-radius: 1rem;
-            font-size: 0.8rem;
-            text-align: center;
-            margin-bottom: 1.5rem;
-            border-right: 4px solid #c0392b;
-            display: none;
-        }
-        .success-message {
-            background: #e8f5e9;
-            color: #2e7d32;
-            padding: 12px;
-            border-radius: 1rem;
-            font-size: 0.8rem;
-            text-align: center;
-            margin-bottom: 1.5rem;
-            border-right: 4px solid #2e7d32;
-            display: none;
-        }
-        .footer-note {
-            background: #fafcf7;
-            padding: 0.8rem;
-            text-align: center;
-            font-size: 0.7rem;
-            color: #6f7e64;
-            border-top: 1px solid #e2efda;
         }
         .modal-overlay {
             position: fixed;
@@ -193,33 +122,32 @@
             visibility: visible;
             opacity: 1;
         }
-        .reset-modal {
+        .forgot-modal {
             background: white;
             border-radius: 2rem;
             max-width: 400px;
             width: 90%;
             padding: 2rem;
             text-align: center;
-            box-shadow: 0 25px 45px rgba(0,0,0,0.2);
         }
-        .reset-modal h3 {
+        .forgot-modal h3 {
             color: #2c5f2d;
             margin-bottom: 0.5rem;
         }
-        .reset-modal p {
+        .forgot-modal p {
             color: #6f7e64;
-            font-size: 0.8rem;
-            margin-bottom: 1rem;
+            font-size: 0.85rem;
+            margin-bottom: 1.2rem;
         }
-        .reset-modal input {
+        .forgot-modal input {
             width: 100%;
             padding: 12px;
             border: 2px solid #e2e7da;
             border-radius: 1.2rem;
             margin: 0.8rem 0;
-            font-family: 'Tajawal', sans-serif;
+            text-align: center;
         }
-        .reset-modal button {
+        .forgot-modal button {
             background: #438e56;
             color: white;
             border: none;
@@ -227,202 +155,219 @@
             border-radius: 2rem;
             cursor: pointer;
             margin: 5px;
-            font-size: 0.9rem;
         }
-        .reset-modal .close-modal {
-            background: #ccc;
-            color: #333;
+        .btn-cancel {
+            background: #ccc !important;
+            color: #333 !important;
         }
-        hr {
-            margin: 15px 0;
-            border: none;
-            border-top: 1px solid #e2e7da;
-        }
-        .warning-text {
-            color: #f39c12;
+        .code-hint {
+            background: #eef4e8;
+            padding: 10px;
+            border-radius: 1rem;
             font-size: 0.7rem;
+            color: #2c5f2d;
+            margin: 10px 0;
+        }
+        .resend-link {
+            color: #438e56;
+            font-size: 0.7rem;
+            cursor: pointer;
             margin-top: 10px;
+            display: inline-block;
+        }
+        .step {
+            font-size: 0.7rem;
+            color: #8ba07a;
+            margin-bottom: 10px;
         }
     </style>
 </head>
 <body>
-<div class="login-panel">
-    <div class="hero-login">
-        <div class="logo-circle">
+<div class="login-card">
+    <div class="header">
+        <div class="logo">
             <img src="asset/images/logo.png" alt="Elixir Logo" onerror="this.src='https://via.placeholder.com/55?text=E'">
         </div>
         <h2>Elixir | المدير</h2>
         <p>يرجى تسجيل الدخول للمتابعة</p>
     </div>
-    <div class="login-form">
-        <div id="errorMsg" class="error-message">
-            <i class="fas fa-exclamation-triangle"></i> <span>البريد الإلكتروني أو كلمة المرور غير صحيحة</span>
-        </div>
-        <div id="successMsg" class="success-message">
-            <i class="fas fa-check-circle"></i> <span></span>
+    <div class="form-body">
+        <div id="loginError" style="background:#fef3e2; color:#c0392b; padding:10px; border-radius:1rem; display:none; margin-bottom:1rem;">
+            البريد الإلكتروني أو كلمة المرور غير صحيحة
         </div>
         
         <div class="input-group">
             <label><i class="fas fa-envelope"></i> البريد الإلكتروني</label>
-            <input type="email" id="loginEmail" placeholder="admin@elixir.com" autocomplete="off">
+            <input type="email" id="loginEmail" placeholder="admin@elixir.com">
         </div>
         
         <div class="input-group">
             <label><i class="fas fa-lock"></i> كلمة المرور</label>
-            <div class="password-wrapper">
-                <input type="password" id="loginPassword" placeholder="•••••••••••" autocomplete="off">
-                <button type="button" class="toggle-password" onclick="togglePassword()">
-                    <i class="far fa-eye-slash"></i>
-                </button>
-            </div>
+            <input type="password" id="loginPassword" placeholder="••••••••">
         </div>
         
-        <button class="login-btn" onclick="validateLogin()">
-            <i class="fas fa-arrow-left"></i> دخول إلى لوحة التحكم
-        </button>
+        <button class="login-btn" onclick="validateLogin()">دخول إلى لوحة التحكم</button>
         
         <div class="forgot-link">
-            <a onclick="openResetModal()">نسيت كلمة المرور؟</a>
+            <a onclick="openForgotModal()">نسيت كلمة المرور؟</a>
         </div>
-    </div>
-    <div class="footer-note">
-        <i class="fas fa-hand-sparkles"></i> Elixir - إدارة المتجر بالكامل من هنا
     </div>
 </div>
 
-<!-- مودال إعادة تعيين كلمة المرور - بدون رقم هاتف -->
-<div id="resetModal" class="modal-overlay">
-    <div class="reset-modal">
-        <i class="fas fa-shield-alt" style="font-size: 2rem; color: #438e56;"></i>
-        <h3>إعادة تعيين كلمة المرور</h3>
-        <p>أدخل كلمة المرور الجديدة</p>
+<!-- نافذة نسيت كلمة المرور (3 خطوات) -->
+<div id="forgotModal" class="modal-overlay">
+    <div class="forgot-modal">
+        <i class="fas fa-key" style="font-size: 2rem; color: #438e56;"></i>
+        <h3 id="modalTitle">إعادة تعيين كلمة المرور</h3>
         
-        <input type="password" id="newPassword" placeholder="كلمة المرور الجديدة">
-        <input type="password" id="confirmPassword" placeholder="تأكيد كلمة المرور الجديدة">
-        
-        <div class="warning-text">
-            <i class="fas fa-info-circle"></i> سيتم تغيير كلمة المرور فوراً
+        <!-- الخطوة 1: إدخال البريد أو الهاتف -->
+        <div id="step1">
+            <p>أدخل بريدك الإلكتروني أو رقم هاتفك المسجل</p>
+            <input type="text" id="userContact" placeholder="admin@elixir.com أو 0591234567">
+            <div id="step1Error" style="color:red; font-size:0.7rem; display:none;">✖ البريد أو الهاتف غير مسجل</div>
+            <button onclick="sendVerification()">إرسال كود التحقق</button>
+            <button class="btn-cancel" onclick="closeForgotModal()">إلغاء</button>
         </div>
         
-        <div style="margin-top: 15px;">
-            <button onclick="resetAdminPassword()">تأكيد التغيير</button>
-            <button class="close-modal" onclick="closeResetModal()">إلغاء</button>
+        <!-- الخطوة 2: إدخال الكود -->
+        <div id="step2" style="display:none;">
+            <p>📧 تم إرسال كود التحقق إلى بريدك الإلكتروني</p>
+            <div class="code-hint">
+                <i class="fas fa-info-circle"></i> كود التحقق (للتجربة): <strong id="demoCode">123456</strong>
+            </div>
+            <input type="text" id="verificationCode" placeholder="أدخل الكود" maxlength="6">
+            <div id="step2Error" style="color:red; font-size:0.7rem; display:none;">✖ الكود غير صحيح</div>
+            <button onclick="verifyCode()">تأكيد الكود</button>
+            <div><a class="resend-link" onclick="resendCode()">⟳ إعادة إرسال الكود</a></div>
+            <button class="btn-cancel" onclick="closeForgotModal()">إلغاء</button>
+        </div>
+        
+        <!-- الخطوة 3: كلمة المرور الجديدة (زي صورتك) -->
+        <div id="step3" style="display:none;">
+            <p>أدخل كلمة المرور الجديدة</p>
+            <input type="password" id="newPassword" placeholder="كلمة المرور الجديدة">
+            <input type="password" id="confirmPassword" placeholder="تأكيد كلمة المرور الجديدة">
+            <div id="step3Error" style="color:red; font-size:0.7rem; display:none;">✖ كلمة المرور غير متطابقة أو ضعيفة</div>
+            <div class="step">⚠️ سيتم تغيير كلمة المرور فوراً</div>
+            <button onclick="changePassword()">تغيير كلمة المرور</button>
+            <button class="btn-cancel" onclick="closeForgotModal()">إلغاء</button>
         </div>
     </div>
 </div>
 
 <script>
-    // بيانات الدخول الثابتة (المدير)
-    let ADMIN_EMAIL = "admin@elixir.com";
+    // بيانات افتراضية (للتجربة - في الحقيقي تجيب من قاعدة البيانات)
+    const ADMIN_EMAIL = "admin@elixir.com";
+    const ADMIN_PHONE = "0591234567";
     let ADMIN_PASSWORD = "Elixir2026@";
+    
+    let generatedCode = "";
+    let verifiedContact = "";
     
     function validateLogin() {
         const email = document.getElementById('loginEmail').value.trim();
         const password = document.getElementById('loginPassword').value;
-        const errorDiv = document.getElementById('errorMsg');
-        const successDiv = document.getElementById('successMsg');
-        
-        successDiv.style.display = 'none';
+        const errorDiv = document.getElementById('loginError');
         
         if (email === ADMIN_EMAIL && password === ADMIN_PASSWORD) {
             sessionStorage.setItem('admin_logged_in', 'true');
-            sessionStorage.setItem('admin_email', email);
             window.location.href = 'admin2.html';
         } else {
             errorDiv.style.display = 'block';
-            setTimeout(() => {
-                errorDiv.style.display = 'none';
-            }, 3000);
+            setTimeout(() => { errorDiv.style.display = 'none'; }, 3000);
         }
     }
     
-    function togglePassword() {
-        const passwordInput = document.getElementById('loginPassword');
-        const toggleIcon = document.querySelector('.toggle-password i');
+    function openForgotModal() {
+        document.getElementById('forgotModal').classList.add('active');
+        // إظهار الخطوة 1
+        document.getElementById('step1').style.display = 'block';
+        document.getElementById('step2').style.display = 'none';
+        document.getElementById('step3').style.display = 'none';
+        document.getElementById('userContact').value = '';
+        document.getElementById('step1Error').style.display = 'none';
+    }
+    
+    function closeForgotModal() {
+        document.getElementById('forgotModal').classList.remove('active');
+    }
+    
+    function generateCode() {
+        return Math.floor(100000 + Math.random() * 900000).toString();
+    }
+    
+    function sendVerification() {
+        const contact = document.getElementById('userContact').value.trim();
         
-        if (passwordInput.type === 'password') {
-            passwordInput.type = 'text';
-            toggleIcon.classList.remove('fa-eye-slash');
-            toggleIcon.classList.add('fa-eye');
+        // التحقق من البريد أو الهاتف
+        if (contact === ADMIN_EMAIL || contact === ADMIN_PHONE) {
+            verifiedContact = contact;
+            generatedCode = generateCode();
+            
+            // عرض الكود التجريبي للمستخدم (محاكاة)
+            document.getElementById('demoCode').innerText = generatedCode;
+            
+            // الانتقال للخطوة 2
+            document.getElementById('step1').style.display = 'none';
+            document.getElementById('step2').style.display = 'block';
+            document.getElementById('step2Error').style.display = 'none';
+            document.getElementById('verificationCode').value = '';
         } else {
-            passwordInput.type = 'password';
-            toggleIcon.classList.remove('fa-eye');
-            toggleIcon.classList.add('fa-eye-slash');
+            document.getElementById('step1Error').style.display = 'block';
         }
     }
     
-    function openResetModal() {
-        document.getElementById('resetModal').classList.add('active');
-        document.getElementById('newPassword').value = '';
-        document.getElementById('confirmPassword').value = '';
-        document.getElementById('errorMsg').style.display = 'none';
-        document.getElementById('successMsg').style.display = 'none';
+    function verifyCode() {
+        const enteredCode = document.getElementById('verificationCode').value.trim();
+        
+        if (enteredCode === generatedCode) {
+            // الكود صحيح - الانتقال للخطوة 3
+            document.getElementById('step2').style.display = 'none';
+            document.getElementById('step3').style.display = 'block';
+            document.getElementById('step3Error').style.display = 'none';
+            document.getElementById('newPassword').value = '';
+            document.getElementById('confirmPassword').value = '';
+        } else {
+            document.getElementById('step2Error').style.display = 'block';
+        }
     }
     
-    function closeResetModal() {
-        document.getElementById('resetModal').classList.remove('active');
+    function resendCode() {
+        generatedCode = generateCode();
+        document.getElementById('demoCode').innerText = generatedCode;
+        alert("✅ تم إرسال كود جديد: " + generatedCode);
     }
     
-    function resetAdminPassword() {
-        const newPassword = document.getElementById('newPassword').value;
-        const confirmPassword = document.getElementById('confirmPassword').value;
-        const errorDiv = document.getElementById('errorMsg');
-        const successDiv = document.getElementById('successMsg');
+    function changePassword() {
+        const newPass = document.getElementById('newPassword').value;
+        const confirmPass = document.getElementById('confirmPassword').value;
         
-        // التحقق من أن كلمة المرور غير فارغة
-        if (!newPassword) {
-            errorDiv.querySelector('span').innerHTML = '❌ الرجاء إدخال كلمة المرور الجديدة';
-            errorDiv.style.display = 'block';
-            successDiv.style.display = 'none';
-            setTimeout(() => {
-                errorDiv.style.display = 'none';
-            }, 2000);
+        if (newPass.length < 6) {
+            document.getElementById('step3Error').innerHTML = '✖ كلمة المرور يجب أن تكون 6 أحرف على الأقل';
+            document.getElementById('step3Error').style.display = 'block';
             return;
         }
         
-        // التحقق من تطابق كلمتي المرور
-        if (newPassword !== confirmPassword) {
-            errorDiv.querySelector('span').innerHTML = '❌ كلمة المرور الجديدة وتأكيدها غير متطابقين';
-            errorDiv.style.display = 'block';
-            successDiv.style.display = 'none';
-            setTimeout(() => {
-                errorDiv.style.display = 'none';
-            }, 2000);
+        if (newPass !== confirmPass) {
+            document.getElementById('step3Error').innerHTML = '✖ كلمة المرور غير متطابقة';
+            document.getElementById('step3Error').style.display = 'block';
             return;
         }
         
-        // التحقق من طول كلمة المرور
-        if (newPassword.length < 6) {
-            errorDiv.querySelector('span').innerHTML = '❌ كلمة المرور يجب أن تكون 6 أحرف على الأقل';
-            errorDiv.style.display = 'block';
-            successDiv.style.display = 'none';
-            setTimeout(() => {
-                errorDiv.style.display = 'none';
-            }, 2000);
-            return;
-        }
+        // تغيير كلمة المرور
+        ADMIN_PASSWORD = newPass;
         
-        // ✅ تغيير كلمة المرور
-        ADMIN_PASSWORD = newPassword;
-        
-        successDiv.querySelector('span').innerHTML = `✅ تم تغيير كلمة المرور بنجاح!<br>يمكنك الآن تسجيل الدخول بكلمة المرور الجديدة.`;
-        successDiv.style.display = 'block';
-        errorDiv.style.display = 'none';
+        alert("✅ تم تغيير كلمة المرور بنجاح! يمكنك تسجيل الدخول الآن.");
         
         // تفريغ حقل كلمة المرور في صفحة الدخول
         document.getElementById('loginPassword').value = '';
         
-        // إغلاق المودال بعد 3 ثواني
-        setTimeout(() => {
-            closeResetModal();
-        }, 3000);
+        // إغلاق النافذة
+        closeForgotModal();
     }
     
-    // الضغط على Enter
+    // Enter key
     document.getElementById('loginPassword').addEventListener('keypress', function(e) {
-        if (e.key === 'Enter') validateLogin();
-    });
-    document.getElementById('loginEmail').addEventListener('keypress', function(e) {
         if (e.key === 'Enter') validateLogin();
     });
 </script>
