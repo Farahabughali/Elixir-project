@@ -199,6 +199,9 @@
             <button onclick="openTab(event, 'products')" class="sidebar-item w-full flex items-center p-4 rounded-2xl font-bold text-emerald-100/60 hover:text-white hover:bg-white/5 transition-all"><i class="fas fa-leaf ml-4 text-lg"></i> إدارة المنتجات</button>
             <button onclick="openTab(event, 'packages')" class="sidebar-item w-full flex items-center p-4 rounded-2xl font-bold text-emerald-100/60 hover:text-white hover:bg-white/5 transition-all"><i class="fas fa-box-open ml-4 text-lg"></i> إدارة البكجات</button>
             <button onclick="openTab(event, 'staff')" class="sidebar-item w-full flex items-center p-4 rounded-2xl font-bold text-emerald-100/60 hover:text-white hover:bg-white/5 transition-all"><i class="fas fa-user-shield ml-4 text-lg"></i> إدارة الموظفين</button>
+            <button onclick="openTab(event, 'careers')" class="sidebar-item w-full flex items-center p-4 rounded-2xl font-bold text-emerald-100/60 hover:text-white hover:bg-white/5 transition-all">
+    <i class="fas fa-briefcase ml-4 text-lg"></i> طلبات التوظيف
+</button>
             <button onclick="openTab(event, 'wholesalers')" class="sidebar-item w-full flex items-center p-4 rounded-2xl font-bold text-emerald-100/60 hover:text-white hover:bg-white/5 transition-all"><i class="fas fa-truck ml-4 text-lg"></i> تجار الجملة</button>
             <button onclick="openTab(event, 'orders')" class="sidebar-item w-full flex items-center p-4 rounded-2xl font-bold text-emerald-100/60 hover:text-white hover:bg-white/5 transition-all"><i class="fas fa-shopping-cart ml-4 text-lg"></i> إدارة الطلبات</button>
             <button onclick="openTab(event, 'categories')" class="sidebar-item w-full flex items-center p-4 rounded-2xl font-bold text-emerald-100/60 hover:text-white hover:bg-white/5 transition-all"><i class="fas fa-tags ml-4 text-lg"></i> إدارة الفئات</button>
@@ -245,6 +248,47 @@
 
         <!-- إدارة الموظفين -->
         <div id="staff" class="tab-content"><div class="bg-white p-10 rounded-[3rem] border border-slate-50 shadow-sm"><div class="flex flex-wrap justify-between items-center gap-4 mb-10"><div><h3 class="text-2xl font-bold">إدارة الموظفين & المهام</h3><p class="text-slate-400 text-sm mt-1">أضف مهام يدوية أو وزع مهام المخزون التلقائية</p></div><div class="flex gap-3"><button onclick="openAddEmployeeModal()" class="bg-elixir text-white px-6 py-3 rounded-2xl font-bold shadow"><i class="fas fa-user-plus ml-2"></i> إضافة موظف</button><button onclick="distributeTasksEqually()" class="bg-amber-600 text-white px-6 py-3 rounded-2xl font-bold shadow"><i class="fas fa-chart-line ml-2"></i> توزيع المهام بالتساوي</button></div></div><div id="employeesCardsContainer" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8"></div></div></div>
+
+
+
+        <!-- طلبات التوظيف -->
+<div id="careers" class="tab-content">
+    <div class="bg-white p-10 rounded-[3rem] border border-slate-50 shadow-sm">
+        <div class="flex justify-between items-center mb-6 flex-wrap gap-4">
+            <div>
+                <h3 class="text-2xl font-bold">📋 طلبات التوظيف</h3>
+                <p class="text-slate-400 text-sm mt-1">إدارة طلبات المتقدمين للعمل في Elixir</p>
+            </div>
+            <div class="flex gap-3">
+                <button onclick="refreshCareers()" class="bg-elixir text-white px-5 py-2 rounded-2xl text-sm hover:bg-emerald-700 transition">
+                    <i class="fas fa-sync-alt ml-1"></i> تحديث
+                </button>
+                <button onclick="exportCareersToExcel()" class="bg-amber-600 text-white px-5 py-2 rounded-2xl text-sm hover:bg-amber-700 transition">
+                    <i class="fas fa-file-excel ml-1"></i> تصدير Excel
+                </button>
+            </div>
+        </div>
+        
+        <!-- فلتر حسب الوظيفة -->
+        <div class="flex flex-wrap gap-3 mb-6 pb-3 border-b border-slate-100">
+            <button onclick="filterCareers('all')" class="filter-career-btn active-career-filter px-4 py-2 rounded-xl text-sm bg-elixir text-white">الكل</button>
+            <button onclick="filterCareers('content')" class="filter-career-btn px-4 py-2 rounded-xl text-sm bg-gray-100 text-gray-700 hover:bg-elixir hover:text-white transition">🎥 مقدمة محتوى</button>
+            <button onclick="filterCareers('packaging')" class="filter-career-btn px-4 py-2 rounded-xl text-sm bg-gray-100 text-gray-700 hover:bg-elixir hover:text-white transition">📦 تعبئة وتغليف</button>
+            <button onclick="filterCareers('orders')" class="filter-career-btn px-4 py-2 rounded-xl text-sm bg-gray-100 text-gray-700 hover:bg-elixir hover:text-white transition">🛒 تجهيز الطلبات</button>
+            <button onclick="filterCareers('other')" class="filter-career-btn px-4 py-2 rounded-xl text-sm bg-gray-100 text-gray-700 hover:bg-elixir hover:text-white transition">📢 وظائف أخرى</button>
+        </div>
+        
+        <!-- حاوية الطلبات -->
+        <div id="careersContainer" class="space-y-4 max-h-[70vh] overflow-y-auto pe-2"></div>
+        
+        <!-- رسالة عند عدم وجود طلبات -->
+        <div id="noCareersMessage" class="text-center py-12 text-slate-400 bg-slate-50 rounded-2xl hidden">
+            <i class="fas fa-briefcase text-5xl mb-3 opacity-50"></i>
+            <p class="text-lg">📭 لا توجد طلبات توظيف حالياً</p>
+            <p class="text-sm mt-1">عندما يقدم مستخدم طلباً، سيظهر هنا تلقائياً</p>
+        </div>
+    </div>
+</div>
 
         <!-- تجار الجملة (قسم منفصل) -->
         <div id="wholesalers" class="tab-content"><div class="bg-white p-10 rounded-[3rem] border border-slate-50 shadow-sm"><div class="flex justify-between items-center mb-6"><div><h3 class="text-2xl font-bold">تجار الجملة</h3><p class="text-slate-400 text-sm mt-1">إدارة حسابات تجار الجملة - إضافة / تعديل / حذف</p></div><button onclick="openWholesaleModal()" class="bg-[#1a2e21] text-white px-6 py-3 rounded-2xl font-bold shadow"><i class="fas fa-plus ml-2"></i> إنشاء حساب تاجر جديد</button></div><div id="wholesalersList" class="space-y-3"></div></div></div>
