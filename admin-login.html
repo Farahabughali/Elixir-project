@@ -1,0 +1,249 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+    <title>تسجيل الدخول | Elixir Admin</title>
+    <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Tajawal', sans-serif;
+            background: linear-gradient(145deg, #e2ecd9 0%, #cfdfc4 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 1.2rem;
+        }
+        .login-panel {
+            max-width: 450px;
+            width: 100%;
+            background: #ffffff;
+            border-radius: 2rem;
+            box-shadow: 0 25px 45px -12px rgba(0, 0, 0, 0.2);
+            overflow: hidden;
+            border: 1px solid rgba(67, 142, 86, 0.3);
+        }
+        .hero-login {
+            background: #438e56;
+            padding: 1.8rem 1.5rem;
+            text-align: center;
+        }
+        .hero-login h2 {
+            font-size: 1.6rem;
+            font-weight: 800;
+            color: #ffffff;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 12px;
+        }
+        .hero-login p {
+            color: #f9f3cf;
+            font-weight: 500;
+            font-size: 0.85rem;
+            margin-top: 8px;
+        }
+        .login-form {
+            padding: 2rem 1.8rem;
+        }
+        .input-group {
+            margin-bottom: 1.5rem;
+        }
+        .input-group label {
+            display: block;
+            font-weight: 700;
+            color: #438e56;
+            margin-bottom: 8px;
+            font-size: 0.85rem;
+        }
+        .input-group label i {
+            margin-left: 8px;
+            color: #438e56;
+        }
+        .input-group input {
+            width: 100%;
+            padding: 12px 16px;
+            border: 2px solid #e2e7da;
+            border-radius: 1.2rem;
+            font-family: 'Tajawal', sans-serif;
+            font-size: 1rem;
+            transition: all 0.2s;
+            background: #fefef7;
+        }
+        .input-group input:focus {
+            outline: none;
+            border-color: #438e56;
+            box-shadow: 0 0 0 3px rgba(67, 142, 86, 0.15);
+        }
+        .password-wrapper {
+            position: relative;
+        }
+        .password-wrapper input {
+            padding-left: 45px;
+        }
+        .toggle-password {
+            position: absolute;
+            left: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            cursor: pointer;
+            color: #8ba07a;
+            background: transparent;
+            border: none;
+            font-size: 1.1rem;
+        }
+        .login-btn {
+            width: 100%;
+            background: #438e56;
+            border: none;
+            padding: 14px;
+            border-radius: 1.5rem;
+            color: white;
+            font-weight: 800;
+            font-size: 1rem;
+            font-family: 'Tajawal', sans-serif;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            transition: all 0.2s;
+            margin-top: 10px;
+        }
+        .login-btn:hover {
+            background: #2f6b3e;
+            transform: translateY(-2px);
+        }
+        .error-message {
+            background: #fef3e2;
+            color: #c0392b;
+            padding: 12px;
+            border-radius: 1rem;
+            font-size: 0.8rem;
+            text-align: center;
+            margin-bottom: 1.5rem;
+            border-right: 4px solid #c0392b;
+            display: none;
+        }
+        .footer-note {
+            background: #fafcf7;
+            padding: 0.8rem;
+            text-align: center;
+            font-size: 0.7rem;
+            color: #6f7e64;
+            border-top: 1px solid #e2efda;
+        }
+        .demo-hint {
+            background: #eef4e8;
+            padding: 10px;
+            border-radius: 1rem;
+            margin-top: 1rem;
+            text-align: center;
+            font-size: 0.75rem;
+            color: #2c5f2d;
+            font-weight: 500;
+        }
+        .demo-hint i {
+            margin-left: 5px;
+            color: #438e56;
+        }
+        .demo-hint strong {
+            color: #438e56;
+            background: white;
+            padding: 2px 8px;
+            border-radius: 20px;
+            margin: 0 3px;
+        }
+    </style>
+</head>
+<body>
+<div class="login-panel">
+    <div class="hero-login">
+        <h2><i class="fas fa-leaf"></i> Elixir | المدير</h2>
+        <p><i class="fas fa-user-shield"></i> يرجى تسجيل الدخول للمتابعة</p>
+    </div>
+    <div class="login-form">
+        <div id="errorMsg" class="error-message">
+            <i class="fas fa-exclamation-triangle"></i> <span>البريد الإلكتروني أو كلمة المرور غير صحيحة</span>
+        </div>
+        
+        <div class="input-group">
+            <label><i class="fas fa-envelope"></i> البريد الإلكتروني</label>
+            <input type="email" id="loginEmail" placeholder="admin@elixir.com" autocomplete="off">
+        </div>
+        
+        <div class="input-group">
+            <label><i class="fas fa-lock"></i> كلمة المرور</label>
+            <div class="password-wrapper">
+                <input type="password" id="loginPassword" placeholder="•••••••••••" autocomplete="off">
+                <button type="button" class="toggle-password" onclick="togglePassword()">
+                    <i class="far fa-eye-slash"></i>
+                </button>
+            </div>
+        </div>
+        
+        <button class="login-btn" onclick="validateLogin()">
+            <i class="fas fa-arrow-left"></i> دخول إلى لوحة التحكم
+        </button>
+        
+        <div class="demo-hint">
+            <i class="fas fa-info-circle"></i> بيانات الدخول:
+            <strong>admin@elixir.com</strong> |
+            <strong>•••••••••••</strong>
+            <span style="display: block; font-size: 0.65rem; margin-top: 5px;"></span>
+        </div>
+    </div>
+    <div class="footer-note">
+        <i class="fas fa-hand-sparkles"></i> Elixir - إدارة المتجر بالكامل من هنا
+    </div>
+</div>
+
+<script>
+    // ✅ بيانات الدخول الثابتة (مشفرة داخل الكود فقط)
+    const ADMIN_EMAIL = "admin@elixir.com";
+    const ADMIN_PASSWORD = "Elixir2026@";
+    
+    function validateLogin() {
+        const email = document.getElementById('loginEmail').value.trim();
+        const password = document.getElementById('loginPassword').value;
+        const errorDiv = document.getElementById('errorMsg');
+        
+        if (email === ADMIN_EMAIL && password === ADMIN_PASSWORD) {
+            sessionStorage.setItem('admin_logged_in', 'true');
+            sessionStorage.setItem('admin_email', email);
+            window.location.href = 'admin2.html';
+        } else {
+            errorDiv.style.display = 'block';
+            setTimeout(() => {
+                errorDiv.style.display = 'none';
+            }, 3000);
+        }
+    }
+    
+    function togglePassword() {
+        const passwordInput = document.getElementById('loginPassword');
+        const toggleIcon = document.querySelector('.toggle-password i');
+        
+        if (passwordInput.type === 'password') {
+            passwordInput.type = 'text';
+            toggleIcon.classList.remove('fa-eye-slash');
+            toggleIcon.classList.add('fa-eye');
+        } else {
+            passwordInput.type = 'password';
+            toggleIcon.classList.remove('fa-eye');
+            toggleIcon.classList.add('fa-eye-slash');
+        }
+    }
+    
+    document.getElementById('loginPassword').addEventListener('keypress', function(e) {
+        if (e.key === 'Enter') validateLogin();
+    });
+    document.getElementById('loginEmail').addEventListener('keypress', function(e) {
+        if (e.key === 'Enter') validateLogin();
+    });
+</script>
+</body>
+</html>
