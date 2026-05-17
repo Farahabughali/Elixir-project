@@ -92,6 +92,9 @@
             cursor: pointer;
             margin-top: 10px;
         }
+        .login-btn:hover {
+            background: #2f6b3e;
+        }
         .forgot-link {
             text-align: center;
             margin-top: 15px;
@@ -160,25 +163,24 @@
             background: #ccc !important;
             color: #333 !important;
         }
-        .code-hint {
-            background: #eef4e8;
-            padding: 10px;
-            border-radius: 1rem;
+        .error-msg {
+            color: #c0392b;
             font-size: 0.7rem;
-            color: #2c5f2d;
-            margin: 10px 0;
+            margin-top: -5px;
+            margin-bottom: 10px;
+            display: none;
         }
-        .resend-link {
-            color: #438e56;
+        .success-msg {
+            color: #2e7d32;
             font-size: 0.7rem;
-            cursor: pointer;
-            margin-top: 10px;
-            display: inline-block;
+            margin-top: -5px;
+            margin-bottom: 10px;
+            display: none;
         }
         .step {
             font-size: 0.7rem;
-            color: #8ba07a;
-            margin-bottom: 10px;
+            color: #f39c12;
+            margin-top: 10px;
         }
     </style>
 </head>
@@ -192,13 +194,11 @@
         <p>يرجى تسجيل الدخول للمتابعة</p>
     </div>
     <div class="form-body">
-        <div id="loginError" style="background:#fef3e2; color:#c0392b; padding:10px; border-radius:1rem; display:none; margin-bottom:1rem;">
-            البريد الإلكتروني أو كلمة المرور غير صحيحة
-        </div>
+        <div id="loginError" class="error-msg" style="background:#fef3e2; padding:10px; border-radius:1rem; margin-bottom:1rem;"></div>
         
         <div class="input-group">
             <label><i class="fas fa-envelope"></i> البريد الإلكتروني</label>
-            <input type="email" id="loginEmail" placeholder="admin@elixir.com">
+            <input type="email" id="loginEmail">
         </div>
         
         <div class="input-group">
@@ -214,40 +214,27 @@
     </div>
 </div>
 
-<!-- نافذة نسيت كلمة المرور (3 خطوات) -->
+<!-- نافذة نسيت كلمة المرور (بدون رمز تحقق) -->
 <div id="forgotModal" class="modal-overlay">
     <div class="forgot-modal">
         <i class="fas fa-key" style="font-size: 2rem; color: #438e56;"></i>
-        <h3 id="modalTitle">إعادة تعيين كلمة المرور</h3>
+        <h3>إعادة تعيين كلمة المرور</h3>
         
-        <!-- الخطوة 1: إدخال البريد أو الهاتف -->
+        <!-- الخطوة 1: تأكيد الهوية -->
         <div id="step1">
-            <p>أدخل بريدك الإلكتروني أو رقم هاتفك المسجل</p>
+            <p>لتأكيد هويتك، أدخل بريدك الإلكتروني أو رقم هاتفك</p>
             <input type="text" id="userContact" placeholder="admin@elixir.com أو 0591234567">
-            <div id="step1Error" style="color:red; font-size:0.7rem; display:none;">✖ البريد أو الهاتف غير مسجل</div>
-            <button onclick="sendVerification()">إرسال كود التحقق</button>
+            <div id="step1Error" class="error-msg"></div>
+            <button onclick="verifyIdentity()">تأكيد الهوية</button>
             <button class="btn-cancel" onclick="closeForgotModal()">إلغاء</button>
         </div>
         
-        <!-- الخطوة 2: إدخال الكود -->
+        <!-- الخطوة 2: كلمة المرور الجديدة -->
         <div id="step2" style="display:none;">
-            <p>📧 تم إرسال كود التحقق إلى بريدك الإلكتروني</p>
-            <div class="code-hint">
-                <i class="fas fa-info-circle"></i> كود التحقق (للتجربة): <strong id="demoCode">123456</strong>
-            </div>
-            <input type="text" id="verificationCode" placeholder="أدخل الكود" maxlength="6">
-            <div id="step2Error" style="color:red; font-size:0.7rem; display:none;">✖ الكود غير صحيح</div>
-            <button onclick="verifyCode()">تأكيد الكود</button>
-            <div><a class="resend-link" onclick="resendCode()">⟳ إعادة إرسال الكود</a></div>
-            <button class="btn-cancel" onclick="closeForgotModal()">إلغاء</button>
-        </div>
-        
-        <!-- الخطوة 3: كلمة المرور الجديدة (زي صورتك) -->
-        <div id="step3" style="display:none;">
             <p>أدخل كلمة المرور الجديدة</p>
             <input type="password" id="newPassword" placeholder="كلمة المرور الجديدة">
             <input type="password" id="confirmPassword" placeholder="تأكيد كلمة المرور الجديدة">
-            <div id="step3Error" style="color:red; font-size:0.7rem; display:none;">✖ كلمة المرور غير متطابقة أو ضعيفة</div>
+            <div id="step2Error" class="error-msg"></div>
             <div class="step">⚠️ سيتم تغيير كلمة المرور فوراً</div>
             <button onclick="changePassword()">تغيير كلمة المرور</button>
             <button class="btn-cancel" onclick="closeForgotModal()">إلغاء</button>
@@ -256,14 +243,15 @@
 </div>
 
 <script>
-    // بيانات افتراضية (للتجربة - في الحقيقي تجيب من قاعدة البيانات)
+    // ========== بيانات المدير الثابتة (للتجربة) ==========
+    // البنات اللي معك وقت ما يربطوا بقاعدة البيانات، يغيروا الدوال تحت
     const ADMIN_EMAIL = "admin@elixir.com";
     const ADMIN_PHONE = "0591234567";
     let ADMIN_PASSWORD = "Elixir2026@";
     
-    let generatedCode = "";
-    let verifiedContact = "";
+    let verifiedContact = null;
     
+    // تسجيل الدخول
     function validateLogin() {
         const email = document.getElementById('loginEmail').value.trim();
         const password = document.getElementById('loginPassword').value;
@@ -271,8 +259,10 @@
         
         if (email === ADMIN_EMAIL && password === ADMIN_PASSWORD) {
             sessionStorage.setItem('admin_logged_in', 'true');
+            sessionStorage.setItem('admin_email', email);
             window.location.href = 'admin2.html';
         } else {
+            errorDiv.innerHTML = '❌ البريد الإلكتروني أو كلمة المرور غير صحيحة';
             errorDiv.style.display = 'block';
             setTimeout(() => { errorDiv.style.display = 'none'; }, 3000);
         }
@@ -280,77 +270,64 @@
     
     function openForgotModal() {
         document.getElementById('forgotModal').classList.add('active');
-        // إظهار الخطوة 1
         document.getElementById('step1').style.display = 'block';
         document.getElementById('step2').style.display = 'none';
-        document.getElementById('step3').style.display = 'none';
         document.getElementById('userContact').value = '';
+        document.getElementById('newPassword').value = '';
+        document.getElementById('confirmPassword').value = '';
         document.getElementById('step1Error').style.display = 'none';
+        document.getElementById('step2Error').style.display = 'none';
     }
     
     function closeForgotModal() {
         document.getElementById('forgotModal').classList.remove('active');
     }
     
-    function generateCode() {
-        return Math.floor(100000 + Math.random() * 900000).toString();
-    }
-    
-    function sendVerification() {
+    // الخطوة 1: تأكيد الهوية (بدون كود تحقق)
+    function verifyIdentity() {
         const contact = document.getElementById('userContact').value.trim();
+        const errorDiv = document.getElementById('step1Error');
         
-        // التحقق من البريد أو الهاتف
+        if (!contact) {
+            errorDiv.innerHTML = '❌ الرجاء إدخال البريد الإلكتروني أو رقم الهاتف';
+            errorDiv.style.display = 'block';
+            return;
+        }
+        
+        // التحقق من صحة البيانات
         if (contact === ADMIN_EMAIL || contact === ADMIN_PHONE) {
             verifiedContact = contact;
-            generatedCode = generateCode();
-            
-            // عرض الكود التجريبي للمستخدم (محاكاة)
-            document.getElementById('demoCode').innerText = generatedCode;
-            
-            // الانتقال للخطوة 2
+            // الانتقال إلى الخطوة 2
             document.getElementById('step1').style.display = 'none';
             document.getElementById('step2').style.display = 'block';
-            document.getElementById('step2Error').style.display = 'none';
-            document.getElementById('verificationCode').value = '';
+            errorDiv.style.display = 'none';
         } else {
-            document.getElementById('step1Error').style.display = 'block';
+            errorDiv.innerHTML = '❌ البريد الإلكتروني أو رقم الهاتف غير صحيح';
+            errorDiv.style.display = 'block';
         }
     }
     
-    function verifyCode() {
-        const enteredCode = document.getElementById('verificationCode').value.trim();
-        
-        if (enteredCode === generatedCode) {
-            // الكود صحيح - الانتقال للخطوة 3
-            document.getElementById('step2').style.display = 'none';
-            document.getElementById('step3').style.display = 'block';
-            document.getElementById('step3Error').style.display = 'none';
-            document.getElementById('newPassword').value = '';
-            document.getElementById('confirmPassword').value = '';
-        } else {
-            document.getElementById('step2Error').style.display = 'block';
-        }
-    }
-    
-    function resendCode() {
-        generatedCode = generateCode();
-        document.getElementById('demoCode').innerText = generatedCode;
-        alert("✅ تم إرسال كود جديد: " + generatedCode);
-    }
-    
+    // الخطوة 2: تغيير كلمة المرور
     function changePassword() {
         const newPass = document.getElementById('newPassword').value;
         const confirmPass = document.getElementById('confirmPassword').value;
+        const errorDiv = document.getElementById('step2Error');
+        
+        if (!newPass || !confirmPass) {
+            errorDiv.innerHTML = '❌ الرجاء إدخال كلمة المرور الجديدة';
+            errorDiv.style.display = 'block';
+            return;
+        }
         
         if (newPass.length < 6) {
-            document.getElementById('step3Error').innerHTML = '✖ كلمة المرور يجب أن تكون 6 أحرف على الأقل';
-            document.getElementById('step3Error').style.display = 'block';
+            errorDiv.innerHTML = '❌ كلمة المرور يجب أن تكون 6 أحرف على الأقل';
+            errorDiv.style.display = 'block';
             return;
         }
         
         if (newPass !== confirmPass) {
-            document.getElementById('step3Error').innerHTML = '✖ كلمة المرور غير متطابقة';
-            document.getElementById('step3Error').style.display = 'block';
+            errorDiv.innerHTML = '❌ كلمة المرور غير متطابقة';
+            errorDiv.style.display = 'block';
             return;
         }
         
@@ -368,6 +345,9 @@
     
     // Enter key
     document.getElementById('loginPassword').addEventListener('keypress', function(e) {
+        if (e.key === 'Enter') validateLogin();
+    });
+    document.getElementById('loginEmail').addEventListener('keypress', function(e) {
         if (e.key === 'Enter') validateLogin();
     });
 </script>
