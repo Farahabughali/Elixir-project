@@ -10,6 +10,237 @@ let categories = [];
 let offers = [];
 let sliders = [];
 let settings = {};
+
+// ========== إدارة طلبات التوظيف ==========
+let careersApplications = [];
+let currentCareerFilter = 'all';
+
+// تحميل طلبات التوظيف
+function loadCareers() {
+    const stored = localStorage.getItem('elixir_careers');
+    if (stored) careersApplications = JSON.parse(stored);
+    else careersApplications = [];
+    renderCareers();
+}
+
+// حفظ طلبات التوظيف
+function saveCareers() {
+    localStorage.setItem('elixir_careers', JSON.stringify(careersApplications));
+}
+
+// إضافة طلب توظيف جديد (يُستدعى من صفحة التقديم)
+function addCareerApplication(application) {
+    application.id = Date.now();
+    application.status = 'new';
+    application.date = new Date().toISOString();
+    careersApplications.unshift(application); // الأحدث أولاً
+    saveCareers();
+    renderCareers();
+    showToast(`✅ تم استلام طلب التوظيف من ${application.name}`, "success");
+}
+
+// عرض طلبات التوظيف
+function renderCareers() {
+    const container = document.getElementById('careersContainer');
+    const noMsg = document.getElementById('noCareersMessage');
+    if (!container) return;
+    
+    let filtered = careersApplications;
+    if (currentCareerFilter !== 'all') {
+        filtered = careersApplications.filter(app => app.jobType === currentCareerFilter);
+    }
+    
+    if (filtered.length === 0) {
+        if (noMsg) noMsg.classList.remove('hidden');
+        container.innerHTML = '';
+        return;
+    }
+    
+    if (noMsg) noMsg.classList.add('hidden');
+    
+    const jobTypeNames = {
+        'content': '🎥 مقدمة محتوى',
+        'packaging': '📦 تعبئة وتغليف',
+        'orders': '🛒 تجهيز الطلبات',
+        'other': '📢 وظائف أخرى'
+    };
+    
+    const statusNames = {
+        'new': '🆕 جديد',
+        'reviewing': '👀 قيد المراجعة',
+        'accepted': '✅ مقبول',
+        'rejected': '❌ مرفوض'
+    };
+    
+    const statusColors = {
+        'new': 'bg-blue-100 text-blue-700',
+        'reviewing': 'bg-yellow-100 text-yellow-700',
+        'accepted': 'bg-green-100 text-green-700',
+        'rejected': 'bg-red-100 text-red-700'
+    };
+    
+    let html = '';
+    for (let app of filtered) {
+        // عرض الملفات المرفوعة إذا وجدت
+        let attachmentsHtml = '';
+        if (app.videoUrl) {
+            attachmentsHtml += `<a href="${app.videoUrl}" target="_blank" class="inline-block bg-purple-100 text-purple-700 px-3 py-1 rounded-xl text-xs ml-2"><i class="fas fa-video ml-1"></i> مشاهدة الفيديو</a>`;
+        }
+        if (app.portfolioUrl) {
+            attachmentsHtml += `<a href="${app.portfolioUrl}" target="_blank" class="inline-block bg-purple-100 text-purple-700 px-3 py-1 rounded-xl text-xs"><i class="fas fa-image ml-1"></i> معرض الأعمال</a>`;
+        }
+        
+        html += `
+            <div class="bg-white rounded-2xl border border-slate-100 shadow-sm overflow-hidden">
+                <div class="p-5">
+                    <div class="flex flex-wrap justify-between items-start gap-3 pb-3 mb-3 border-b border-slate-100">
+                        <div>
+                            <span class="text-elixir font-bold text-lg">📋 ${app.name}</span>
+                            <span class="text-sm text-slate-400 mr-3"><i class="fas fa-calendar-alt ml-1"></i> ${new Date(app.date).toLocaleDateString('ar-EG')}</span>
+                        </div>
+                        <div class="flex items-center gap-2">
+                            <span class="px-3 py-1 rounded-full text-xs font-bold ${statusColors[app.status]}">${statusNames[app.status]}</span>
+                            <select onchange="updateCareerStatus(${app.id}, this.value)" class="text-xs border rounded-lg p-1 bg-white">
+                                <option value="new" ${app.status === 'new' ? 'selected' : ''}>🆕 جديد</option>
+                                <option value="reviewing" ${app.status === 'reviewing' ? 'selected' : ''}>👀 قيد المراجعة</option>
+                                <option value="accepted" ${app.status === 'accepted' ? 'selected' : ''}>✅ مقبول</option>
+                                <option value="rejected" ${app.status === 'rejected' ? 'selected' : ''}>❌ مرفوض</option>
+                            </select>
+                        </div>
+                    </div>
+                    
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+                        <div class="bg-slate-50 p-3 rounded-xl">
+                            <p class="text-xs text-slate-400 mb-1"><i class="fas fa-user ml-1"></i> الاسم</p>
+                            <p class="font-bold text-slate-700">${app.name}</p>
+                        </div>
+                        <div class="bg-slate-50 p-3 rounded-xl">
+                            <p class="text-xs text-slate-400 mb-1"><i class="fas fa-calendar ml-1"></i> العمر</p>
+                            <p class="font-bold text-slate-700">${app.age || 'غير محدد'}</p>
+                        </div>
+                        <div class="bg-slate-50 p-3 rounded-xl">
+                            <p class="text-xs text-slate-400 mb-1"><i class="fas fa-map-marker-alt ml-1"></i> المدينة</p>
+                            <p class="font-bold text-slate-700">${app.city || 'غير محدد'}</p>
+                        </div>
+                        <div class="bg-slate-50 p-3 rounded-xl">
+                            <p class="text-xs text-slate-400 mb-1"><i class="fas fa-briefcase ml-1"></i> نوع الوظيفة</p>
+                            <p class="font-bold text-slate-700">${jobTypeNames[app.jobType] || app.jobType}</p>
+                        </div>
+                        <div class="bg-slate-50 p-3 rounded-xl">
+                            <p class="text-xs text-slate-400 mb-1"><i class="fas fa-star ml-1"></i> المهارات</p>
+                            <p class="font-bold text-slate-700">${app.skills || 'غير محددة'}</p>
+                        </div>
+                        <div class="bg-slate-50 p-3 rounded-xl">
+                            <p class="text-xs text-slate-400 mb-1"><i class="fas fa-phone ml-1"></i> رقم الهاتف</p>
+                            <p class="font-bold text-slate-700 dir-ltr">${app.phone || 'غير محدد'}</p>
+                        </div>
+                        ${app.instagram ? `<div class="bg-slate-50 p-3 rounded-xl">
+                            <p class="text-xs text-slate-400 mb-1"><i class="fab fa-instagram ml-1"></i> إنستغرام</p>
+                            <p class="font-bold text-slate-700">${app.instagram}</p>
+                        </div>` : ''}
+                    </div>
+                    
+                    ${app.message ? `
+                    <div class="bg-slate-50 p-3 rounded-xl mb-4">
+                        <p class="text-xs text-slate-400 mb-1"><i class="fas fa-comment ml-1"></i> رسالة إضافية</p>
+                        <p class="text-slate-600 text-sm">${app.message}</p>
+                    </div>
+                    ` : ''}
+                    
+                    ${attachmentsHtml ? `
+                    <div class="bg-slate-50 p-3 rounded-xl mb-4">
+                        <p class="text-xs text-slate-400 mb-1"><i class="fas fa-paperclip ml-1"></i> المرفقات</p>
+                        <div class="flex flex-wrap gap-2">${attachmentsHtml}</div>
+                    </div>
+                    ` : ''}
+                    
+                    <div class="flex justify-end gap-3 mt-3 pt-2 border-t border-slate-100">
+                        <button onclick="deleteCareer(${app.id})" class="text-red-500 hover:text-red-700 text-sm">
+                            <i class="fas fa-trash-alt ml-1"></i> حذف الطلب
+                        </button>
+                    </div>
+                </div>
+            </div>
+        `;
+    }
+    
+    container.innerHTML = html;
+}
+
+// تحديث حالة الطلب
+function updateCareerStatus(id, newStatus) {
+    const app = careersApplications.find(a => a.id === id);
+    if (app) {
+        app.status = newStatus;
+        saveCareers();
+        renderCareers();
+        showToast(`✅ تم تحديث حالة الطلب`, "success");
+    }
+}
+
+// حذف طلب
+function deleteCareer(id) {
+    customConfirm("هل تريد حذف هذا الطلب نهائياً؟", () => {
+        careersApplications = careersApplications.filter(a => a.id !== id);
+        saveCareers();
+        renderCareers();
+        showToast("🗑️ تم حذف الطلب", "success");
+    });
+}
+
+// فلتر الطلبات
+function filterCareers(type) {
+    currentCareerFilter = type;
+    renderCareers();
+    
+    // تحديث شكل أزرار الفلتر
+    document.querySelectorAll('.filter-career-btn').forEach(btn => {
+        btn.classList.remove('bg-elixir', 'text-white');
+        btn.classList.add('bg-gray-100', 'text-gray-700');
+    });
+    const activeBtn = document.querySelector(`.filter-career-btn[onclick="filterCareers('${type}')"]`);
+    if (activeBtn) {
+        activeBtn.classList.remove('bg-gray-100', 'text-gray-700');
+        activeBtn.classList.add('bg-elixir', 'text-white');
+    }
+}
+
+// تحديث الطلبات
+function refreshCareers() {
+    loadCareers();
+    showToast("🔄 تم تحديث طلبات التوظيف", "success");
+}
+
+// تصدير إلى Excel
+function exportCareersToExcel() {
+    let data = [['الاسم', 'العمر', 'المدينة', 'نوع الوظيفة', 'المهارات', 'رقم الهاتف', 'إنستغرام', 'الحالة', 'تاريخ التقديم']];
+    careersApplications.forEach(app => {
+        data.push([
+            app.name,
+            app.age || '',
+            app.city || '',
+            app.jobType || '',
+            app.skills || '',
+            app.phone || '',
+            app.instagram || '',
+            app.status || '',
+            new Date(app.date).toLocaleDateString('ar-EG')
+        ]);
+    });
+    
+    let csv = data.map(row => row.map(cell => `"${cell}"`).join(',')).join('\n');
+    const blob = new Blob(["\uFEFF" + csv], {type: 'text/csv;charset=utf-8;'});
+    const link = document.createElement('a');
+    link.href = URL.createObjectURL(blob);
+    link.download = `careers_applications_${new Date().toISOString().slice(0,19)}.csv`;
+    link.click();
+    URL.revokeObjectURL(link);
+    showToast("📊 تم تصدير الطلبات إلى Excel", "success");
+}
+
+
+
+
 // دالة لتحديد ألوان البكجات حسب الفئة
 function getPackageColorsByCategory(category) {
     const colorMap = {
@@ -36,6 +267,7 @@ function loadAllData() {
     const storedOffers = localStorage.getItem('elixir_offers');
     const storedSliders = localStorage.getItem('elixir_sliders');
     const storedSettings = localStorage.getItem('elixir_settings');
+     loadCareers();
 
     // تحميل المنتجات
     if (storedProducts) products = JSON.parse(storedProducts);
