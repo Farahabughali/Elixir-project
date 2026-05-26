@@ -1,3 +1,4 @@
+
 // ---------- البيانات الأساسية ----------
 let products = [];
 let packagesList = [];
@@ -10,10 +11,13 @@ let categories = [];
 let offers = [];
 let sliders = [];
 let settings = {};
+let wholesaleProductsList = [];
 
 // ========== إدارة طلبات التوظيف ==========
 let careersApplications = [];
 let currentCareerFilter = 'all';
+
+
 
 // تحميل طلبات التوظيف
 function loadCareers() {
@@ -336,6 +340,7 @@ function loadAllData() {
         privacyPolicy: ""
     };
     updateAllCategoriesDropdowns();
+    loadWholesaleProductsList();
 }
 
 // ========== حساب المنتجات الأكثر مبيعاً من الطلبات ==========
@@ -601,6 +606,7 @@ function openProductModal(productId = null) {
             document.getElementById('productName').value = product.name;
             document.getElementById('productCategory').value = product.category;
             document.getElementById('productPrice').value = product.price;
+            document.getElementById('productWholesalePrice').value = product.wholesalePrice || '';
             document.getElementById('productStock').value = product.stock;
             document.getElementById('productUsage').value = product.usage || '';
             document.getElementById('productWarnings').value = product.warnings || '';
@@ -673,14 +679,19 @@ async function saveProduct() {
         }
 
         if (id) {
-            const index = products.findIndex(p => p.id == id);
-            if (index !== -1) {
-                products[index] = { ...products[index], name, category, price, stock, usage, warnings, image: imageBase64 };
-                showToast("تم تحديث المنتج", "success");
-            }
-        } else {
+    const index = products.findIndex(p => p.id == id);
+    if (index !== -1) {
+        products[index] = { ...products[index], name, category, price, stock, usage, warnings, image: imageBase64 };
+        
+            delete products[index].wholesalePrice;
+        
+        showToast("تم تحديث المنتج", "success");
+    }
+} else {
     const newId = products.length > 0 ? Math.max(...products.map(p => p.id)) + 1 : 1;
-    products.push({ id: newId, name, category, price, stock, usage, warnings, image: imageBase64, addedAt: new Date().toISOString() });
+    let newProduct = { id: newId, name, category, price, stock, usage, warnings, image: imageBase64, addedAt: new Date().toISOString() };
+    
+    products.push(newProduct);
     showToast("تم إضافة المنتج", "success");
     
     // ✅ إضافة المنتج تلقائياً إلى جديدنا
@@ -737,12 +748,12 @@ window.deleteProduct = function(productId) {
         // 1. حذف المنتج
         products = products.filter(p => p.id !== productId);
         
-        // 2. حذف العروض المرتبطة بهذا المنتج
+        // 2. حذف العروض المرتبطة
         let offers = JSON.parse(localStorage.getItem('elixir_offers') || '[]');
         let filteredOffers = offers.filter(o => o.productId !== productId);
         localStorage.setItem('elixir_offers', JSON.stringify(filteredOffers));
         
-        // 3. حذف من جديدنا
+        // 3. 🔥 حذف من جديدنا (المهم!)
         let newArrivals = JSON.parse(localStorage.getItem('elixir_new_arrivals') || '[]');
         let filteredNew = newArrivals.filter(n => n.id !== productId);
         localStorage.setItem('elixir_new_arrivals', JSON.stringify(filteredNew));
@@ -760,19 +771,18 @@ function toggleProductActive(productId) {
     if (product) {
         product.active = !product.active;
         
-        // ✅ إذا تم إخفاء المنتج، احذف عروضه وجديدنا
         if (!product.active) {
             // حذف العروض المرتبطة
             let offers = JSON.parse(localStorage.getItem('elixir_offers') || '[]');
             let filteredOffers = offers.filter(o => o.productId !== productId);
             localStorage.setItem('elixir_offers', JSON.stringify(filteredOffers));
             
-            // حذف من جديدنا
+            //  حذف من جديدنا
             let newArrivals = JSON.parse(localStorage.getItem('elixir_new_arrivals') || '[]');
             let filteredNew = newArrivals.filter(n => n.id !== productId);
             localStorage.setItem('elixir_new_arrivals', JSON.stringify(filteredNew));
             
-            showToast(`⛔ تم إخفاء المنتج "${product.name}" وإزالة عروضه`, "warning");
+            showToast(`⛔ تم إخفاء المنتج "${product.name}" وإزالة عروضه وجديدنا`, "warning");
         } else {
             showToast(`✅ تم تفعيل المنتج "${product.name}"`, "success");
         }
@@ -2681,6 +2691,222 @@ document.addEventListener('keydown', function(e) {
         closeImagePreview();
     }
 });
+
+
+
+
+
+
+
+// ========== إدارة منتجات الجملة ==========
+function loadWholesaleProductsList() {
+    const stored = localStorage.getItem('elixir_wholesale_products_list');
+    if (stored) {
+        wholesaleProductsList = JSON.parse(stored);
+    } else {
+        wholesaleProductsList = [];
+    }
+    renderWholesaleProductsTable();
+}
+
+function saveWholesaleProductsList() {
+    localStorage.setItem('elixir_wholesale_products_list', JSON.stringify(wholesaleProductsList));
+}
+
+function renderWholesaleProductsTable() {
+    const tbody = document.getElementById('wholesaleProductsTableBody');
+    if (!tbody) return;
+    
+    if (!wholesaleProductsList || wholesaleProductsList.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="6" class="text-center py-8 text-slate-400">لا توجد منتجات جملة، أضف منتجاً</td></tr>';
+        return;
+    }
+    
+    tbody.innerHTML = '';
+    wholesaleProductsList.forEach(prod => {
+        // صورة قابلة للضغط
+        const imageHtml = prod.image && prod.image !== "" 
+            ? `<img src="${prod.image}" class="w-10 h-10 rounded-lg object-cover cursor-pointer hover:opacity-80 transition" onclick="openImagePreview('${prod.image}')" title="اضغط للتكبير">` 
+            : '<div class="w-10 h-10 bg-gray-100 rounded-lg flex items-center justify-center"><i class="fas fa-image text-gray-400"></i></div>';
+        
+        // أيقونة العين (إخفاء/إظهار)
+        const isHidden = prod.hidden === true;
+        const eyeIcon = isHidden ? 'fa-eye-slash' : 'fa-eye';
+        const eyeColor = isHidden ? 'text-gray-400' : 'text-green-600';
+        const eyeTitle = isHidden ? 'المنتج مخفي عن تجار الجملة' : 'المنتج ظاهر لتجار الجملة';
+        
+        tbody.innerHTML += `
+            <tr class="border-b hover:bg-slate-50 ${isHidden ? 'opacity-50 bg-gray-50' : ''}">
+                <td class="py-3">
+                    <div class="flex items-center gap-3">
+                        ${imageHtml}
+                        <span class="font-bold">${prod.productName}</span>
+                    </div>
+                 </td>
+                 <td>${prod.category}</td>
+                 <td class="text-slate-500">${prod.retailPrice} ₪</td>
+                 <td class="text-elixir font-bold">${prod.wholesalePrice} ₪</td>
+                 <td>
+                    <i class="fas ${eyeIcon} ${eyeColor} cursor-pointer ml-3 text-lg hover:opacity-75 transition" 
+                       onclick="toggleWholesaleProductVisibility(${prod.id})" 
+                       title="${eyeTitle}"></i>
+                    <i class="fas fa-edit text-slate-500 hover:text-elixir cursor-pointer ml-2" 
+                       onclick="editWholesaleProductItem(${prod.id})" title="تعديل"></i>
+                    <i class="fas fa-trash-alt text-slate-500 hover:text-red-500 cursor-pointer" 
+                       onclick="deleteWholesaleProductItem(${prod.id})" title="حذف"></i>
+                 </td>
+             </tr>
+        `;
+    });
+}
+
+
+// تبديل حالة إخفاء/إظهار منتج الجملة
+window.toggleWholesaleProductVisibility = function(id) {
+    const product = wholesaleProductsList.find(p => p.id === id);
+    if (!product) return;
+    
+    product.hidden = !product.hidden;
+    saveWholesaleProductsList();
+    renderWholesaleProductsTable();
+    
+    const status = product.hidden ? 'مخفي' : 'ظاهر';
+    showToast(`✅ ${product.productName} الآن ${status} لتجار الجملة`, "success");
+    addToActivityLog(`تم ${status} منتج الجملة "${product.productName}"`);
+};
+
+// فتح مودال إضافة منتج للجملة
+window.openWholesaleProductModal = function() {
+    console.log("فتح مودال");
+    const select = document.getElementById('wholesaleProductSelectStore');
+    if (!select) {
+        console.error("ال select غير موجود");
+        return;
+    }
+    const existingProductIds = (wholesaleProductsList || []).map(p => p.productId);
+    const availableProducts = products.filter(p => !existingProductIds.includes(p.id) && p.active !== false);
+    
+    select.innerHTML = '<option value="">-- اختر منتج --</option>';
+    availableProducts.forEach(p => {
+        select.innerHTML += `<option value="${p.id}" data-name="${p.name}" data-category="${p.category}" data-price="${p.price}" data-img="${p.image || ''}">${p.name} (${p.category} - ${p.price} ₪)</option>`;
+    });
+    
+    document.getElementById('wholesaleProductModalTitle').innerText = "➕ إضافة منتج للجملة";
+    document.getElementById('editWholesaleProductItemId').value = '';
+    document.getElementById('wholesaleProductPriceStore').value = '';
+    document.getElementById('wholesaleProductModalForm').classList.remove('hidden');
+};
+
+window.closeWholesaleProductModalForm = function() {
+    document.getElementById('wholesaleProductModalForm').classList.add('hidden');
+};
+
+window.saveWholesaleProductItem = function() {
+    const editId = document.getElementById('editWholesaleProductItemId').value;
+    const select = document.getElementById('wholesaleProductSelectStore');
+    const productId = parseInt(select.value);
+    const wholesalePrice = parseFloat(document.getElementById('wholesaleProductPriceStore').value);
+    
+    if (!productId || isNaN(wholesalePrice)) {
+        showToast("يرجى اختيار المنتج وإدخال سعر الجملة", "error");
+        return;
+    }
+    
+    const selectedOption = select.options[select.selectedIndex];
+    const productName = selectedOption.getAttribute('data-name');
+    const category = selectedOption.getAttribute('data-category');
+    const retailPrice = parseFloat(selectedOption.getAttribute('data-price'));
+    const image = selectedOption.getAttribute('data-img');
+    
+    if (editId) {
+        // تعديل: نحدث البيانات كاملة
+        const index = wholesaleProductsList.findIndex(p => p.id == editId);
+        if (index !== -1) {
+            // نسمح بتغيير المنتج نفسه وليس فقط السعر
+            wholesaleProductsList[index] = {
+                ...wholesaleProductsList[index],
+                productId: productId,
+                productName: productName,
+                category: category,
+                retailPrice: retailPrice,
+                wholesalePrice: wholesalePrice,
+                image: image
+            };
+            showToast("✅ تم تحديث منتج الجملة", "success");
+        }
+    } else {
+        // إضافة جديدة
+        const newId = wholesaleProductsList.length > 0 ? Math.max(...wholesaleProductsList.map(p => p.id)) + 1 : 1;
+        wholesaleProductsList.push({
+            id: newId,
+            productId: productId,
+            productName: productName,
+            category: category,
+            retailPrice: retailPrice,
+            wholesalePrice: wholesalePrice,
+            image: image
+        });
+        showToast(`✅ تم إضافة ${productName} إلى قائمة منتجات الجملة`, "success");
+    }
+    
+    saveWholesaleProductsList();
+    renderWholesaleProductsTable();
+    closeWholesaleProductModalForm();
+};
+
+window.editWholesaleProductItem = function(id) {
+    const product = wholesaleProductsList.find(p => p.id === id);
+    if (!product) return;
+    
+    const select = document.getElementById('wholesaleProductSelectStore');
+    // تعبئة كل المنتجات المتاحة
+    const existingProductIds = wholesaleProductsList.map(p => p.productId);
+    const availableProducts = products.filter(p => !existingProductIds.includes(p.id) && p.active !== false);
+    
+    // نضيف المنتج الحالي أولاً (حتى لو كان موجود في القائمة)
+    select.innerHTML = `<option value="${product.productId}" data-name="${product.productName}" data-category="${product.category}" data-price="${product.retailPrice}" data-img="${product.image}" selected>${product.productName}</option>`;
+    
+    // نضيف باقي المنتجات
+    availableProducts.forEach(p => {
+        select.innerHTML += `<option value="${p.id}" data-name="${p.name}" data-category="${p.category}" data-price="${p.price}" data-img="${p.image || ''}">${p.name} (${p.category} - ${p.price} ₪)</option>`;
+    });
+    
+    document.getElementById('wholesaleProductModalTitle').innerText = "✏️ تعديل منتج الجملة";
+    document.getElementById('editWholesaleProductItemId').value = product.id;
+    document.getElementById('wholesaleProductPriceStore').value = product.wholesalePrice;
+    document.getElementById('wholesaleProductModalForm').classList.remove('hidden');
+};
+
+window.deleteWholesaleProductItem = function(id) {
+    const product = wholesaleProductsList.find(p => p.id === id);
+    if (!product) return;
+    
+    customConfirm(`هل تريد حذف "${product.productName}" من قائمة منتجات الجملة؟`, () => {
+        wholesaleProductsList = wholesaleProductsList.filter(p => p.id !== id);
+        saveWholesaleProductsList();
+        renderWholesaleProductsTable();
+        showToast(`🗑️ تم حذف ${product.productName} من منتجات الجملة`, "success");
+    });
+};
+
+// تصحيح الإحصائيات
+function refreshStats() {
+    const totalProducts = document.getElementById('totalProductsCount');
+    const outOfStock = document.getElementById('outOfStockCounter');
+    const activeTasks = document.getElementById('activeTasksCount');
+    
+    if (totalProducts) totalProducts.innerText = products.length;
+    if (outOfStock) outOfStock.innerText = products.filter(p => p.stock === 0).length;
+    if (activeTasks) {
+        const totalTasks = employees.reduce((s, e) => s + (e.tasks?.length || 0), 0);
+        activeTasks.innerText = totalTasks;
+    }
+}
+
+setTimeout(refreshStats, 100);
+
+
+
 
 
 
