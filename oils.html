@@ -7,6 +7,8 @@
     <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <link rel="stylesheet" href="oils.css">
+    <link rel="stylesheet" href="floating-share.css">
+
 </head>
 <body>
 
@@ -22,7 +24,7 @@
             </a>
         </div>
         <div class="header-left">
-            <span class="help-text">💧 هل تحتاج لمساعدة في اختيار الزيت المناسب؟</span>
+            <span class="help-text"> هل تحتاج لمساعدة في اختيار الزيت المناسب لك؟</span>
             <a href="chatbot.html" class="ai-consult-link"><i class="fas fa-robot"></i> استشر الذكاء الاصطناعي</a>
         </div>
     </div>
@@ -44,99 +46,67 @@
 </div>
 
 <div id="customToast" class="toast-message"><i class="fas fa-check-circle"></i><span id="toastText"></span></div>
-<button id="scrollTopBtn" class="scroll-top-btn"><i class="fas fa-arrow-up"></i></button>
+<button id="scrollTopBtn" class="scroll-top-btn" style="display:none;"><i class="fas fa-arrow-up"></i></button>
 
 <link rel="stylesheet" href="floating-cart.css">
 <script src="floating-cart.js"></script>
+<script src="floating-share.js"></script>
 
 <script>
-    // ====== البيانات الثابتة للزيوت ======
-    const defaultOilsData = [
-        { id: 1, name: "زيت اللافندر العطري", category: "عطري", desc: "مهدئ للأعصاب، يساعد على الاسترخاء والنوم العميق", price: 18, img: "asset/images/lavender.jpg" },
-        { id: 2, name: "زيت الورد الجوري", category: "عطري", desc: "مضاد للشيخوخة، مرطب طبيعي للبشرة", price: 55, img: "asset/images/rose.jpg" },
-        { id: 3, name: "زيت إكليل الجبل", category: "للشعر", desc: "منشط للدورة الدموية، يقوي بصيلات الشعر، يقلل القشرة", price: 22, img: "asset/images/rosemaryoil.png" },
-        { id: 4, name: "زيت النعناع الفلفلي", category: "عطري", desc: "يخفف الصداع وانسداد الأنف، منعش ومنشط", price: 15, img: "asset/images/peppermint.jpg" },
-        { id: 5, name: "زيت شجرة الشاي", category: "عطري", desc: "مطهر طبيعي، مضاد لحب الشباب والفطريات", price: 19, img: "asset/images/teatree.jpg" },
-        { id: 6, name: "زيت الزيتون البكر", category: "نباتي", desc: "مرطب طبيعي، غني بمضادات الأكسدة", price: 20, img: "asset/images/olive.jpg" },
-        { id: 7, name: "زيت جوز الهند", category: "نباتي", desc: "للشعر والبشرة، يرطب ويغذي بعمق", price: 16, img: "asset/images/coconut.jpg" },
-        { id: 8, name: "زيت الخروع", category: "للشعر", desc: "يطيل الشعر ويكثفه، ينعم الحواجب والرموش", price: 13, img: "asset/images/castor.jpg" },
-        { id: 9, name: "زيت اللوز الحلو", category: "نباتي", desc: "مرطب عميق، غني بفيتامين E", price: 18, img: "asset/images/almondoil.png" },
-        { id: 10, name: "زيت الأرجان", category: "للشعر", desc: "لترطيب البشرة والشعر، غني بمضادات الأكسدة", price: 35, img: "asset/images/argan.jpg" },
-        { id: 11, name: "زيت الجوجوبا", category: "نباتي", desc: "مشابه لزيت البشرة الطبيعي، مناسب للبشرة الدهنية", price: 30, img: "asset/images/jojoba.jpg" },
-        { id: 12, name: "زيت السمسم", category: "نباتي", desc: "غني بفيتامين E، يحمي البشرة من الشمس", price: 14, img: "asset/images/sesame.jpg" },
-        { id: 13, name: "زيت البابونج", category: "عطري", desc: "مهدئ للبشرة الحساسة، يخفف الالتهابات", price: 20, img: "asset/images/chamomileoil.png" },
-        { id: 14, name: "زيت الياسمين", category: "عطري", desc: "مضاد للتوتر، يحسن المزاج، يمنح رائحة فواحة", price: 20, img: "asset/images/jasmine-oil.png" },
-        { id: 15, name: "زيت الورد المسكي", category: "للشعر", desc: "يقلل علامات التمدد والندبات والبقع الداكنة", price: 25, img: "asset/images/mosquerose.jpg" },
-        { id: 16, name: "زيت الخروع الأسود", category: "للشعر", desc: "ترطيب الشعر الجاف، التالف", price: 16, img: "asset/images/blackcastor.jpg" },
-        { id: 17, name: "زيت اللوز المر", category: "للشعر", desc: "يفتح البشرة، يقلل الهالات السوداء، تعزيز نمو الشعر", price: 17, img: "asset/images/bitteralmond.jpg" },
-        { id: 18, name: "زيت الأوكالبتوس", category: "عطري", desc: "يفتح المجاري التنفسية، يخفف آلام العضلات", price: 15, img: "asset/images/eucalyptus.jpg" },
-        { id: 19, name: "زيت القرنفل", category: "عطري", desc: "مسكن لآلام الأسنان، مضاد للالتهابات", price: 14, img: "asset/images/clove.jpg" },
-        { id: 20, name: "زيت الحبة السوداء", category: "للشعر", desc: "يقوي المناعة، يعالج مشاكل الجلد والشعر", price: 18, img: "asset/images/blackseed.jpg" },
-        { id: 21, name: "زيت الباتشولي", category: "للشعر", desc: "مضاد للفطريات، يمنح رائحة ترابية دافئة", price: 20, img: "asset/images/patchouli.jpg" }
+    const oilsData = [
+        { id: 38, name: "زيت اللافندر العطري", category: "عطري", desc: "مهدئ للأعصاب، يساعد على الاسترخاء والنوم العميق", price: 38, img: "asset/images/lavender.jpg" },
+    { id: 39, name: "زيت الورد الجوري", category: "عطري", desc: "مضاد للشيخوخة، مرطب طبيعي للبشرة", price: 185, img: "asset/images/rose.jpg" },
+    { id: 40, name: "زيت إكليل الجبل", category: "عطري", desc: "منشط للدورة الدموية، يقوي بصيلات الشعر", price: 55, img: "asset/images/rosemaryoil.png" },
+    { id: 41, name: "زيت النعناع الفلفلي", category: "عطري", desc: "يخفف الصداع وانسداد الأنف، منعش ومنشط", price: 30, img: "asset/images/peppermint.jpg" },
+    { id: 42, name: "زيت الياسمين", category: "عطري", desc: "مضاد للتوتر، يحسن المزاج، يمنح رائحة فواحة", price: 45, img: "asset/images/jasmine-oil.png" },
+    { id: 43, name: "زيت شجرة الشاي", category: "عطري", desc: "مطهر طبيعي، مضاد لحب الشباب والفطريات", price: 42, img: "asset/images/teatree.jpg" },
+    { id: 44, name: "زيت البابونج", category: "عطري", desc: "مهدئ للبشرة الحساسة، يخفف الالتهابات", price: 48, img: "asset/images/Chamomileoil.png" },
+    { id: 45, name: "زيت البرتقال الحلو", category: "عطري", desc: "منشط للذهن، يخفف القلق، يضيء البشرة", price: 35, img: "asset/images/orangeoil.jpg" },
+    { id: 46, name: "زيت الليمون", category: "عطري", desc: "مضاد للبكتيريا، ينقي الهواء، يمنح طاقة", price: 32, img: "asset/images/lemon.jpg" },
+    { id: 47, name: "زيت اليانغ يانغ", category: "عطري", desc: "متوازن للهرمونات، يمنح رائحة استوائية جذابة", price: 50, img: "asset/images/ylang.jpg" },
+    { id: 48, name: "زيت المريمية", category: "عطري", desc: "يساعد في تخفيف التعرق الليلي وأعراض سن اليأس", price: 40, img: "asset/images/sage.jpg" },
+    { id: 49, name: "زيت الزعتر", category: "عطري", desc: "مضاد للسعال والتهاب الحلق، يقوي المناعة", price: 38, img: "asset/images/thyme.jpg" },
+    { id: 50, name: "زيت الزيتون البكر الفلسطيني", category: "نباتي", desc: "مرطب طبيعي، غني بمضادات الأكسدة", price: 45, img: "asset/images/olive.jpg" },
+    { id: 51, name: "زيت اللوز الحلو", category: "نباتي", desc: "مرطب عميق، غني بفيتامين E، مناسب لجميع البشرة", price: 42, img: "asset/images/almondoil.png" },
+    { id: 52, name: "زيت جوز الهند العضوي", category: "نباتي", desc: "للشعر والبشرة، يرطب ويغذي بعمق", price: 35, img: "asset/images/coconut.jpg" },
+    { id: 53, name: "زيت الأرجان المغربي", category: "نباتي", desc: "لترطيب البشرة والشعر، غني بمضادات الأكسدة", price: 75, img: "asset/images/argan.jpg" },
+    { id: 54, name: "زيت الجوجوبا", category: "نباتي", desc: "مشابه لزيت البشرة الطبيعي، مناسب للبشرة الدهنية", price: 65, img: "asset/images/jojoba.jpg" },
+    { id: 55, name: "زيت السمسم", category: "نباتي", desc: "غني بفيتامين E، يحمي البشرة من الشمس", price: 30, img: "asset/images/sesame.jpg" },
+    { id: 56, name: "زيت الخروع", category: "نباتي", desc: "يطيل الشعر ويكثفه، ينعم الحواجب والرموش", price: 28, img: "asset/images/castor.jpg" },
+    { id: 57, name: "زيت المشمش", category: "نباتي", desc: "خفيف وسريع الامتصاص، مناسب للبشرة الحساسة", price: 50, img: "asset/images/apricot.jpg" },
+    { id: 58, name: "زيت بذور العنب", category: "نباتي", desc: "قابض طبيعي، مناسب للبشرة الدهنية والمختلطة", price: 40, img: "asset/images/grapeseed.jpg" },
+    { id: 59, name: "زيت الأفوكادو", category: "نباتي", desc: "غني بالأحماض الدهنية، مثالي للبشرة الجافة والتالفة", price: 60, img: "asset/images/avocado.jpg" },
+    { id: 60, name: "زيت الخروع الأسود", category: "للشعر", desc: "يقوي الشعر ويمنع التساقط، يطيل الرموش", price: 35, img: "asset/images/blackcastor.jpg" },
+    { id: 62, name: "زيت اللوز المر", category: "للشعر", desc: "يفتح البشرة، يقلل الهالات السوداء", price: 38, img: "asset/images/bitteralmond.jpg" },
+    { id: 63, name: "زيت الورد المسك", category: "للشعر", desc: "يقلل علامات التمدد والندبات", price: 55, img: "asset/images/mosquerose.jpg" },
+    { id: 64, name: "زيت الأوكالبتوس", category: "للشعر", desc: "يفتح المجاري التنفسية، يخفف آلام العضلات", price: 32, img: "asset/images/eucalyptus.jpg" },
+    { id: 65, name: "زيت القرنفل", category: "للشعر", desc: "مسكن لآلام الأسنان، مضاد للالتهابات", price: 30, img: "asset/images/clove.jpg" },
+    { id: 66, name: "زيت الحبة السوداء", category: "للشعر", desc: "يقوي المناعة، يعالج مشاكل الجلد والشعر", price: 40, img: "asset/images/blackseed.jpg" },
+    { id: 67, name: "زيت الباتشولي", category: "للشعر", desc: "مضاد للفطريات، يمنح رائحة ترابية دافئة", price: 45, img: "asset/images/patchouli.jpg" },
     ];
-
-    function getAllOils() {
-        const storedProducts = JSON.parse(localStorage.getItem('elixir_products') || '[]');
-        const adminOils = storedProducts.filter(p => p.category === 'زيوت مركزة' && p.active !== false);
-        
-        const defaultOils = defaultOilsData.map(oil => ({
-            id: oil.id,
-            name: oil.name,
-            category: oil.category,
-            desc: oil.desc,
-            price: oil.price,
-            img: oil.img,
-            usage: oil.desc,
-            active: true
-        }));
-        
-        const allOils = [...defaultOils];
-        
-        adminOils.forEach(adminOil => {
-            const exists = allOils.some(o => o.name === adminOil.name);
-            if (!exists) {
-                let productCategory = adminOil.subCategory || adminOil.category;
-                if (productCategory === "زيوت مركزة") productCategory = "عطري";
-                allOils.push({
-                    id: adminOil.id,
-                    name: adminOil.name,
-                    category: productCategory,
-                    desc: adminOil.desc || adminOil.usage || "زيت طبيعي 100%",
-                    price: adminOil.price,
-                    img: adminOil.image || "asset/images/placeholder.png",
-                    usage: adminOil.usage || adminOil.desc,
-                    active: adminOil.active
-                });
-            }
-        });
-         return allOils.filter(oil => oil.active !== false);
-    }
 
     function renderProducts(selectedCategory = 'all') {
         const grid = document.getElementById("oilsGrid");
-        let oilsData = getAllOils();
-        let filtered = selectedCategory === 'all' ? oilsData : oilsData.filter(o => o.category === selectedCategory);
-        const favorites = JSON.parse(localStorage.getItem('elixir_favorites') || '[]');
-        
+        let filtered = oilsData;
+        if (selectedCategory !== 'all') filtered = oilsData.filter(oil => oil.category === selectedCategory);
         if (filtered.length === 0) {
             grid.innerHTML = `<div class="no-results"><i class="fas fa-search"></i> لا توجد زيوت مطابقة للفلتر</div>`;
             return;
         }
-        
         grid.innerHTML = filtered.map(oil => {
-            let catText = oil.category === "عطري" ? "زيت عطري" : (oil.category === "نباتي" ? "زيت نباتي ثابت" : "للبشرة والشعر");
-            const description = oil.desc || oil.usage || "زيت طبيعي فاخر";
-            const isFav = favorites.includes(oil.id);
+            let categoryText = "";
+            if (oil.category === "عطري") categoryText = "زيت عطري";
+            else if (oil.category === "نباتي") categoryText = "زيت نباتي ثابت";
+            else categoryText = "للبشرة والشعر";
+            let isFav = JSON.parse(localStorage.getItem('elixir_favorites') || []).includes(oil.id);
             return `
-            <div class="oil-card" data-id="${oil.id}">
-                <div class="fav-icon ${isFav ? 'active' : ''}" data-id="${oil.id}">
-                    <i class="fa-${isFav ? 'solid' : 'regular'} fa-heart"></i>
-                </div>
+            <div class="oil-card">
+                <div class="fav-icon ${isFav ? 'active' : ''}" data-id="${oil.id}"><i class="fa-${isFav ? 'solid' : 'regular'} fa-heart"></i></div>
                 <img class="oil-img" src="${oil.img}" alt="${oil.name}" onerror="this.src='asset/images/placeholder.png'">
                 <div class="oil-info">
-                    <div class="oil-cat">${catText}</div>
+                    <div class="oil-cat">${categoryText}</div>
                     <div class="oil-title">${oil.name}</div>
-                    <div class="oil-desc">${description}</div>
+                    <div class="oil-desc">${oil.desc}</div>
                     <div class="price-row">
                         <span class="price">${oil.price} ₪</span>
                         <div class="btn-group">
@@ -150,29 +120,35 @@
         if (window.applyFadeToNewCards) window.applyFadeToNewCards();
     }
 
+    // ✅ تفويض الحدث لإضافة إلى السلة – هذه هي الإضافة الصحيحة
     document.addEventListener('click', function(e) {
         const btn = e.target.closest('.add-cart');
         if (!btn) return;
         e.preventDefault();
+
         const id = parseInt(btn.dataset.id);
         const name = btn.dataset.name;
         const price = parseFloat(btn.dataset.price);
         const img = btn.dataset.img;
+
         let cart = JSON.parse(localStorage.getItem('elixir_cart') || '[]');
         const existing = cart.find(item => item.id === id);
         existing ? existing.quantity++ : cart.push({ id, name, price, img, quantity: 1 });
         localStorage.setItem('elixir_cart', JSON.stringify(cart));
+
         if (window.updateFloatingCart) window.updateFloatingCart();
         const headerBadge = document.querySelector('.cart-count');
         if (headerBadge) headerBadge.innerText = cart.reduce((sum, i) => sum + i.quantity, 0);
+
         const toast = document.getElementById('customToast');
         if (toast) {
-            document.getElementById('toastText').innerText = `تمت إضافة ${name} بنجاح`;
+            document.getElementById('toastText').innerText = `تمت إضافة ${name} بنجاح، يتمنى ${name} أن ينال إعجابكم 😊`;
             toast.style.display = 'flex';
             setTimeout(() => toast.style.display = 'none', 3000);
         }
     });
 
+    // عرض التفاصيل
     document.addEventListener('click', function(e) {
         const btn = e.target.closest('.view-details');
         if (btn) {
@@ -181,62 +157,7 @@
             if (id) window.location.href = 'product-details.html?id=' + id;
         }
     });
-
-    const filterSelect = document.getElementById('filterSelect');
-    filterSelect.addEventListener('change', () => renderProducts(filterSelect.value));
-    document.getElementById('resetFilter').addEventListener('click', () => {
-        filterSelect.value = 'all';
-        renderProducts('all');
-    });
-
-    const scrollBtn = document.getElementById('scrollTopBtn');
-    window.addEventListener('scroll', () => scrollBtn.style.display = window.scrollY > 300 ? 'flex' : 'none');
-    scrollBtn.addEventListener('click', () => window.scrollTo({ top: 0, behavior: 'smooth' }));
-
-    function updateFavorite(icon, productId) {
-        let favorites = JSON.parse(localStorage.getItem('elixir_favorites')) || [];
-        const index = favorites.indexOf(productId);
-        if (index === -1) {
-            favorites.push(productId);
-            icon.classList.add('active');
-            icon.innerHTML = '<i class="fa-solid fa-heart"></i>';
-        } else {
-            favorites.splice(index, 1);
-            icon.classList.remove('active');
-            icon.innerHTML = '<i class="fa-regular fa-heart"></i>';
-        }
-        localStorage.setItem('elixir_favorites', JSON.stringify(favorites));
-    }
-    
-    function burstHearts(x, y) {
-        for (let i = 0; i < 10; i++) {
-            const heart = document.createElement('div');
-            heart.innerHTML = '❤️';
-            heart.classList.add('heart-particle');
-            const offsetX = (Math.random() - 0.5) * 50;
-            const offsetY = (Math.random() - 0.5) * 40;
-            heart.style.left = (x + offsetX) + 'px';
-            heart.style.top = (y + offsetY) + 'px';
-            heart.style.animationDelay = (Math.random() * 0.2) + 's';
-            document.body.appendChild(heart);
-            setTimeout(() => heart.remove(), 1000);
-        }
-    }
-    
-    const grid = document.getElementById('oilsGrid');
-    if (grid) {
-        grid.addEventListener('click', (e) => {
-            const heartIcon = e.target.closest('.fav-icon');
-            if (!heartIcon) return;
-            e.preventDefault();
-            e.stopPropagation();
-            const rect = heartIcon.getBoundingClientRect();
-            burstHearts(rect.left + rect.width / 2, rect.top + rect.height / 2);
-            const productId = parseInt(heartIcon.getAttribute('data-id'));
-            updateFavorite(heartIcon, productId);
-        });
-    }
-    
+        // تأثير fade-up
     (function() {
         const elements = document.querySelectorAll('.oil-card, .product-card, .collection-card, section');
         elements.forEach(el => el.classList.add('fade-up'));
@@ -253,16 +174,85 @@
             });
         };
     })();
-    
-    function initCartBadge() {
-        const cart = JSON.parse(localStorage.getItem('elixir_cart')) || [];
-        const total = cart.reduce((sum, item) => sum + item.quantity, 0);
-        const headerBadge = document.querySelector('.cart-count');
-        if (headerBadge) headerBadge.innerText = total;
-        if (window.updateFloatingCart) window.updateFloatingCart();
-    }
-    initCartBadge();
+
+    // الفلتر
+    const filterSelect = document.getElementById('filterSelect');
+    filterSelect.addEventListener('change', () => renderProducts(filterSelect.value));
+    document.getElementById('resetFilter').addEventListener('click', () => renderProducts('all'));
+
+    // زر الرجوع للأعلى
+    const scrollBtn = document.getElementById('scrollTopBtn');
+    window.addEventListener('scroll', () => scrollBtn.style.display = window.scrollY > 300 ? 'flex' : 'none');
+    scrollBtn.addEventListener('click', () => window.scrollTo({ top: 0, behavior: 'smooth' }));
+
+    // البداية
     renderProducts('all');
+    // ========== دوال المفضلة (مع الحفاظ على القلوب المتطايرة والتأثيرات) ==========
+function burstHearts(x, y) {
+    for (let i = 0; i < 12; i++) {
+        const heart = document.createElement('div');
+        heart.innerHTML = '❤️';
+        heart.classList.add('heart-particle');
+        const offsetX = (Math.random() - 0.5) * 60;
+        const offsetY = (Math.random() - 0.5) * 50;
+        heart.style.left = (x + offsetX) + 'px';
+        heart.style.top = (y + offsetY) + 'px';
+        heart.style.animationDelay = (Math.random() * 0.2) + 's';
+        document.body.appendChild(heart);
+        setTimeout(() => heart.remove(), 1000);
+    }
+}
+
+function updateFavCount() {
+    let favorites = JSON.parse(localStorage.getItem('elixir_favorites') || '[]');
+    const countSpan = document.querySelector('.favorite-count');
+    if (countSpan) countSpan.innerText = favorites.length;
+}
+
+function toggleFavorite(icon, productId) {
+    // تطاير القلوب
+    const rect = icon.getBoundingClientRect();
+    burstHearts(rect.left + rect.width / 2, rect.top + rect.height / 2);
+    
+    let favorites = JSON.parse(localStorage.getItem('elixir_favorites') || '[]');
+    const index = favorites.indexOf(productId);
+    
+    if (index === -1) {
+        favorites.push(productId);
+        icon.classList.add('active');
+        icon.innerHTML = '<i class="fa-solid fa-heart"></i>';
+    } else {
+        favorites.splice(index, 1);
+        icon.classList.remove('active');
+        icon.innerHTML = '<i class="fa-regular fa-heart"></i>';
+    }
+    localStorage.setItem('elixir_favorites', JSON.stringify(favorites));
+    updateFavCount();
+}
+
+// ربط أحداث القلب بعد تحميل المنتجات
+function attachFavEvents() {
+    document.querySelectorAll('.fav-icon').forEach(icon => {
+        icon.removeEventListener('click', window.favHandler);
+        window.favHandler = (e) => {
+            e.stopPropagation();
+            const id = parseInt(icon.getAttribute('data-id'));
+            toggleFavorite(icon, id);
+        };
+        icon.addEventListener('click', window.favHandler);
+    });
+}
+
+// تعديل دالة renderProducts لربط أحداث القلب بعد التحديث (بدون كسر أي شيء)
+const originalRender = renderProducts;
+renderProducts = function(selectedCategory = 'all') {
+    originalRender(selectedCategory);
+    attachFavEvents();
+};
+
+// تشغيل ربط الأحداث بعد التحميل الأول
+attachFavEvents();
+updateFavCount();
 </script>
 </body>
 </html>

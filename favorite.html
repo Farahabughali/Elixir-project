@@ -26,7 +26,7 @@
         <div class="container" style="max-width:1400px; margin:0 auto; padding:0 1.5rem;">
             <div class="page-header" style="text-align:center; margin-bottom:2rem;">
                 <h1 style="color:#2c5f2d; background:rgba(255,255,255,0.6); display:inline-block; padding:0.5rem 2rem; border-radius:50px;">
-                    <i class="fa-regular fa-heart"></i> منتجاتي المفضلة <i class="fa-regular fa-heart"></i>
+                     منتجاتي المفضلة
                 </h1>
             </div>
             <div class="products-grid" id="favoritesGrid"></div>
@@ -109,7 +109,7 @@ const allProducts = [
     { id: 67, name: "زيت الباتشولي", category: "للشعر", desc: "مضاد للفطريات، يمنح رائحة ترابية دافئة", price: 45, img: "asset/images/patchouli.jpg" },
         { id: 68, name: "بهارات مشكلة (عربية)", category: "عربية", desc: "خليط متكامل من البهارات العربية الأصيلة، مثالي للأرز واللحوم", price: 12, rating: 4.8, img: "asset/images/spice-mix.jpg" },
         { id: 69, name: "بهارات الكبسة", category: "عربية", desc: "خليط بهارات الكبسة الخليجية، يضفي نكهة رائعة على الأرز والدجاج", price: 10, rating: 4.7, img: "asset/images/kabsa-spice.jpg" },
-        { id: 70, name: "بهارات اللحم)", category: "عربية", desc: "مزيج قوي ومناسب للحوم والقدور، يمنح نكهة عميقة", price: 14, rating: 4.9, img: "asset/images/meat-spice.jpg" },
+        { id: 70, name: "بهارات اللحم", category: "عربية", desc: "مزيج قوي ومناسب للحوم والقدور، يمنح نكهة عميقة", price: 14, rating: 4.9, img: "asset/images/meat-spice.jpg" },
         { id: 71, name: "بهارات المندي", category: "عربية", desc: "خليط المندي العطري، يستخدم للأرز واللحم", price: 11, rating: 4.6, img: "asset/images/mandi-spice.jpg" },
         { id: 72, name: "سماق", category: "عربية", desc: "بهار حامض قليلًا، يستخدم على اللحوم والسلطات", price: 8, rating: 4.5, img: "asset/images/sumac.jpg" },
         { id: 73, name: "كمون", category: "عربية", desc: "من أهم البهارات في المطبخ العربي، يعزز الهضم", price: 7, rating: 4.6, img: "asset/images/cumin-spice.jpg" },
@@ -189,9 +189,23 @@ function displayFavorites() {
     let html = '';
     favProducts.forEach(product => {
         let categoryText = "";
-        if (product.category === "عطري") categoryText = "زيت عطري";
+        if (product.category === "نباتي") categoryText = "زيت نباتي ثابت";
+       else if (product.category === "تونر") categoryText = " تونرات طبيعية";
+       else if (product.category === "صابون") categoryText = " صابونات طبيعية";
+         else if (product.category === "مقشر") categoryText = " مقشرات طبيعية";
+         else if (product.category === "مرطب") categoryText = " مرطبات طبيعية";
+         else if (product.category === "عطري") categoryText = " زيوت عطرية طبيعية";
         else if (product.category === "نباتي") categoryText = "زيت نباتي ثابت";
-        else categoryText = "للبشرة والشعر";
+        else if (product.category === "للشعر") categoryText = "منتج للشعر";
+        else if (product.category === "للبشرة") categoryText = "منتج للبشرة";
+        else if (product.category === "علاجي") categoryText = "منتج علاجي";
+        else if (product.category === "عطرية") categoryText = " منتجات عطرية طبيعية";
+        else if (product.category === "طبية") categoryText = " منتجات علاجية طبيعية";
+        else if (product.category === "خلطات أعشاب") categoryText = "خلطات أعشاب";
+        else if (product.category === "خلطات ") categoryText = "خلطات بهارات";
+        else if (product.category === "عربية") categoryText = "بهارات عربية";
+        else if (product.category === "عالمية") categoryText = "بهارات عالمية";
+        else categoryText = "أخرى";
 
         html += `
             <div class="fav-card" data-id="${product.id}">

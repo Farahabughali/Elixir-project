@@ -7,6 +7,8 @@
     <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <link rel="stylesheet" href="herbs.css">
+    <link rel="stylesheet" href="floating-share.css">
+
 </head>
 <body>
 
@@ -64,11 +66,11 @@
 
 <link rel="stylesheet" href="floating-cart.css">
 <script src="floating-cart.js"></script>
-
+<script src="floating-share.js"></script>
 <script>
-    // ====== البيانات الثابتة (الافتراضية) ======
-    const defaultHerbsData = [
-        { id: 1, name: "عسل طبيعي متعدد الأعشاب", category: "طبية", desc: "يعتبر مضاداً طبيعياً للأكسدة والبكتيريا، مما يساعد في تقوية الجسم", price: 12, rating: 4.7, img: "asset/images/herbalhoney.png" },
+    // بيانات الأعشاب (نفس البيانات مع إزالة التكرارات)
+    const herbsData = [
+      { id: 1, name: "عسل طبيعي متعدد الأعشاب", category: "طبية", desc: "يعتبر مضاداً طبيعياً للأكسدة والبكتيريا، مما يساعد في تقوية الجسم", price: 12, rating: 4.7, img: "asset/images/herbalhoney.png" },
         { id: 2, name: "عشبة البابونج", category: "طبية", desc: "مهدئ طبيعي، يساعد على الاسترخاء والنوم، مفيد للجهاز الهضمي", price: 12, rating: 4.7, img: "asset/images/chamomileherb.jpg" },
         { id: 3, name: "عشبة النعناع الفلفلي", category: "عطرية", desc: "منعش، يخفف عسر الهضم والصداع، يمنح طاقة", price: 10, rating: 4.8, img: "asset/images/peppermintherb.jpg" },
         { id: 4, name: "عشبة الزعتر", category: "طبية", desc: "مضاد للسعال والتهاب الحلق، يقوي المناعة", price: 14, rating: 4.6, img: "asset/images/thymeherb.jpg" },
@@ -77,9 +79,9 @@
         { id: 7, name: "اللافندر", category: "عطرية", desc: "مهدئ للأعصاب، يساعد على النوم العميق، يخفف التوتر", price: 16, rating: 4.8, img: "asset/images/lavenderherb.jpg" },
         { id: 8, name: "الحبة السوداء", category: "طبية", desc: "تقوي المناعة، تعالج مشاكل الجلد والشعر، مضادة للالتهابات", price: 18, rating: 4.9, img: "asset/images/blackseedherb.jpg" },
         { id: 9, name: "اليانسون النجمي", category: "طبية", desc: "مفيد للجهاز الهضمي، يخفف المغص والانتفاخات، مدر للحليب", price: 11, rating: 4.5, img: "asset/images/anise.jpg" },
-        { id: 10, name: "الكركديه", category: "خلطات", desc: "يخفض ضغط الدم، غني بمضادات الأكسدة، منعش", price: 9, rating: 4.6, img: "asset/images/hibiscus.jpg" },
-        { id: 11, name: "الزنجبيل", category: "خلطات", desc: "مضاد للغثيان، يخفف آلام المفاصل، يعزز المناعة", price: 12, rating: 4.7, img: "asset/images/ginger.jpg" },
-        { id: 12, name: "القرفة", category: "خلطات", desc: "تنظم سكر الدم، مضادة للأكسدة، تحسن الهضم", price: 10, rating: 4.8, img: "asset/images/cinnamon.jpg" },
+        { id: 10, name: "الكركديه", category: "خلطات أعشاب", desc: "يخفض ضغط الدم، غني بمضادات الأكسدة، منعش", price: 9, rating: 4.6, img: "asset/images/hibiscus.jpg" },
+        { id: 11, name: "الزنجبيل", category: "خلطات أعشاب", desc: "مضاد للغثيان، يخفف آلام المفاصل، يعزز المناعة", price: 12, rating: 4.7, img: "asset/images/ginger.jpg" },
+        { id: 12, name: "القرفة", category: "خلطات أعشاب", desc: "تنظم سكر الدم، مضادة للأكسدة، تحسن الهضم", price: 10, rating: 4.8, img: "asset/images/cinnamon.jpg" },
         { id: 13, name: "البردقوش", category: "طبية", desc: "مهدئ للأعصاب، يساعد على الهضم، مفيد للنساء", price: 13, rating: 4.5, img: "asset/images/marjoram.jpg" },
         { id: 14, name: "الشمر", category: "طبية", desc: "مفيد للهضم، يخفف الانتفاخات، مدر للحليب", price: 11, rating: 4.6, img: "asset/images/fennel.jpg" },
         { id: 15, name: "العرقسوس", category: "طبية", desc: "ملين للمعدة، يخفف السعال، مفيد للجهاز التنفسي", price: 9, rating: 4.4, img: "asset/images/licorice.jpg" },
@@ -88,107 +90,44 @@
         { id: 18, name: "الجنكة بيلوبا", category: "طبية", desc: "يحسن الذاكرة والتركيز، ينشط الدورة الدموية الدماغية", price: 22, rating: 4.8, img: "asset/images/ginkgo.jpg" },
         { id: 19, name: "الاشواغاندا", category: "طبية", desc: "مكيف طبيعي، يقلل التوتر والقلق، يعزز الطاقة", price: 25, rating: 4.9, img: "asset/images/ashwagandha.jpg" },
         { id: 20, name: "الريحان المقدس", category: "عطرية", desc: "مضاد للإجهاد، يعزز المناعة، مفيد للجهاز التنفسي", price: 14, rating: 4.7, img: "asset/images/holybasil.jpg" },
-        { id: 21, name: "البقدونس", category: "خلطات", desc: "مدر للبول، غني بالفيتامينات، مفيد للكلى", price: 6, rating: 4.5, img: "asset/images/parsley.jpg" },
-        { id: 22, name: "الكزبرة", category: "خلطات", desc: "مضادة للأكسدة، تساعد على الهضم، تخفض الكوليسترول", price: 8, rating: 4.6, img: "asset/images/coriander.jpg" },
+        { id: 21, name: "البقدونس", category: "خلطات أعشاب", desc: "مدر للبول، غني بالفيتامينات، مفيد للكلى", price: 6, rating: 4.5, img: "asset/images/parsley.jpg" },
+        { id: 22, name: "الكزبرة", category: "خلطات أعشاب", desc: "مضادة للأكسدة، تساعد على الهضم، تخفض الكوليسترول", price: 8, rating: 4.6, img: "asset/images/coriander.jpg" },
         { id: 23, name: "الحلبة", category: "طبية", desc: "مفيدة للرضاعة، تنظم السكر، تقوي الشعر", price: 10, rating: 4.7, img: "asset/images/fenugreek.jpg" },
         { id: 24, name: "المليسا", category: "عطرية", desc: "مضادة للقلق، تحسن المزاج، تساعد على النوم", price: 15, rating: 4.7, img: "asset/images/lemonbalm.jpg" },
-        { id: 25, name: "الزوفا", category: "طبية", desc: "مقشع، مضاد للسعال، مفيد للجهاز التنفسي", price: 12, rating: 4.5, img: "asset/images/hyssop.jpg" },
-        { id: 26, name: "الآس", category: "عطرية", desc: "معطر طبيعي، قابض، مفيد للبشرة", price: 14, rating: 4.6, img: "asset/images/myrtle.jpg" },
-        { id: 27, name: "الأقحوان", category: "طبية", desc: "يخفض الحرارة، مفيد للعينين، مهدئ", price: 11, rating: 4.5, img: "asset/images/chrysanthemum.jpg" },
-        { id: 28, name: "القرنفل", category: "خلطات", desc: "مسكن لآلام الأسنان، مضاد للالتهابات", price: 9, rating: 4.6, img: "asset/images/cloveherb.jpg" },
-        { id: 29, name: "الهيل", category: "خلطات", desc: "منعش للفم، مفيد للهضم، مضاد للأكسدة", price: 20, rating: 4.7, img: "asset/images/cardamomherb.jpg" },
-        { id: 30, name: "الكركم", category: "خلطات", desc: "مضاد قوي للالتهابات، غني بمضادات الأكسدة", price: 15, rating: 4.9, img: "asset/images/turmeric.jpg" },
+        { id: 25, name: "الزوفا", category: "طبية", desc: "مقشع، مضاد للسعال， مفيد للجهاز التنفسي", price: 12, rating: 4.5, img: "asset/images/hyssop.jpg" },
+        { id: 26, name: "الآس", category: "عطرية", desc: "معطر طبيعي， قابض， مفيد للبشرة", price: 14, rating: 4.6, img: "asset/images/myrtle.jpg" },
+        { id: 27, name: "الأقحوان", category: "طبية", desc: "يخفض الحرارة， مفيد للعينين， مهدئ", price: 11, rating: 4.5, img: "asset/images/chrysanthemum.jpg" },
+        { id: 28, name: "القرنفل", category: "خلطات أعشاب", desc: "مسكن لآلام الأسنان، مضاد للالتهابات", price: 9, rating: 4.6, img: "asset/images/cloveherb.jpg" },
+        { id: 29, name: "الهيل", category: "خلطات أعشاب", desc: "منعش للفم، مفيد للهضم، مضاد للأكسدة", price: 20, rating: 4.7, img: "asset/images/cardamomherb.jpg" },
+        { id: 30, name: "الكركم", category: "خلطات أعشاب", desc: "مضاد قوي للالتهابات، غني بمضادات الأكسدة", price: 15, rating: 4.9, img: "asset/images/turmeric.jpg" },
         { id: 31, name: "الجنسنغ", category: "طبية", desc: "مقوي عام، يزيد الطاقة، يحسن الأداء الذهني", price: 35, rating: 4.9, img: "asset/images/ginseng.jpg" },
         { id: 32, name: "الإخناسيا", category: "طبية", desc: "مقوي للمناعة، يقي من نزلات البرد", price: 22, rating: 4.8, img: "asset/images/echinacea.jpg" },
         { id: 33, name: "القطيفة", category: "طبية", desc: "مضادة للالتهابات، تهدئ البشرة، مفيدة للجروح", price: 13, rating: 4.6, img: "asset/images/calendula.jpg" },
         { id: 34, name: "الريحان", category: "عطرية", desc: "مضاد للتوتر، يحسن المزاج، مفيد للجهاز الهضمي", price: 12, rating: 4.7, img: "asset/images/basil.jpg" },
-        { id: 35, name: "الزعفران", category: "خلطات", desc: "مضاد للاكتئاب، يحسن المزاج، غني بمضادات الأكسدة", price: 50, rating: 4.9, img: "asset/images/saffron.jpg" },
-        { id: 36, name: "الكمون", category: "خلطات", desc: "يساعد على الهضم، مضاد للأكسدة، يخفض الكوليسترول", price: 8, rating: 4.6, img: "asset/images/cumin.jpg" },
-        { id: 37, name: "القرطم", category: "طبية", desc: "مضاد للالتهابات، مفيد للقلب والشرايين", price: 18, rating: 4.7, img: "asset/images/safflower.jpg" }
+        { id: 35, name: "الزعفران", category: "خلطات أعشاب", desc: "مضاد للاكتئاب، يحسن المزاج، غني بمضادات الأكسدة", price: 50, rating: 4.9, img: "asset/images/saffron.jpg" },
+        { id: 36, name: "الكمون", category: "خلطات أعشاب", desc: "يساعد على الهضم، مضاد للأكسدة، يخفض الكوليسترول", price: 8, rating: 4.6, img: "asset/images/cumin.jpg" },
+        { id: 37, name: "القرطم", category: "طبية", desc: "مضاد للالتهابات، مفيد للقلب والشرايين", price: 18, rating: 4.7, img: "asset/images/safflower.jpg" },
     ];
-
-    // جلب المنتجات من localStorage ودمجها مع الافتراضية
-    function getAllHerbs() {
-        // جلب المنتجات من localStorage (التي أضافها الأدمن)
-        const storedProducts = JSON.parse(localStorage.getItem('elixir_products') || '[]');
-        
-        // فلترة المنتجات التي تنتمي لفئة الأعشاب (أعشاب طبيعية)
-        const adminHerbs = storedProducts.filter(p => p.category === 'أعشاب طبيعية' && p.active !== false);
-        
-        // تحويل البيانات الافتراضية إلى نفس الشكل
-        const defaultHerbs = defaultHerbsData.map(herb => ({
-            id: herb.id,
-            name: herb.name,
-            category: herb.category,
-            desc: herb.desc,
-            price: herb.price,
-            img: herb.img,
-            usage: herb.desc,
-            active: true
-        }));
-        
-        const allHerbs = [...defaultHerbs];
-        
-        adminHerbs.forEach(adminHerb => {
-            // التحقق من الاسم فقط لمنع التكرار (أفضل من id)
-            const exists = allHerbs.some(h => h.name === adminHerb.name);
-            
-            if (!exists) {
-                // تحديد الفئة المناسبة من subCategory أو جعلها "طبية" كافتراضي
-                let productCategory = adminHerb.subCategory || "طبية";
-                
-                allHerbs.push({
-                    id: adminHerb.id,
-                    name: adminHerb.name,
-                    category: productCategory,
-                    desc: adminHerb.desc || adminHerb.usage || "منتج طبيعي 100%",
-                    price: adminHerb.price,
-                    img: adminHerb.image || "asset/images/placeholder.png",
-                    usage: adminHerb.usage || adminHerb.desc,
-                    active: adminHerb.active
-                });
-            } else {
-                // إذا كان المنتج موجوداً، قم بتحديث بياناته (السعر مثلاً)
-                const existingIndex = allHerbs.findIndex(h => h.name === adminHerb.name);
-                if (existingIndex !== -1) {
-                    allHerbs[existingIndex] = {
-                        ...allHerbs[existingIndex],
-                        price: adminHerb.price,
-                        desc: adminHerb.desc || adminHerb.usage || allHerbs[existingIndex].desc,
-                        img: adminHerb.image || allHerbs[existingIndex].img,
-                        usage: adminHerb.usage || adminHerb.desc
-                    };
-                }
-            }
-        });
-        
-         return allHerbs.filter(herb => herb.active !== false);
-    }
 
     function renderProducts(selectedCategory = 'all') {
         const grid = document.getElementById("herbsGrid");
-        let herbsData = getAllHerbs();
-        
         let filtered = herbsData;
         if (selectedCategory !== 'all') {
             filtered = herbsData.filter(herb => herb.category === selectedCategory);
         }
-        
-        const favorites = JSON.parse(localStorage.getItem('elixir_favorites') || '[]');
-        
         if (filtered.length === 0) {
             grid.innerHTML = `<div class="no-results"><i class="fas fa-search"></i> لا توجد أعشاب مطابقة للفلتر</div>`;
             return;
         }
-        
         grid.innerHTML = filtered.map(herb => {
             let categoryText = "";
             if (herb.category === "طبية") categoryText = "عشبة طبية";
             else if (herb.category === "عطرية") categoryText = "عشبة عطرية";
             else categoryText = "خلطة خاصة";
             
-            const description = herb.desc || herb.usage || "منتج طبيعي فاخر";
-            const isFav = favorites.includes(herb.id);
+            let isFav = false;
+            let favorites = JSON.parse(localStorage.getItem('elixir_favorites')) || [];
+            if (favorites.includes(herb.id)) isFav = true;
             
             return `
             <div class="herb-card" data-id="${herb.id}">
@@ -199,7 +138,7 @@
                 <div class="herb-info">
                     <div class="herb-cat">${categoryText}</div>
                     <div class="herb-title">${herb.name}</div>
-                    <div class="herb-desc">${description}</div>
+                    <div class="herb-desc">${herb.desc}</div>
                     <div class="price-row">
                         <span class="price">${herb.price} ₪</span>
                         <div class="btn-group">
@@ -213,6 +152,7 @@
         }).join('');
         
         if (window.applyFadeToNewCards) window.applyFadeToNewCards();
+        // تم إزالة bindAddToCartEvents() و bindViewDetailsEvents()
     }
 
     // ========== إضافة المنتج إلى السلة (تفويض الأحداث) ==========
@@ -235,6 +175,7 @@
         }
         localStorage.setItem('elixir_cart', JSON.stringify(cart));
 
+        // تحديث العداد في الهيدر والسلة العائمة
         const headerBadge = document.querySelector('.cart-count');
         if (headerBadge) {
             const total = cart.reduce((sum, item) => sum + item.quantity, 0);
@@ -242,9 +183,10 @@
         }
         if (window.updateFloatingCart) window.updateFloatingCart();
 
+        // إظهار رسالة توست
         const toast = document.getElementById('customToast');
         if (toast) {
-            document.getElementById('toastText').innerHTML = `تمت إضافة ${name} بنجاح`;
+            document.getElementById('toastText').innerHTML = `تمت إضافة ${name} بنجاح، يتمنى ${name} أن ينال إعجابكم 😊`;
             toast.style.display = 'flex';
             setTimeout(() => toast.style.display = 'none', 3000);
         }
@@ -294,6 +236,7 @@
         }
     }
     
+    // تفويض حدث القلب
     const grid = document.getElementById('herbsGrid');
     if (grid) {
         grid.addEventListener('click', (e) => {

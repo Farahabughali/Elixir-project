@@ -180,6 +180,9 @@
             background: #2c5f2d;
             transform: scale(1.01);
         }
+        .note{ 
+            text-align: center;
+        }
         /* الفوتر */
         .footer-policies {
             max-width: 1400px;

@@ -13,7 +13,7 @@
 <div class="hero-banner">
     <img src="asset/images/logo.png" alt="Elixir Logo" style="width: 80px; height: 80px; border-radius: 50%; margin-bottom: 10px; border: 2px solid white;">
     <h1>Elixir</h1>
-    <p>جوهر الطبيعة بروح فلسطينية – أعشاب، ورد، وعطور نقية</p>
+    <p>جوهر الطبيعة بروح فلسطينية – أعشاب، زيوت، بهارات عالمية وعربية، منتجات للعناية الشخصية وأخرى</p>
 </div>
 
 <div class="checkout-grid">
@@ -22,6 +22,8 @@
         <h2><i class="fas fa-box-open"></i> منتجاتك</h2>
         <div id="cartItemsList" class="cart-items"></div>
         <div id="cartTotal" class="cart-total"></div>
+        <div class="note">
+        ⚠️ يضاف عليه رسوم التوصيل حسب منطقتك والتي هي معتمدة من شركة التوصيل </div>
         <div style="text-align: center; margin-top: 20px;">
             <a href="index.html" class="back-link"><i class="fas fa-arrow-right"></i> العودة إلى التسوق</a>
         </div>
@@ -96,7 +98,7 @@
         });
 
         container.innerHTML = html;
-        totalContainer.innerHTML = `💰 الإجمالي: ${total} ₪`;
+        totalContainer.innerHTML = ` الإجمالي: ${total} ₪`;
 
         // أحداث الزيادة والنقصان والحذف
         document.querySelectorAll('.decQty').forEach(btn => {

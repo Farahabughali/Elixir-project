@@ -14,8 +14,20 @@ const corrections = [
     { wrong: "ورد جوري", correct: "زيت الورد الجوري", category: "زيوت" },
     { wrong: "بابنج", correct: "بابونج", category: "أعشاب" },
     { wrong: "زعتره", correct: "زعتر", category: "أعشاب" },
-    { wrong: "بهار", co1rrect: "بهارات", category: "بهارات" },
-    { wrong: "صابون", correct: "صابون", category: "عناية" }
+    { wrong: "بهر", correct: "بهارات", category: "بهارات" },
+    { wrong: "صبون", correct: "صابون", category: "عناية" },
+    { wrong: "غسيل", correct: "غسول", category: "عناية" },
+    { wrong: "افريقي", correct: "الصابونة الافريقية", category: "عناية" },
+    { wrong: "مردقوش", correct: "البردقوش", category: "أعشاب" },
+    { wrong: "قزحه", correct: "الحبة السوداء", category: "أعشاب" },
+    { wrong: "قزحة", correct: "الحبة السوداء", category: "أعشاب" },
+    { wrong: "حبة البركة", correct: "الحبة السوداء", category: "أعشاب" },
+    { wrong: "جنزبيل", correct: "الزنجبيل", category: "أعشاب" },
+    { wrong: "الروزماري", correct: "زيت إكليل الجبل", category: "زيوت" },
+    { wrong: "مرمية", correct: "زيت الميرمية", category: "زيوت" }
+
+
+
 ];
 
 function getCorrection(query) {

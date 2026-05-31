@@ -12,20 +12,25 @@
         floatingBtn.innerHTML = '<i class="fas fa-shopping-cart"></i><span class="wholesale-cart-badge">' + cart.reduce((s, i) => s + i.quantity, 0) + '</span>';
         document.body.appendChild(floatingBtn);
 
-        // النافذة الجانبية
+        // النافذة الجانبية مع تحسين هيكل flex وتثبيت الفوتر
         const sidebar = document.createElement('div');
         sidebar.className = 'wholesale-cart-sidebar';
-        sidebar.innerHTML = `
-            <div class="wholesale-cart-header">
-                <h3>🛒 سلة الجملة</h3>
-                <button class="close-wholesale-cart">&times;</button>
-            </div>
-            <div class="wholesale-cart-items"></div>
-            <div class="wholesale-cart-footer">
-                <div class="wholesale-cart-total">الإجمالي: 0 ₪</div>
-                <button class="wholesale-checkout-btn">إتمام طلب الجملة</button>
-            </div>
-        `;
+       sidebar.innerHTML = `
+    <div class="wholesale-cart-header">
+        <h3>سلة الجملة</h3>
+        <button class="close-wholesale-cart">&times;</button>
+    </div>
+
+    <div class="wholesale-cart-items"></div>
+
+    <div class="wholesale-cart-footer">
+        <div class="wholesale-cart-total">الإجمالي: 0 ₪</div>
+        <button class="wholesale-checkout-btn"
+            onclick="window.location.href='wholesalecheckout.html'">
+            إتمام طلب الجملة
+        </button>
+    </div>
+`;
         document.body.appendChild(sidebar);
 
         // طبقة خلفية داكنة
@@ -65,7 +70,7 @@
         if (!container) return;
 
         if (cart.length === 0) {
-            container.innerHTML = '<div class="wholesale-empty-cart">🛒 سلة الجملة فارغة</div>';
+            container.innerHTML = '<div class="wholesale-empty-cart"> سلة الجملة فارغة</div>';
             if (totalSpan) totalSpan.innerText = 'الإجمالي: 0 ₪';
             return;
         }
@@ -128,8 +133,14 @@
                 updateWholesaleCartVisibility();
             });
         });
-        document.querySelector('.wholesale-checkout-btn')?.addEventListener('click', () => {
-window.location.href='wholesalecheckout.html';        });
+        
+        // زر إتمام الطلب (يتم ربطه بعد كل تحديث)
+        const checkoutBtn = document.querySelector('.wholesale-checkout-btn');
+        if (checkoutBtn) {
+            checkoutBtn.addEventListener('click', () => {
+                window.location.href = 'wholesalecheckout.html';
+            });
+        }
     }
 
     function updateWholesaleCartVisibility() {
@@ -151,7 +162,7 @@ window.location.href='wholesalecheckout.html';        });
         localStorage.setItem('elixir_wholesale_cart', JSON.stringify(cart));
         updateWholesaleCartBadge();
         updateWholesaleCartVisibility();
-        showWholesaleToast(` تمت إضافة ${name} إلى سلة الجملة`);
+        showWholesaleToast(`✅ تمت إضافة ${name} إلى سلة الجملة`);
     };
 
     function showWholesaleToast(message) {

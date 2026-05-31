@@ -8,7 +8,7 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <link rel="stylesheet" href="wholesale.css">
     <link rel="stylesheet" href="wholesale-search-modal.css">
-    <link rel="stylesheet" href="wholesale-cart.css">
+    <link rel="stylesheet" href="wholesale-floating-cart.css">
 </head>
 <body>
 
@@ -94,7 +94,7 @@
 
 <script src="wholesale-search-data.js"></script>
 <script src="wholesale-search-modal.js"></script>
-<script src="wholesale-cart.js"></script>
+<script src="wholesale-floating-cart.js"></script>
 
 <script>
     // ========== منتجات الجملة ==========
@@ -203,139 +203,89 @@
 
     // ========== عرض المنتجات ==========
     function renderProducts() {
-    const grid = document.getElementById("wholesaleGrid");
-    
-    // جلب منتجات الجملة من localStorage
-    let wholesaleProductsFromAdmin = JSON.parse(localStorage.getItem('elixir_wholesale_products_list')) || [];
-    
-    // ✅ فلترة: نعرض فقط المنتجات اللي مش مخفية
-    let visibleProducts = wholesaleProductsFromAdmin.filter(p => p.hidden !== true);
-    
-    // ✅ تحويل المنتجات الظاهرة فقط
-    let adminProducts = visibleProducts.map(p => ({
-        id: p.productId,
-        name: p.productName,
-        price: p.retailPrice,
-        wholesalePrice: p.wholesalePrice,
-        image: p.image || "asset/images/placeholder.png",
-        category: p.category,
-        usage: ""
-    }));
-    
-    // تحويل المنتجات الثابتة (wholesaleProducts)
-    let staticProducts = [];
-    for (let cat in wholesaleProducts) {
-        wholesaleProducts[cat].forEach(p => {
-            staticProducts.push({
-                id: p.id,
-                name: p.name,
-                price: p.retail,
-                wholesalePrice: p.wholesale,
-                image: p.img,
-                category: p.category === "herbs" ? "أعشاب طبيعية" : 
-                         (p.category === "oils" ? "زيوت مركزة" :
-                         (p.category === "spices" ? "بهارات" : "منتجات عناية")),
-                usage: p.desc || "",
-                active: true
+        const grid = document.getElementById("wholesaleGrid");
+        let allProducts = [];
+        
+        if (currentFilter === "all") {
+            allProducts = [
+                ...wholesaleProducts.herbs,
+                ...wholesaleProducts.oils,
+                ...wholesaleProducts.spices,
+                ...wholesaleProducts.care
+            ];
+        } else {
+            allProducts = wholesaleProducts[currentFilter] || [];
+        }
+
+        if (allProducts.length === 0) {
+            grid.innerHTML = `<div class="no-results"><i class="fas fa-search"></i> لا توجد منتجات في هذه الفئة</div>`;
+            return;
+        }
+
+        let favorites = JSON.parse(localStorage.getItem('elixir_wholesale_favorites') || '[]');
+
+        grid.innerHTML = allProducts.map(product => {
+            let categoryText = "";
+            switch(product.category) {
+                case "herbs": categoryText = "🌿 أعشاب طبيعية"; break;
+                case "oils": categoryText = "💧 زيوت طبيعية"; break;
+                case "spices": categoryText = "🧂 بهارات"; break;
+                case "care": categoryText = "🌸 عناية شخصية & ورد"; break;
+            }
+            let isFav = favorites.includes(product.id);
+            return `
+            <div class="wholesale-card" data-id="${product.id}">
+                <div class="wholesale-fav-icon ${isFav ? 'active' : ''}" data-id="${product.id}">
+                    <i class="fa-${isFav ? 'solid' : 'regular'} fa-heart"></i>
+                </div>
+                <img class="wholesale-img" src="${product.img}" alt="${product.name}" onerror="this.src='asset/images/placeholder.png'">
+                <div class="wholesale-info">
+                    <div class="wholesale-cat">${categoryText}</div>
+                    <div class="wholesale-title">${product.name}</div>
+                    <div class="wholesale-desc">${product.desc || ''}</div>
+                    <div class="price-row">
+                        <span class="old-price">${product.retail} ₪</span>
+                        <span class="wholesale-price">${product.wholesale} ₪ (جملة)</span>
+                    </div>
+                    <div class="wholesale-actions">
+                        <button class="view-details-btn" data-id="${product.id}"> عرض التفاصيل</button>
+                        <button class="add-wholesale-cart" data-id="${product.id}" data-name="${product.name}" data-price="${product.wholesale}" data-img="${product.img}"> إضافة إلى السلة</button>
+                    </div>
+                </div>
+            </div>
+            `;
+        }).join('');
+
+        document.querySelectorAll('.wholesale-fav-icon').forEach(icon => {
+            icon.addEventListener('click', (e) => {
+                e.stopPropagation();
+                const id = parseInt(icon.getAttribute('data-id'));
+                toggleWholesaleFavorite(icon, id);
             });
         });
+
+        document.querySelectorAll('.add-wholesale-cart').forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                e.preventDefault();
+                const id = parseInt(btn.getAttribute('data-id'));
+                const name = btn.getAttribute('data-name');
+                const price = parseFloat(btn.getAttribute('data-price'));
+                const img = btn.getAttribute('data-img');
+                addToWholesaleCart(id, name, price, img);
+                showToast(`✅ تمت إضافة ${name} إلى سلة الجملة`);
+            });
+        });
+
+        document.querySelectorAll('.view-details-btn').forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                e.preventDefault();
+                const id = btn.getAttribute('data-id');
+                window.location.href = `product-details.html?id=${id}`;
+            });
+        });
+
+        if (window.applyFadeToWholesaleCards) window.applyFadeToWholesaleCards();
     }
-    
-    // دمج المنتجات (منتجات الأدمن الظاهرة فقط + الثابتة)
-    let allWholesaleProducts = [...adminProducts];
-    
-    staticProducts.forEach(staticProduct => {
-        let exists = allWholesaleProducts.some(p => p.id === staticProduct.id);
-        if (!exists) {
-            allWholesaleProducts.push(staticProduct);
-        }
-    });
-    
-    // فلترة حسب الفئة المختارة
-    let filteredProducts = [];
-    if (currentFilter === "all") {
-        filteredProducts = allWholesaleProducts;
-    } else {
-        filteredProducts = allWholesaleProducts.filter(p => {
-            if (currentFilter === "herbs") return p.category === "أعشاب طبيعية";
-            if (currentFilter === "oils") return p.category === "زيوت مركزة";
-            if (currentFilter === "spices") return p.category === "بهارات";
-            if (currentFilter === "care") return p.category === "منتجات عناية";
-            return false;
-        });
-    }
-    
-    if (filteredProducts.length === 0) {
-        grid.innerHTML = `<div class="no-results"><i class="fas fa-search"></i> لا توجد منتجات في هذه الفئة</div>`;
-        return;
-    }
-    
-    let favorites = JSON.parse(localStorage.getItem('elixir_wholesale_favorites') || '[]');
-    
-    grid.innerHTML = filteredProducts.map(product => {
-        let categoryText = "";
-        switch(product.category) {
-            case "أعشاب طبيعية": categoryText = "🌿 أعشاب طبيعية"; break;
-            case "زيوت مركزة": categoryText = "💧 زيوت طبيعية"; break;
-            case "بهارات": categoryText = "🧂 بهارات"; break;
-            case "منتجات عناية": categoryText = "🌸 عناية شخصية & ورد"; break;
-            default: categoryText = "📦 منتج";
-        }
-        let isFav = favorites.includes(product.id);
-        return `
-        <div class="wholesale-card" data-id="${product.id}">
-            <div class="wholesale-fav-icon ${isFav ? 'active' : ''}" data-id="${product.id}">
-                <i class="fa-${isFav ? 'solid' : 'regular'} fa-heart"></i>
-            </div>
-            <img class="wholesale-img" src="${product.image || 'asset/images/placeholder.png'}" alt="${product.name}" onerror="this.src='asset/images/placeholder.png'">
-            <div class="wholesale-info">
-                <div class="wholesale-cat">${categoryText}</div>
-                <div class="wholesale-title">${product.name}</div>
-                <div class="wholesale-desc">${product.usage?.substring(0, 60) || ''}</div>
-                <div class="price-row">
-                    <span class="old-price">${product.price} ₪</span>
-                    <span class="wholesale-price">${product.wholesalePrice} ₪ (جملة)</span>
-                </div>
-                <div class="wholesale-actions">
-                    <button class="view-details-btn" data-id="${product.id}">📄 عرض التفاصيل</button>
-                    <button class="add-wholesale-cart" data-id="${product.id}" data-name="${product.name}" data-price="${product.wholesalePrice}" data-img="${product.image}">🛒 إضافة إلى السلة</button>
-                </div>
-            </div>
-        </div>
-        `;
-    }).join('');
-    
-    // إعادة ربط الأحداث
-    document.querySelectorAll('.wholesale-fav-icon').forEach(icon => {
-        icon.addEventListener('click', (e) => {
-            e.stopPropagation();
-            const id = parseInt(icon.getAttribute('data-id'));
-            toggleWholesaleFavorite(icon, id);
-        });
-    });
-    
-    document.querySelectorAll('.add-wholesale-cart').forEach(btn => {
-        btn.addEventListener('click', (e) => {
-            e.preventDefault();
-            const id = parseInt(btn.getAttribute('data-id'));
-            const name = btn.getAttribute('data-name');
-            const price = parseFloat(btn.getAttribute('data-price'));
-            const img = btn.getAttribute('data-img');
-            addToWholesaleCart(id, name, price, img);
-            showToast(`✅ تمت إضافة ${name} إلى سلة الجملة`);
-        });
-    });
-    
-    document.querySelectorAll('.view-details-btn').forEach(btn => {
-        btn.addEventListener('click', (e) => {
-            e.preventDefault();
-            const id = btn.getAttribute('data-id');
-            window.location.href = `product-details.html?id=${id}`;
-        });
-    });
-    
-    if (window.applyFadeToWholesaleCards) window.applyFadeToWholesaleCards();
-}
 
     // ========== دوال السلة ==========
     function addToWholesaleCart(id, name, price, img) {

@@ -25,21 +25,21 @@ body {
     gap: 1rem;
     margin-bottom: 2rem;
     padding-bottom: 1rem;
-    border-bottom: 2px solid #c47a3a;
+    border-bottom: 2px solid #358610;
 }
 
 .cart-header h1 {
     font-size: 1.8rem;
-    color: #a05e2a;
+    color: #358610;
 }
 
 .cart-header h1 i {
     margin-left: 0.5rem;
-    color: #c47a3a;
+    color: #358610;
 }
 
 .back-to-shop {
-    background: #c47a3a;
+    background: #358610;
     color: white;
     padding: 0.5rem 1.2rem;
     border-radius: 3rem;
@@ -48,7 +48,7 @@ body {
     transition: 0.2s;
 }
 .back-to-shop:hover {
-    background: #a05e2a;
+    background: #77c254;
     transform: translateY(-2px);
 }
 
@@ -63,15 +63,15 @@ body {
 }
 .empty-cart i {
     font-size: 4rem;
-    color: #c47a3a;
+    color: #358610;
     margin-bottom: 1rem;
 }
 .empty-cart h2 {
-    color: #a05e2a;
+    color: #358610;
     margin-bottom: 0.5rem;
 }
 .start-shopping-btn {
-    background: #c47a3a;
+    background: #358610;
     color: white;
     padding: 0.7rem 1.5rem;
     border-radius: 3rem;
@@ -82,7 +82,7 @@ body {
     margin-top: 1rem;
 }
 .start-shopping-btn:hover {
-    background: #a05e2a;
+    background: #7fc75e;
 }
 
 /* شبكة المنتجات */
@@ -125,7 +125,7 @@ body {
 }
 
 .cart-item-price {
-    color: #c47a3a;
+    color: #358610;
     font-weight: bold;
     margin-bottom: 0.5rem;
 }
@@ -146,7 +146,7 @@ body {
     font-weight: bold;
 }
 .quantity-control button:hover {
-    background: #c47a3a;
+    background: #358610;
     color: white;
 }
 .item-qty {
@@ -155,7 +155,7 @@ body {
     text-align: center;
 }
 .remove-item {
-    background: #e67e22;
+    background: #e62222;
     color: white;
     border: none;
     padding: 0.3rem 0.8rem;
@@ -167,7 +167,7 @@ body {
     gap: 0.3rem;
 }
 .remove-item:hover {
-    background: #d35400;
+    background: #90ba7d;
 }
 
 /* إجمالي السلة */
@@ -186,10 +186,10 @@ body {
 .total-price {
     font-size: 1.8rem;
     font-weight: bold;
-    color: #c47a3a;
+    color: #358610;
 }
 .checkout-btn {
-    background: #a05e2a;
+    background: #358610;
     color: white;
     border: none;
     padding: 0.7rem 1.5rem;
@@ -201,7 +201,7 @@ body {
     width: 100%;
 }
 .checkout-btn:hover {
-    background: #7a4520;
+    background: #01a807;
 }
 
 .home-link {
@@ -209,7 +209,7 @@ body {
     margin-top: 2rem;
     text-align: center;
     width: 100%;
-    color: #a05e2a;
+    color: #4a9627;
     text-decoration: none;
 }
 .home-link:hover {

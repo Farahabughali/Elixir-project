@@ -371,22 +371,23 @@ body {
 }
 
 /* ========== قلوب متطايرة ========== */
+/* حركة القلوب المتطايرة */
 .heart-particle {
     position: fixed;
-    font-size: 1.3rem;
     pointer-events: none;
+    font-size: 20px;
+    animation: flyHeart 1s ease-out forwards;
     z-index: 9999;
-    animation: floatHeart 1s ease-out forwards;
-    color: #e74c3c;
 }
-@keyframes floatHeart {
+
+@keyframes flyHeart {
     0% {
+        transform: scale(1) translateY(0);
         opacity: 1;
-        transform: translateY(0) scale(0.8);
     }
     100% {
+        transform: scale(0.5) translateY(-80px);
         opacity: 0;
-        transform: translateY(-120px) scale(1.2);
     }
 }
 

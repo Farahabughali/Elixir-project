@@ -7,6 +7,9 @@
     <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <link rel="stylesheet" href="packages.css">
+    <link rel="stylesheet" href="floating-share.css">
+
+
 </head>
 <body>
 
@@ -67,8 +70,9 @@
 </button>
 <link rel="stylesheet" href="floating-cart.css">
 <script src="floating-cart.js"></script>
+<script src="floating-share.js"></script>
 <script>
-    const defaultPackagesData  = [
+    const packagesData = [
         { id: 1, name: "بكج النشاط والتوازن", category: "نشاط", desc: "منتجات تمنحك الطاقة والنشاط، مع زيت النعناع المنعش والعسل الطبيعي وزيت الليمون وإكليل الجبل.", price: 65, img: "asset/images/balance-package.png", bgColor: "#fff3e0", btnColor: "#ef6c00" },
         { id: 2, name: "بكج جوهر الورد", category: "ورد", desc: "زيت الورد الجوري، ماء الورد، مرطب الورد وبتلات الورد المجففة للعناية الفاخرة.", price: 110, img: "asset/images/roseessence-package.png", bgColor: "#fce4ec", btnColor: "#c2185b" },
         { id: 3, name: "بكج عالم البهارات", category: "بهارات", desc: "بهارات مشكلة، غارام ماسالا، شاورما وبابريكا – جولة في مطابخ العالم.", price: 45, img: "asset/images/spices-package.jpg", bgColor: "#efebe9", btnColor: "#8d6e63" },
@@ -79,57 +83,13 @@
         { id: 8, name: "بكج العناية بالشعر", category: "شعر", desc: "زيت إكليل الجبل، زيت جوز الهند، زيت الخروع وزيت الأرجان للعناية الفائقة بالشعر.", price: 85, img: "asset/images/hair-package.jpg", bgColor: "#fef3e8", btnColor: "#c47a3a" }
     ];
 
-    // دالة لتحديد الألوان حسب الفئة
-function getColorsByCategory(category) {
-    const colorMap = {
-        'نشاط': { bg: '#fff3e0', btn: '#ef6c00' },
-        'ورد': { bg: '#fce4ec', btn: '#c2185b' },
-        'بهارات': { bg: '#efebe9', btn: '#8d6e63' },
-        'نضارة': { bg: '#e0f7fa', btn: '#00838f' },
-        'هدوء': { bg: '#e8eaf6', btn: '#3949ab' },
-        'عناية': { bg: '#ffe0f0', btn: '#d81b60' },
-        'شفاء': { bg: '#e0f2e0', btn: '#43a047' },
-        'شعر': { bg: '#fef3e8', btn: '#c47a3a' }
-    };
-    return colorMap[category] || { bg: '#ffffff', btn: '#438e56' };
-}
-
-// دالة لجلب كل البكجات (من localStorage + الافتراضية)
-function getAllPackages() {
-    const storedPackages = JSON.parse(localStorage.getItem('elixir_packages') || '[]');
-    const defaultPackages = defaultPackagesData;
-    const allPackages = [...defaultPackages];
-    
-    storedPackages.forEach(adminPkg => {
-        const exists = allPackages.some(p => p.name === adminPkg.name);
-        if (!exists) {
-            allPackages.push({
-                id: adminPkg.id,
-                name: adminPkg.name,
-                category: adminPkg.category,
-                desc: adminPkg.description || adminPkg.desc,
-                price: adminPkg.price,
-                img: adminPkg.image || "asset/images/placeholder.png",
-                bgColor: adminPkg.bgColor || getColorsByCategory(adminPkg.category).bg,
-                btnColor: adminPkg.btnColor || getColorsByCategory(adminPkg.category).btn,
-                catText: adminPkg.catText || "بكج",
-                active: adminPkg.active !== false
-            });
-        }
-    });
-    return allPackages;
-}
-
     let currentFilter = "all";
 
     function renderPackages() {
         const grid = document.getElementById("packagesGrid");
-        let allPackages = getAllPackages();
-        // عرض البكجات النشطة فقط للمستخدمين
-allPackages = allPackages.filter(pkg => pkg.active !== false);
-        let filtered = allPackages;
+        let filtered = packagesData;
         if (currentFilter !== "all") {
-            filtered = allPackages.filter(pkg => pkg.category === currentFilter);
+            filtered = packagesData.filter(pkg => pkg.category === currentFilter);
         }
         if (filtered.length === 0) {
             grid.innerHTML = `<div class="no-results"><i class="fas fa-search"></i> لا توجد بكجات مطابقة للفلتر</div>`;

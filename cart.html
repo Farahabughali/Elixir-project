@@ -9,77 +9,74 @@
     <link rel="stylesheet" href="cart.css">
 </head>
 <body>
-    <div class="glass-card">
-        
+<div class="page-header" style="text-align:center; margin-bottom:2rem;">
 
-        <div class="empty-icon">
-            <i class="fas fa-shopping-cart"></i>
-        </div>
+<h1 style="color:#2c5f2d; background:rgba(255,255,255,0.6); display:inline-block; padding:0.5rem 2rem; border-radius:50px;">
+                     سلّتي
+                </h1>
+</div> 
+<div class="cart-container">
+    <div id="cartContent">
 
-        <h1>سلتك فارغة</h1>
-        <p class="empty-message">لا يوجد أي منتجات في سلة تسوقك<br>أضف منتجاتك لبدء الطلب</p>
-
-        <a href="index.html" class="shop-btn">
-            <i class="fas fa-arrow-left"></i> ابدأ التسوق
-        </a>
-
-       
     </div>
-   <script>
-    // ========== سلة التسوق ==========
+</div>
+
+<script>
     function renderCart() {
-        // جلب المنتجات من localStorage
-        let cart = JSON.parse(localStorage.getItem('elixir_cart')) || [];
-        const container = document.querySelector('.glass-card'); // الحاوية الرئيسية
+        let cart = JSON.parse(localStorage.getItem('elixir_cart') || '[]');
+        const container = document.getElementById('cartContent');
 
         if (cart.length === 0) {
-            // إذا كانت السلة فارغة، ابقي المحتوى الأصلي كما هو
+            container.innerHTML = `
+                <div class="empty-cart">
+                    <div class="empty-icon">
+                        <i class="fas fa-shopping-cart"></i>
+                    </div>
+                    <h1>سلتك فارغة</h1>
+                    <p class="empty-message">لا يوجد أي منتجات في سلة تسوقك<br>أضف منتجاتك لبدء الطلب</p>
+                    <a href="index.html" class="shop-btn">
+                        <i class="fas fa-arrow-left"></i> ابدأ التسوق
+                    </a>
+                </div>
+            `;
             return;
         }
 
-        // بناء محتوى السلة الجديد
-        let html = `
-            <div style="max-width: 1200px; margin: 0 auto; width: 100%;">
-                <h1 style="color:#2c5f2d; text-align:center; margin-bottom:1.5rem;"><i class="fas fa-shopping-cart"></i> سلة التسوق</h1>
-                <div class="cart-grid" style="display:grid; grid-template-columns:repeat(auto-fill, minmax(280px,1fr)); gap:25px; direction:rtl;">
-        `;
+        let html = `<div class="cart-grid">`;
         let total = 0;
         cart.forEach((item, index) => {
             const itemTotal = item.price * item.quantity;
             total += itemTotal;
             html += `
-                <div class="cart-item" style="background:rgba(255,255,255,0.9); border-radius:1.5rem; overflow:hidden;">
-                    <img src="${item.img}" alt="${item.name}" style="width:100%; height:200px; object-fit:cover;" onerror="this.src='asset/images/placeholder.png'">
-                    <div style="padding:1rem; text-align:right;">
-                        <div style="font-weight:bold; color:#2c5f2d;">${item.name}</div>
-                        <div style="color:#438e56; margin:0.5rem 0;">${item.price} ₪</div>
-                        <div style="display:flex; align-items:center; justify-content:center; gap:1rem; margin:0.8rem 0;">
-                            <button class="minus-btn" data-index="${index}" style="background:#e0e0e0; border:none; width:30px; height:30px; border-radius:50%; cursor:pointer;">-</button>
+                <div class="cart-item">
+                    <img class="cart-item-img" src="${item.img}" alt="${item.name}" onerror="this.src='asset/images/placeholder.png'">
+                    <div class="cart-item-info">
+                        <div class="cart-item-title">${item.name}</div>
+                        <div class="cart-item-price">${item.price} ₪</div>
+                        <div class="quantity-control">
+                            <button class="qty-btn minus-btn" data-index="${index}">-</button>
                             <span>${item.quantity}</span>
-                            <button class="plus-btn" data-index="${index}" style="background:#e0e0e0; border:none; width:30px; height:30px; border-radius:50%; cursor:pointer;">+</button>
+                            <button class="qty-btn plus-btn" data-index="${index}">+</button>
                         </div>
-                        <button class="remove-btn" data-index="${index}" style="background:#e67e22; color:white; border:none; padding:6px 12px; border-radius:2rem; cursor:pointer; width:100%; margin-top:0.5rem;">إزالة</button>
+                        <button class="remove-btn" data-index="${index}"> إزالة</button>
                     </div>
                 </div>
             `;
         });
+        html += `</div>`;
         html += `
-                </div>
-                <div style="background:rgba(255,255,255,0.9); border-radius:1.5rem; padding:1rem; text-align:center; margin-top:1.5rem;">
-                    <h3>إجمالي السلة</h3>
-                    <div style="font-size:1.5rem; font-weight:bold; color:#438e56;">${total} ₪</div>
-                    <button id="checkoutBtn" style="background:#2c5f2d; color:white; border:none; padding:0.6rem 1.5rem; border-radius:2rem; margin-top:1rem; cursor:pointer;">إتمام الشراء</button>
-                </div>
-                <div style="text-align:center; margin-top:2rem;">
-                    <a href="index.html" style="background:rgba(255,255,255,0.7); padding:8px 20px; border-radius:2rem; text-decoration:none; color:#2c5f2d;">← العودة إلى الرئيسية</a>
-                </div>
+            <div class="cart-summary">
+                <h3>إجمالي السلة</h3>
+                <div class="total-price">${total} ₪</div>
+                <button class="checkout-btn" onclick="window.location.href='checkout.html'">إتمام الشراء</button>
+            </div>
+            <div class="back-link">
+                <a href="index.html"><i class="fas fa-arrow-right"></i> العودة إلى الرئيسية</a>
             </div>
         `;
-
-        // استبدال محتوى .glass-card بالكامل
         container.innerHTML = html;
 
-        // أحداث الأزرار
+        // ربط الأحداث
         document.querySelectorAll('.minus-btn').forEach(btn => {
             btn.addEventListener('click', () => {
                 let idx = parseInt(btn.dataset.index);
@@ -87,7 +84,7 @@
                 if (cart[idx].quantity > 1) cart[idx].quantity--;
                 else cart.splice(idx, 1);
                 localStorage.setItem('elixir_cart', JSON.stringify(cart));
-                renderCart(); // إعادة تحميل السلة
+                renderCart();
             });
         });
         document.querySelectorAll('.plus-btn').forEach(btn => {
@@ -108,15 +105,10 @@
                 renderCart();
             });
         });
-        document.getElementById('checkoutBtn')?.addEventListener('click', () => {
-            alert('شكراً لتسوقك مع Elixir! سيتم توجيهك لصفحة الدفع قريباً.');
-        });
     }
 
-    
-
-    // تشغيل عرض السلة عند تحميل الصفحة
     renderCart();
 </script>
+
 </body>
 </html>

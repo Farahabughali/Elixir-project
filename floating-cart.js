@@ -1,5 +1,16 @@
 // floating-cart.js
 (function() {
+    // تحديد لون الخلفية حسب الصفحة
+function getPageThemeColor() {
+    const path = window.location.pathname;
+    if (path.includes('spices.html')) {
+        return '#b87333'; // لون بني للبهارات
+    } else if (path.includes('care.html') || path.includes('personal-care.html')) {
+        return '#c77d9b'; // لون وردي للعناية
+    } else {
+        return '#2c5f2d'; // الأخضر الأساسي
+    }
+}
   function createFloatingCart() {
     // ✅ إزالة الشرط الذي يمنع إنشاء الزر إذا كانت السلة فارغة
     // let cart = JSON.parse(localStorage.getItem('elixir_cart') || '[]');
@@ -14,19 +25,21 @@
     floatingBtn.className = 'floating-cart-btn';
     floatingBtn.innerHTML = '<i class="fas fa-shopping-cart"></i><span class="cart-badge">' + cart.reduce((s, i) => s + i.quantity, 0) + '</span>';
     document.body.appendChild(floatingBtn);
-
+    
+const themeColor = getPageThemeColor();
+floatingBtn.style.backgroundColor = themeColor;
     // النافذة الجانبية
     const sidebar = document.createElement('div');
     sidebar.className = 'cart-sidebar';
     sidebar.innerHTML = `
         <div class="cart-header">
-            <h3>🛒 سلة التسوق</h3>
+            <h3> سلة التسوق</h3>
             <button class="close-cart">&times;</button>
         </div>
         <div class="cart-items"></div>
         <div class="cart-footer">
             <div class="cart-total">الإجمالي: 0 ₪</div>
-            <button class="checkout-btn">إتمام الشراء</button>
+            <button class="checkout-btn" onclick="window.location.href='checkout.html'">إتمام الشراء</button>
         </div>
     `;
     document.body.appendChild(sidebar);
@@ -40,15 +53,18 @@
     floatingBtn.addEventListener('click', () => {
         sidebar.classList.add('open');
         overlay.classList.add('show');
+        hideShareButton(); // إخفاء زر المشاركة عند فتح السلة
         renderCartSidebar();
     });
     sidebar.querySelector('.close-cart').addEventListener('click', () => {
         sidebar.classList.remove('open');
         overlay.classList.remove('show');
+        showShareButton(); // إظهار زر المشاركة عند إغلاق السلة
     });
     overlay.addEventListener('click', () => {
         sidebar.classList.remove('open');
         overlay.classList.remove('show');
+        showShareButton(); // إظهار زر المشاركة عند إغلاق السلة
     });
 }
 
@@ -240,4 +256,16 @@
             }
         });
     });
+    // إخفاء زر المشاركة عند فتح السلة
+function hideShareButton() {
+    const shareBtn = document.querySelector('.share-fixed-btn');
+    if (shareBtn) shareBtn.style.display = 'none';
+}
+
+// إظهار زر المشاركة عند إغلاق السلة
+function showShareButton() {
+    const shareBtn = document.querySelector('.share-fixed-btn');
+    if (shareBtn) shareBtn.style.display = 'flex';
+}
+
 })();
