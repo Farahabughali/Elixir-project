@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Elixir | دخول الموظفين</title>
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <link rel="stylesheet" href="employee-login.css">
+</head>
+<body>
+
+<div class="login-card">
+    <h1><i class="fas fa-user-tie"></i> دخول الموظفين</h1>
+    <p style="margin-bottom: 25px; color: #666;">Elixir | فريق العمل</p>
+
+    <div class="input-group">
+        <label><i class="fas fa-envelope"></i> البريد الإلكتروني</label>
+        <input type="email" id="empEmail" placeholder="employee@elixir.ps">
+    </div>
+    <div class="input-group">
+        <label><i class="fas fa-lock"></i> كلمة المرور</label>
+        <input type="password" id="empPassword" placeholder="********">
+    </div>
+
+    <button class="login-btn" onclick="loginEmployee()">
+        <i class="fas fa-sign-in-alt"></i> دخول
+    </button>
+    <div id="loginError" class="error-msg"></div>
+    <a href="index.html" class="back-link"><i class="fas fa-arrow-right"></i> العودة للرئيسية</a>
+</div>
+
+<script>
+    // قاعدة بيانات الموظفين (مؤقتة - يمكن نقلها لقاعدة بيانات لاحقاً)
+    const employees = [
+        { email: "admin@elixir.ps", password: "admin123", name: "أحمد", role: "مدير", tasks: ["مراجعة طلبات اليوم", "تحديث سياسات المتجر", "مقابلة موظفين جدد"] },
+        { email: "sara@elixir.ps", password: "sara123", name: "سارة", role: "مسوقة", tasks: ["نشر منشور على انستقرام", "الرد على استفسارات العملاء", "تحضير خطة تسويق للشهر القادم"] },
+        { email: "omar@elixir.ps", password: "omar123", name: "عمر", role: "مصمم", tasks: ["تصميم بانر للعروض", "تعديل صور المنتجات", "إعداد فيديو تعريفي للموقع"] }
+    ];
+
+    function loginEmployee() {
+        const email = document.getElementById('empEmail').value.trim();
+        const password = document.getElementById('empPassword').value.trim();
+        const errorDiv = document.getElementById('loginError');
+
+        const employee = employees.find(emp => emp.email === email && emp.password === password);
+
+        if (employee) {
+            // حفظ بيانات الموظف في localStorage
+            localStorage.setItem('elixir_employee', JSON.stringify({
+                email: employee.email,
+                name: employee.name,
+                role: employee.role,
+                tasks: employee.tasks,
+                loggedIn: true
+            }));
+            window.location.href = 'employee-dashboard.html';
+        } else {
+            errorDiv.innerHTML = '❌ البريد الإلكتروني أو كلمة المرور غير صحيحة';
+        }
+    }
+</script>
+
+</body>
+</html>

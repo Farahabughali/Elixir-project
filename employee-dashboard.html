@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Elixir | لوحة التحكم</title>
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+   <link rel="stylesheet" href="employee-dashboard.css">
+</head>
+<body>
+
+<div class="dashboard-container">
+    <div class="header">
+        <div class="welcome">
+            <h2><i class="fas fa-user-check"></i> مرحباً، <span id="empName">...</span></h2>
+            <p><span id="empRole"></span> @ Elixir</p>
+        </div>
+        <button class="logout-btn" onclick="logout()"><i class="fas fa-sign-out-alt"></i> تسجيل خروج</button>
+    </div>
+
+    <div class="tasks-grid">
+        <!-- المهام الحالية -->
+        <div class="task-card">
+            <h3><i class="fas fa-spinner"></i> المهام الحالية</h3>
+            <ul class="task-list" id="currentTasksList"></ul>
+        </div>
+
+        <!-- المهام السابقة (المكتملة) -->
+        <div class="task-card">
+            <h3><i class="fas fa-check-circle"></i> المهام السابقة / المنجزة</h3>
+            <ul class="task-list" id="completedTasksList"></ul>
+        </div>
+
+        <!-- المهام الملغاة -->
+        <div class="task-card">
+            <h3><i class="fas fa-trash-alt"></i> المهام الملغاة</h3>
+            <ul class="task-list" id="cancelledTasksList"></ul>
+        </div>
+    </div>
+
+    <a href="index.html" class="back-link"><i class="fas fa-arrow-right"></i> العودة للرئيسية</a>
+</div>
+
+<script>
+    // هيكل البيانات الافتراضي للموظف
+    const defaultEmployee = {
+        email: "",
+        name: "",
+        role: "",
+        loggedIn: true,
+        tasks: [
+            { id: 1, text: "مراجعة طلبات اليوم", status: "pending" },
+            { id: 2, text: "تحديث سياسات المتجر", status: "pending" },
+            { id: 3, text: "مقابلة موظفين جدد", status: "pending" },
+            { id: 4, text: "نشر منشور على انستقرام", status: "pending" }
+        ],
+        completedTasks: [
+            { id: 5, text: "تحضير تقرير المبيعات", completedAt: "2025-06-01 14:30" }
+        ],
+        cancelledTasks: [
+            { id: 6, text: "تنظيم ورشة عمل", cancelledAt: "2025-05-30 10:15" }
+        ],
+        nextId: 7
+    };
+
+    let currentEmployee = null;
+
+    function loadEmployeeData() {
+        let empData = JSON.parse(localStorage.getItem('elixir_employee'));
+        
+        if (!empData || !empData.loggedIn) {
+            window.location.href = 'employee-login.html';
+            return;
+        }
+
+        // إذا كان الموظف لا يملك الهيكل الجديد (مهام سابقة وملغاة)
+        if (!empData.completedTasks) empData.completedTasks = [];
+        if (!empData.cancelledTasks) empData.cancelledTasks = [];
+        if (!empData.nextId) empData.nextId = 1;
+        
+        currentEmployee = empData;
+        
+        document.getElementById('empName').innerText = empData.name;
+        document.getElementById('empRole').innerText = empData.role;
+
+        renderTasks();
+    }
+
+    function renderTasks() {
+        // المهام الحالية
+        const currentList = document.getElementById('currentTasksList');
+        const pendingTasks = currentEmployee.tasks.filter(t => t.status === 'pending');
+        
+        if (pendingTasks.length === 0) {
+            currentList.innerHTML = '<li class="empty-msg">🎉 لا توجد مهام حالياً</li>';
+        } else {
+            currentList.innerHTML = pendingTasks.map(task => `
+                <li>
+                    <div style="flex:1">
+                        <div class="task-text">${task.text}</div>
+                    </div>
+                    <div class="actions">
+                        <button class="complete-btn" onclick="completeTask(${task.id})"><i class="fas fa-check"></i> تم</button>
+                        <button class="delete-btn" onclick="cancelTask(${task.id})"><i class="fas fa-times"></i> حذف</button>
+                    </div>
+                </li>
+            `).join('');
+        }
+
+        // المهام المكتملة
+        const completedList = document.getElementById('completedTasksList');
+        if (currentEmployee.completedTasks.length === 0) {
+            completedList.innerHTML = '<li class="empty-msg">📭 لا توجد مهام سابقة</li>';
+        } else {
+            completedList.innerHTML = currentEmployee.completedTasks.map(task => `
+                <li class="completed-task">
+                    <div style="flex:1">
+                        <div class="task-text">${task.text}</div>
+                        <div class="task-date"><i class="far fa-calendar-alt"></i> ${task.completedAt}</div>
+                    </div>
+                    <div class="actions">
+                        <button class="delete-btn" onclick="permanentlyDeleteTask(${task.id}, 'completed')"><i class="fas fa-trash"></i> حذف</button>
+                    </div>
+                </li>
+            `).join('');
+        }
+
+        // المهام الملغاة
+        const cancelledList = document.getElementById('cancelledTasksList');
+        if (currentEmployee.cancelledTasks.length === 0) {
+            cancelledList.innerHTML = '<li class="empty-msg">🗑️ لا توجد مهام ملغاة</li>';
+        } else {
+            cancelledList.innerHTML = currentEmployee.cancelledTasks.map(task => `
+                <li>
+                    <div style="flex:1">
+                        <div class="task-text">${task.text}</div>
+                        <div class="task-date"><i class="far fa-calendar-alt"></i> ألغيت: ${task.cancelledAt}</div>
+                    </div>
+                    <div class="actions">
+                        <button class="delete-btn" onclick="permanentlyDeleteTask(${task.id}, 'cancelled')"><i class="fas fa-trash"></i> حذف نهائي</button>
+                    </div>
+                </li>
+            `).join('');
+        }
+    }
+
+    function completeTask(taskId) {
+        const task = currentEmployee.tasks.find(t => t.id === taskId);
+        if (task && task.status === 'pending') {
+            // نقل المهمة إلى completedTasks
+            currentEmployee.completedTasks.push({
+                id: task.id,
+                text: task.text,
+                completedAt: new Date().toLocaleString('ar-EG')
+            });
+            // حذفها من المهام الحالية
+            currentEmployee.tasks = currentEmployee.tasks.filter(t => t.id !== taskId);
+            
+            saveAndRender();
+        }
+    }
+
+    function cancelTask(taskId) {
+        const task = currentEmployee.tasks.find(t => t.id === taskId);
+        if (task) {
+            // نقل المهمة إلى cancelledTasks
+            currentEmployee.cancelledTasks.push({
+                id: task.id,
+                text: task.text,
+                cancelledAt: new Date().toLocaleString('ar-EG')
+            });
+            // حذفها من المهام الحالية
+            currentEmployee.tasks = currentEmployee.tasks.filter(t => t.id !== taskId);
+            
+            saveAndRender();
+        }
+    }
+
+    function permanentlyDeleteTask(taskId, from) {
+        if (from === 'completed') {
+            currentEmployee.completedTasks = currentEmployee.completedTasks.filter(t => t.id !== taskId);
+        } else if (from === 'cancelled') {
+            currentEmployee.cancelledTasks = currentEmployee.cancelledTasks.filter(t => t.id !== taskId);
+        }
+        saveAndRender();
+    }
+
+    function saveAndRender() {
+        localStorage.setItem('elixir_employee', JSON.stringify(currentEmployee));
+        renderTasks();
+    }
+
+    function logout() {
+        localStorage.removeItem('elixir_employee');
+        window.location.href = 'employee-login.html';
+    }
+                
+
+    loadEmployeeData();
+</script>
+
+</body>
+</html>
