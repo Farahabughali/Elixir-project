@@ -7,6 +7,7 @@
 
 body {
     font-family: 'Cairo', sans-serif;
+    font-size: 14px;
     background: linear-gradient(135deg, #eef5e9 0%, #d4e2c6 100%);
     padding: 2rem;
     color: #3a2a1a;
@@ -44,6 +45,7 @@ body {
     padding: 0.5rem 1.2rem;
     border-radius: 3rem;
     text-decoration: none;
+    margin-top: 1.4rem;
     font-weight: 500;
     transition: 0.2s;
 }
@@ -70,17 +72,16 @@ body {
     color: #358610;
     margin-bottom: 0.5rem;
 }
-.start-shopping-btn {
+  .start-shopping-btn {
     background: #358610;
     color: white;
     padding: 0.7rem 1.5rem;
     border-radius: 3rem;
     text-decoration: none;
-    display: inline-flex;
-    align-items: center;
-    gap: 0.5rem;
-    margin-top: 1rem;
-}
+    font-weight: 500;
+    margin-top: 1.5rem;
+    transition: 0.2s;}
+    
 .start-shopping-btn:hover {
     background: #7fc75e;
 }
