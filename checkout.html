@@ -34,11 +34,11 @@
         <h2><i class="fas fa-user-check"></i> معلومات التوصيل</h2>
         <div class="form-group">
             <label>الاسم الكامل</label>
-            <input type="text" id="fullName" placeholder="مثال: سارة أحمد">
+            <input type="text" id="fullName" placeholder="مثال: قاسم محمد">
         </div>
         <div class="form-group">
             <label>رقم الهاتف</label>
-            <input type="tel" id="phone" placeholder="0598 000 000">
+            <input type="tel" id="phone" placeholder="059- --- ---">
         </div>
         <div class="form-group">
             <label>عنوان التوصيل</label>
@@ -140,13 +140,14 @@
         let cart = JSON.parse(localStorage.getItem('elixir_cart') || '[]');
 
         if (!name || !phone || !address) {
-            alert('❌ الرجاء تعبئة جميع البيانات');
+            showToast('❌ الرجاء تعبئة جميع البيانات');
             return;
         }
         if (cart.length === 0) {
-            alert('❌ سلتك فارغة');
+            showToast('❌ سلتك فارغة');
             return;
         }
+
 
         let total = 0;
         cart.forEach(item => total += item.price * item.quantity);
@@ -166,13 +167,28 @@
             date: new Date().toLocaleString('ar-EG'),
             status: 'جديد'
         };
+        
+function showToast(message) {
+    const oldToast = document.querySelector('.custom-toast');
+    if (oldToast) oldToast.remove();
 
+    const toast = document.createElement('div');
+    toast.className = 'custom-toast';
+    toast.innerHTML = `<i class="fas fa-exclamation-triangle"></i> <span>${message}</span>`;
+    document.body.appendChild(toast);
+
+    setTimeout(() => toast.classList.add('show'), 10);
+    setTimeout(() => {
+        toast.classList.remove('show');
+        setTimeout(() => toast.remove(), 300);
+    }, 3000);
+}
         let orders = JSON.parse(localStorage.getItem('elixir_orders') || '[]');
         orders.unshift(newOrder);
         localStorage.setItem('elixir_orders', JSON.stringify(orders));
 
         localStorage.removeItem('elixir_cart');
-        alert(`✅ تم استلام طلبك رقم ${newOrder.id}`);
+        showToast(`✅ تم استلام طلبك رقم ${newOrder.id}`);
         window.location.href = 'index.html';
     }
 

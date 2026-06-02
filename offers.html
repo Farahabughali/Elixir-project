@@ -3,418 +3,315 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Elixir | العروض والخصومات</title>
+    <title>Elixir | عروض وخصومات</title>
     <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
-    
-    <!-- ربط جميع ملفات CSS الأصلية - كل فئة لها شكلها -->
-    <link rel="stylesheet" href="style.css">
-    <link rel="stylesheet" href="herbs.css">
-    <link rel="stylesheet" href="oils.css">
-    <link rel="stylesheet" href="spices.css">
-    <link rel="stylesheet" href="personal-care.css">
-    <link rel="stylesheet" href="packages.css">
-    
-    <style>
-        /* تنسيقات الصفحة العامة فقط */
-        * { margin: 0; padding: 0; box-sizing: border-box; }
-        body { 
-            font-family: 'Cairo', sans-serif; 
-            background: linear-gradient(135deg, #eef5e9 0%, #d4e2c6 100%); 
-            min-height: 100vh; 
-            padding-top: 90px; 
-        }
-        
-        .main-header { 
-            display: flex; justify-content: space-between; align-items: center; 
-            padding: 5px 40px; height: 80px; background-color: rgb(253, 253, 252); 
-            border-bottom: 1px solid #eee; position: fixed; top: 0; right: 0; left: 0; 
-            z-index: 1000; box-shadow: 0 2px 10px rgba(0,0,0,0.1); direction: rtl; 
-            flex-wrap: wrap; 
-        }
-        .header-right { display: flex; align-items: center; gap: 15px; }
-        .logo-circle img { width: 44px; height: 44px; border-radius: 50%; border: 2px solid #e8f5e9; }
-        .web-name { color: #3e6d44; font-weight: bold; font-size: 1.3rem; font-family: "Playfair Display", serif; }
-        .page-title-in-header { font-size: 1rem; color: #438e56; font-weight: 500; margin-right: 10px; padding-right: 10px; border-right: 1px solid #ccc; }
-        .header-left { display: flex; align-items: center; gap: 15px; flex-wrap: wrap; }
-        .help-text { color: #438e56; font-size: 0.9rem; font-weight: 500; }
-        .ai-consult-link { background: linear-gradient(95deg, #438e56, #5aad6a); color: white; text-decoration: none; padding: 6px 16px; border-radius: 30px; font-size: 0.85rem; font-weight: 600; display: inline-flex; align-items: center; gap: 8px; transition: 0.3s; }
-        .ai-consult-link:hover { background: linear-gradient(95deg, #2d6a3a, #438e56); transform: translateY(-2px); }
-        
-        .offers-header { text-align: center; margin: 30px 0 40px; }
-        .offers-header h1 { font-size: 2rem; color: #438e56; font-family: "Playfair Display", serif; }
-        .offers-header p { color: #888; font-size: 1rem; }
-        
-        .container { max-width: 1400px; margin: 0 auto; padding: 0 1.5rem; }
-        .products-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 30px; }
-        
-        /* شارة الخصم - موحدة للجميع فوق البطاقة */
-        .offer-badge-red { 
-            position: absolute; top: 12px; right: 12px; background: #e74c3c; 
-            color: white; font-weight: bold; padding: 5px 12px; border-radius: 30px; 
-            font-size: 13px; z-index: 15; box-shadow: 0 2px 5px rgba(0,0,0,0.2); 
-        }
-        
-        .old-price-cross { text-decoration: line-through; color: #999; font-size: 0.8rem; margin-right: 5px; }
-        
-        .empty-state { text-align: center; padding: 4rem 2rem; background: rgba(255,255,255,0.7); backdrop-filter: blur(10px); border-radius: 2rem; grid-column: 1 / -1; }
-        .empty-state i { font-size: 4rem; color: #438e56; margin-bottom: 1rem; opacity: 0.5; }
-        .empty-state h3 { font-size: 1.5rem; color: #438e56; margin-bottom: 0.5rem; }
-        
-        .back-home { text-align: center; margin: 2rem 0; }
-        .back-home a { background: rgba(67,142,86,0.1); padding: 10px 25px; border-radius: 40px; color: #438e56; text-decoration: none; transition: 0.2s; display: inline-block; }
-        .back-home a:hover { background: #438e56; color: white; }
-        
-        .toast-message { position: fixed; bottom: 30px; right: 30px; background: #2c5f2d; color: white; padding: 12px 24px; border-radius: 50px; font-size: 0.9rem; z-index: 9999; display: none; align-items: center; gap: 10px; }
-        .scroll-top-btn { position: fixed; bottom: 30px; left: 30px; width: 50px; height: 50px; background: #438e56; color: white; border: none; border-radius: 50%; cursor: pointer; font-size: 1.5rem; z-index: 99; transition: 0.3s; display: flex; align-items: center; justify-content: center; box-shadow: 0 5px 15px rgba(0,0,0,0.2); }
-        .scroll-top-btn:hover { background: #2d6a3a; transform: translateY(-5px); }
-        
-        @media (max-width: 768px) { .main-header { flex-direction: column; height: auto; gap: 10px; padding: 10px; } body { padding-top: 130px; } .products-grid { grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 20px; } }
-    </style>
+    <link rel="stylesheet" href="floating-cart.css">
+    <link rel="stylesheet" href="floating-share.css">
+    <link rel="stylesheet" href="offers.css">
 </head>
 <body>
 
-<header>
+<div class="container">
     <div class="main-header">
-        <div class="header-right">
+        <div class="logo-area">
             <a href="index.html" style="display: flex; align-items: center; gap: 15px; text-decoration: none;">
                 <div class="logo-circle"><img src="asset/images/logo.png" alt="Logo"></div>
-                <span class="web-name">Elixir</span>
             </a>
-            <span class="page-title-in-header">🔥 العروض والخصومات</span>
+            <div>
+                <div class="web-name">Elixir</div>
+                <div class="page-title">عروض وخصومات</div>
+            </div>
         </div>
-        <div class="header-left">
-            <span class="help-text">🔥 خصومات تصل إلى 50% لفترة محدودة!</span>
+        <div class="ai-consult-area">
+            <span class="help-text"> هل تحتاج لمساعدة في اختيار المنتجات المناسبة؟</span>
             <a href="chatbot.html" class="ai-consult-link"><i class="fas fa-robot"></i> استشر الذكاء الاصطناعي</a>
         </div>
     </div>
-</header>
 
-<div class="container">
     <div class="offers-header">
-        <h1>🔥 عروض حصرية</h1>
-        <p>استفد من تخفيضات تصل إلى 50% على منتجات مختارة لفترة محدودة</p>
+        <h1> عروض وخصومات Elixir </h1>
+        <div class="countdown-banner">
+            <div class="countdown-label">
+                <i class="fa-regular fa-hourglass-half"></i> ينتهي العرض خلال:
+            </div>
+            <div class="countdown-timer" id="offerTimer">
+                <div class="timer-block"><span id="days">00</span><span>يوم</span></div>
+                <div class="timer-block"><span id="hours">00</span><span>ساعة</span></div>
+                <div class="timer-block"><span id="minutes">00</span><span>دقيقة</span></div>
+                <div class="timer-block"><span id="seconds">00</span><span>ثانية</span></div>
+            </div>
+        </div>
     </div>
+
     <div class="products-grid" id="offersGrid"></div>
+
     <div class="back-home">
         <a href="index.html"><i class="fas fa-arrow-right"></i> العودة إلى الرئيسية</a>
     </div>
 </div>
 
-<div id="customToast" class="toast-message"><i class="fas fa-check-circle"></i><span id="toastText"></span></div>
-<button id="scrollTopBtn" class="scroll-top-btn"><i class="fas fa-arrow-up"></i></button>
+<div id="customToast" style="display:none; position:fixed; bottom:20px; right:20px; background:#438e56; color:white; padding:12px 20px; border-radius:30px; z-index:9999;">
+    <i class="fas fa-check-circle"></i> <span id="toastText"></span>
+</div>
+
+<script src="floating-cart.js"></script>
+<script src="floating-share.js"></script>
 
 <script>
-    // ============================================================
-    // إدارة العروض بشكل موحد - كل فئة تحافظ على شكل بطاقتها الخاصة
-    // ============================================================
-    
-    function showToast(message) {
-        const toast = document.getElementById('customToast');
-        if (toast) {
-            document.getElementById('toastText').innerHTML = message;
-            
-            toast.style.display = 'flex';
-            setTimeout(() => toast.style.display = 'none', 3000);
+    // ========== منتجات العروض ==========
+    const offersProducts = [
+        { 
+            id: 1, 
+            name: "عسل طبيعي متعدد الأعشاب", 
+            oldPrice: 150, 
+            newPrice: 135, 
+            discount: 10,
+            img: "asset/images/herbalhoney.png"
+        },
+        { 
+            id: 113, 
+            name: "الليفة المغربية", 
+            oldPrice: 70, 
+            newPrice: 49, 
+            discount: 30,
+            img: "asset/images/moroccan-loofah.png"
+        },
+        { 
+            id: 42, 
+            name: "زيت الياسمين", 
+            oldPrice: 45, 
+            newPrice: 36, 
+            discount: 20,
+            img: "asset/images/jasmine-oil.png"
         }
-    }
-    
-    // التحقق من صلاحية العرض
-    function isOfferValid(offer) {
-        if (!offer.endDate || offer.endDate === "") return true;
-        const today = new Date();
-        today.setHours(0, 0, 0, 0);
-        const endDate = new Date(offer.endDate);
-        endDate.setHours(0, 0, 0, 0);
-        return today <= endDate;
-    }
-    
-    function removeExpiredOffers() {
-        let offers = JSON.parse(localStorage.getItem('elixir_offers')) || [];
-        const validOffers = offers.filter(offer => isOfferValid(offer));
-        if (validOffers.length !== offers.length) {
-            localStorage.setItem('elixir_offers', JSON.stringify(validOffers));
-        }
-        return validOffers;
-    }
-    
-    // ========== بطاقة الأعشاب ==========
-    function getHerbCard(offer) {
-        let isFav = (JSON.parse(localStorage.getItem('elixir_favorites')) || []).includes(offer.productId);
-        let catText = offer.catText || "عشبة طبية";
-        let descText = offer.desc || "منتج طبيعي 100%";
-        
-        return `
-            <div class="herb-card" data-id="${offer.productId}" style="position:relative;">
-                <div class="offer-badge-red">-${offer.discount}%</div>
-                <div class="fav-icon ${isFav ? 'active' : ''}" data-id="${offer.productId}">
-                    <i class="fa-${isFav ? 'solid' : 'regular'} fa-heart"></i>
-                </div>
-                <img class="herb-img" src="${offer.productImg}" onerror="this.src='asset/images/placeholder.png'">
-                <div class="herb-info">
-                    <div class="herb-cat">${catText}</div>
-                    <div class="herb-title">${offer.productName}</div>
-                    <div class="herb-desc">${descText.substring(0, 80)}${descText.length > 80 ? '...' : ''}</div>
-                    <div class="price-row">
-                        <span class="price" style="color:#e74c3c; font-weight:bold;">${offer.newPrice} ₪ <span class="old-price-cross">${offer.productPrice} ₪</span></span>
-                        <div class="btn-group">
-                            <button class="view-details" data-id="${offer.productId}"> عرض التفاصيل</button>
-                            <button class="add-cart" data-id="${offer.productId}" data-name="${offer.productName}" data-price="${offer.newPrice}" data-img="${offer.productImg}"> إضافة إلى السلة</button>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        `;
-    }
-    
-    // ========== بطاقة الزيوت ==========
-    function getOilCard(offer) {
-        let isFav = (JSON.parse(localStorage.getItem('elixir_favorites')) || []).includes(offer.productId);
-        let catText = offer.catText || "زيت طبيعي";
-        let descText = offer.desc || "زيت طبيعي نقي";
-        
-        return `
-            <div class="oil-card" data-id="${offer.productId}" style="position:relative;">
-                <div class="offer-badge-red">-${offer.discount}%</div>
-                <div class="fav-icon ${isFav ? 'active' : ''}" data-id="${offer.productId}">
-                    <i class="fa-${isFav ? 'solid' : 'regular'} fa-heart"></i>
-                </div>
-                <img class="oil-img" src="${offer.productImg}" onerror="this.src='asset/images/placeholder.png'">
-                <div class="oil-info">
-                    <div class="oil-cat">${catText}</div>
-                    <div class="oil-title">${offer.productName}</div>
-                    <div class="oil-desc">${descText.substring(0, 80)}${descText.length > 80 ? '...' : ''}</div>
-                    <div class="price-row">
-                        <span class="price" style="color:#e74c3c; font-weight:bold;">${offer.newPrice} ₪ <span class="old-price-cross">${offer.productPrice} ₪</span></span>
-                        <div class="btn-group">
-                            <button class="view-details" data-id="${offer.productId}"> عرض التفاصيل</button>
-                            <button class="add-cart" data-id="${offer.productId}" data-name="${offer.productName}" data-price="${offer.newPrice}" data-img="${offer.productImg}"> إضافة إلى السلة</button>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        `;
-    }
-    
-    // ========== بطاقة البهارات (تم التصحيح - نستخدم offer وليس product) ==========
-    function getSpiceCard(offer) {
-        let isFav = (JSON.parse(localStorage.getItem('elixir_favorites')) || []).includes(offer.productId);
-        let catText = offer.catText || "بهارات عربية";
-        let descText = offer.desc || "بهار طبيعي";
-        
-        return `
-            <div class="spice-card" data-id="${offer.productId}" style="position:relative; background: rgba(255,248,235,0.85); border-radius: 1.5rem; overflow: hidden; box-shadow: 0 4px 12px rgba(0,0,0,0.05);">
-                <div class="offer-badge-red" style="position:absolute; top:12px; right:12px; background:#e74c3c; color:white; font-weight:bold; padding:4px 12px; border-radius:30px; font-size:12px; z-index:15;">-${offer.discount}%</div>
-                <div class="fav-icon ${isFav ? 'active' : ''}" data-id="${offer.productId}">
-                    <i class="fa-${isFav ? 'solid' : 'regular'} fa-heart"></i>
-                </div>
-                <img class="spice-img" src="${offer.productImg}" onerror="this.src='asset/images/placeholder.png'" style="width:100%; height:200px; object-fit:cover;">
-                <div class="spice-info" style="padding:1rem; text-align:right;">
-                    <div class="spice-cat" style="font-size:0.7rem; color:#a67c52;">${catText}</div>
-                    <div class="spice-title" style="font-size:1rem; font-weight:700; color:#6d462a;">${offer.productName}</div>
-                    <div class="spice-desc" style="font-size:0.75rem; color:#8b6844; line-height:1.4; margin:8px 0;">${descText.substring(0, 80)}</div>
-                    <div class="price-row" style="display:flex; justify-content:space-between; align-items:center; margin-top:10px;">
-                        <div>
-                            <span class="old-price" style="text-decoration:line-through; color:#999; font-size:0.8rem;">${offer.productPrice} ₪</span>
-                            <span class="price" style="font-weight:bold; color:#e74c3c; font-size:1.2rem;">${offer.newPrice} ₪</span>
-                        </div>
-                        <div class="btn-group" style="display:flex; gap:8px;">
-                            <button class="view-details" data-id="${offer.productId}" style="background:#b9804b; color:white; border:none; padding:5px 12px; border-radius:30px; cursor:pointer; font-size:0.75rem;"> عرض التفاصيل</button>
-                            <button class="add-cart" data-id="${offer.productId}" data-name="${offer.productName}" data-price="${offer.newPrice}" data-img="${offer.productImg}" style="background:#c47a3a; color:white; border:none; padding:5px 12px; border-radius:30px; cursor:pointer; font-size:0.75rem;"> إضافة إلى السلة</button>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        `;
-    }
-    
-    // ========== بطاقة العناية الشخصية ==========
-    function getCareCard(offer) {
-        let isFav = (JSON.parse(localStorage.getItem('elixir_favorites')) || []).includes(offer.productId);
-        let catText = offer.catText || "عناية شخصية";
-        let descText = offer.desc || "منتج طبيعي للعناية";
-        
-        return `
-            <div class="care-card" data-id="${offer.productId}" style="position:relative;">
-                <div class="offer-badge-red">-${offer.discount}%</div>
-                <div class="fav-icon ${isFav ? 'active' : ''}" data-id="${offer.productId}">
-                    <i class="fa-${isFav ? 'solid' : 'regular'} fa-heart"></i>
-                </div>
-                <img class="care-img" src="${offer.productImg}" onerror="this.src='asset/images/placeholder.png'">
-                <div class="care-info">
-                    <div class="care-cat">${catText}</div>
-                    <div class="care-title">${offer.productName}</div>
-                    <div class="care-desc">${descText.substring(0, 80)}${descText.length > 80 ? '...' : ''}</div>
-                    <div class="price-row">
-                        <span class="price" style="color:#e74c3c; font-weight:bold;">${offer.newPrice} ₪ <span class="old-price-cross">${offer.productPrice} ₪</span></span>
-                        <div class="btn-group">
-                            <button class="view-details" data-id="${offer.productId}"> عرض التفاصيل</button>
-                            <button class="add-cart" data-id="${offer.productId}" data-name="${offer.productName}" data-price="${offer.newPrice}" data-img="${offer.productImg}"> إضافة إلى السلة</button>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        `;
-    }
-    
-    // ========== بطاقة البكجات ==========
-    function getPackageCard(offer) {
-        let isFav = (JSON.parse(localStorage.getItem('elixir_favorites')) || []).includes(offer.productId);
-        let descText = offer.desc || "بكج متكامل";
-        let bgColor = offer.bgColor || "#fff3e0";
-        let btnColor = offer.btnColor || "#ef6c00";
-        
-        return `
-            <div class="package-card" data-id="${offer.productId}" style="position:relative; background: ${bgColor}; border-bottom: 4px solid ${btnColor}; border-radius: 1rem; overflow: hidden;">
-                <div class="offer-badge-red">-${offer.discount}%</div>
-                <div class="fav-icon ${isFav ? 'active' : ''}" data-id="${offer.productId}">
-                    <i class="fa-${isFav ? 'solid' : 'regular'} fa-heart"></i>
-                </div>
-                <img class="package-img" src="${offer.productImg}" onerror="this.src='asset/images/placeholder.png'">
-                <div class="package-info">
-                    <div class="package-title">${offer.productName}</div>
-                    <div class="package-desc">${descText.substring(0, 80)}${descText.length > 80 ? '...' : ''}</div>
-                    <div class="price-row">
-                        <span class="price" style="color:#e74c3c; font-weight:bold;">${offer.newPrice} ₪ <span class="old-price-cross">${offer.productPrice} ₪</span></span>
-                        <button class="add-cart" data-id="${offer.productId}" data-name="${offer.productName}" data-price="${offer.newPrice}" data-img="${offer.productImg}" style="background: ${btnColor};"> إضافة إلى السلة</button>
-                    </div>
-                </div>
-            </div>
-        `;
-    }
-    
-    // اختيار القالب حسب القسم
-    function renderCard(offer) {
-        if (!offer) return '';
-        switch(offer.section) {
-            case 'herbs': return getHerbCard(offer);
-            case 'oils': return getOilCard(offer);
-            case 'spices': return getSpiceCard(offer);
-            case 'care': return getCareCard(offer);
-            case 'packages': return getPackageCard(offer);
-            default:
-                // محاولة تحديد القسم من الفئة
-                if (offer.category === 'أعشاب طبيعية') return getHerbCard(offer);
-                if (offer.category === 'زيوت مركزة') return getOilCard(offer);
-                if (offer.category === 'بهارات') return getSpiceCard(offer);
-                if (offer.category === 'منتجات عناية') return getCareCard(offer);
-                return getHerbCard(offer);
-        }
-    }
-    
+    ];
 
+    // ========== المؤقت العد التنازلي ==========
+    let endDate = new Date(2026, 6, 6, 23, 59, 59);
 
+    function updateCountdown() {
+        const now = new Date().getTime();
+        const distance = endDate - now;
 
-    function renderOffers() {
-        const grid = document.getElementById("offersGrid");
-        if (!grid) return;
-        
-        let validOffers = removeExpiredOffers();
-        
-        if (validOffers.length === 0) {
-            grid.innerHTML = `
-                <div class="empty-state">
-                    <i class="fas fa-tag"></i>
-                    <h3>✨ لا توجد عروض حالياً</h3>
-                    <p>يمكنك إضافة عروض من صفحات المنتجات في لوحة التحكم</p>
-                </div>
-            `;
+        if (distance < 0) {
+            document.getElementById("offerTimer").innerHTML = '<div class="timer-block"><span>انتهى</span><span>العرض</span></div>';
             return;
         }
-        
-        let html = '';
-        for (let offer of validOffers) {
-            html += renderCard(offer);
+
+        const days = Math.floor(distance / (1000 * 60 * 60 * 24));
+        const hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+        const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
+        const seconds = Math.floor((distance % (1000 * 60)) / 1000);
+
+        document.getElementById("days").innerHTML = days < 10 ? "0" + days : days;
+        document.getElementById("hours").innerHTML = hours < 10 ? "0" + hours : hours;
+        document.getElementById("minutes").innerHTML = minutes < 10 ? "0" + minutes : minutes;
+        document.getElementById("seconds").innerHTML = seconds < 10 ? "0" + seconds : seconds;
+    }
+
+    setInterval(updateCountdown, 1000);
+    updateCountdown();
+
+    // ========== حركة القلوب المتطايرة ==========
+    function burstHearts(x, y) {
+        for (let i = 0; i < 12; i++) {
+            const heart = document.createElement('div');
+            heart.innerHTML = '❤️';
+            heart.classList.add('heart-particle');
+            const offsetX = (Math.random() - 0.5) * 60;
+            const offsetY = (Math.random() - 0.5) * 50;
+            heart.style.left = (x + offsetX) + 'px';
+            heart.style.top = (y + offsetY) + 'px';
+            heart.style.animationDelay = (Math.random() * 0.2) + 's';
+            document.body.appendChild(heart);
+            setTimeout(() => heart.remove(), 1000);
         }
-        grid.innerHTML = html;
-        bindEvents();
     }
-    
-    function bindEvents() {
-        // إضافة إلى السلة
-        document.querySelectorAll('.add-cart').forEach(btn => {
-            btn.onclick = (e) => {
-                e.preventDefault();
-                e.stopPropagation();
-                let cart = JSON.parse(localStorage.getItem('elixir_cart')) || [];
-                const existing = cart.find(item => item.id == btn.dataset.id);
-                if (existing) existing.quantity++;
-                else cart.push({ 
-                    id: parseInt(btn.dataset.id), 
-                    name: btn.dataset.name, 
-                    price: parseFloat(btn.dataset.price), 
-                    img: btn.dataset.img, 
-                    quantity: 1 
-                });
-                localStorage.setItem('elixir_cart', JSON.stringify(cart));
-                if (window.updateFloatingCart) window.updateFloatingCart();
-                showToast(`✅ تمت إضافة ${btn.dataset.name} إلى السلة`);
-                const badge = document.querySelector('.cart-count');
-                if (badge) badge.innerText = cart.reduce((s,i) => s + i.quantity, 0);
-            };
-        });
+
+    // ========== دوال المفضلة ==========
+    function updateFavCount() {
+        let favorites = JSON.parse(localStorage.getItem('elixir_favorites') || '[]');
+        const countSpan = document.querySelector('.favorite-count');
+        if (countSpan) countSpan.innerText = favorites.length;
+    }
+
+    function toggleFavorite(icon, productId) {
+        const rect = icon.getBoundingClientRect();
+        burstHearts(rect.left + rect.width / 2, rect.top + rect.height / 2);
         
-        // عرض التفاصيل
-        document.querySelectorAll('.view-details').forEach(btn => {
-            btn.onclick = (e) => {
-                e.preventDefault();
-                e.stopPropagation();
-                window.location.href = `product-details.html?id=${btn.dataset.id}`;
-            };
-        });
-        
-        // المفضلة
+        let favorites = JSON.parse(localStorage.getItem('elixir_favorites') || '[]');
+        const index = favorites.indexOf(productId);
+        if (index === -1) {
+            favorites.push(productId);
+            icon.classList.add('active');
+            icon.innerHTML = '<i class="fa-solid fa-heart"></i>';
+        } else {
+            favorites.splice(index, 1);
+            icon.classList.remove('active');
+            icon.innerHTML = '<i class="fa-regular fa-heart"></i>';
+        }
+        localStorage.setItem('elixir_favorites', JSON.stringify(favorites));
+        updateFavCount();
+    }
+
+    // ========== عرض المنتجات ==========
+    function renderOffers() {
+        const grid = document.getElementById('offersGrid');
+        let favorites = JSON.parse(localStorage.getItem('elixir_favorites') || '[]');
+
+        if (offersProducts.length === 0) {
+            grid.innerHTML = `<div class="no-products" style="text-align:center; padding:60px; background:rgba(255,255,255,0.85); border-radius:30px;"><i class="fas fa-tags"></i><br>لا توجد عروض حالياً<br>ترقبوا عروضنا القادمة!</div>`;
+            return;
+        }
+
+        grid.innerHTML = offersProducts.map(product => {
+            let isFav = favorites.includes(product.id);
+            return `
+                <div class="product-card fade-up">
+                    <div class="discount-badge">-${product.discount}%</div>
+                    <div class="fav-icon ${isFav ? 'active' : ''}" data-id="${product.id}">
+                        <i class="fa-${isFav ? 'solid' : 'regular'} fa-heart"></i>
+                    </div>
+                    <img class="product-img" src="${product.img}" alt="${product.name}" onerror="this.src='asset/images/placeholder.png'">
+                    <div class="product-info">
+                        <div class="product-title">${product.name}</div>
+                        <div class="price-row">
+                            <span class="old-price">${product.oldPrice} ₪</span>
+                            <span class="new-price">${product.newPrice} ₪</span>
+                        </div>
+                        <div class="btn-group">
+                            <button class="details-btn view-details" data-id="${product.id}"> عرض التفاصيل</button>
+                            <button class="add-cart-btn add-to-cart" data-id="${product.id}" data-name="${product.name}" data-price="${product.newPrice}" data-img="${product.img}"> إضافة إلى السلة</button>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }).join('');
+
         document.querySelectorAll('.fav-icon').forEach(icon => {
-            icon.onclick = (e) => {
-                e.preventDefault();
+            icon.addEventListener('click', (e) => {
                 e.stopPropagation();
-                const id = parseInt(icon.dataset.id);
-                let favorites = JSON.parse(localStorage.getItem('elixir_favorites')) || [];
-                const index = favorites.indexOf(id);
-                if (index === -1) {
-                    favorites.push(id);
-                    icon.classList.add('active');
-                    icon.innerHTML = '<i class="fa-solid fa-heart"></i>';
-                } else {
-                    favorites.splice(index, 1);
-                    icon.classList.remove('active');
-                    icon.innerHTML = '<i class="fa-regular fa-heart"></i>';
-                }
-                localStorage.setItem('elixir_favorites', JSON.stringify(favorites));
-            };
+                const id = parseInt(icon.getAttribute('data-id'));
+                toggleFavorite(icon, id);
+            });
         });
+
+        document.querySelectorAll('.view-details').forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                e.preventDefault();
+                const id = btn.dataset.id;
+                window.location.href = `product-details.html?id=${id}`;
+            });
+        });
+
+        document.querySelectorAll('.add-to-cart').forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                e.preventDefault();
+                const id = parseInt(btn.dataset.id);
+                const name = btn.dataset.name;
+                const price = parseFloat(btn.dataset.price);
+                const img = btn.dataset.img;
+                addToCart(id, name, price, img);
+            });
+        });
+
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) entry.target.classList.add('visible');
+            });
+        }, { threshold: 0.1 });
+        document.querySelectorAll('.fade-up').forEach(el => observer.observe(el));
     }
-    
-    function initCartBadge() {
-        const cart = JSON.parse(localStorage.getItem('elixir_cart')) || [];
-        const total = cart.reduce((s,i) => s + i.quantity, 0);
-        const badge = document.querySelector('.cart-count');
-        if (badge) badge.innerText = total;
+
+    // ========== إضافة إلى السلة ==========
+    function addToCart(id, name, price, img) {
+        let cart = JSON.parse(localStorage.getItem('elixir_cart') || '[]');
+        const existing = cart.find(item => item.id === id);
+        if (existing) {
+            existing.quantity++;
+        } else {
+            cart.push({ id, name, price, img, quantity: 1 });
+        }
+        localStorage.setItem('elixir_cart', JSON.stringify(cart));
+        
+        showToast(`✅ تمت إضافة ${name} إلى السلة يتمنى ${name} أن ينال إعجابكم`);
+        
+        const headerBadge = document.querySelector('.cart-count');
+        if (headerBadge) {
+            const total = cart.reduce((sum, i) => sum + i.quantity, 0);
+            headerBadge.innerText = total;
+        }
         if (window.updateFloatingCart) window.updateFloatingCart();
     }
-    
-    const scrollBtn = document.getElementById('scrollTopBtn');
-    if (scrollBtn) {
-        window.addEventListener('scroll', () => {
-            scrollBtn.style.display = window.scrollY > 300 ? 'flex' : 'none';
-        });
-        scrollBtn.addEventListener('click', () => {
-            window.scrollTo({ top: 0, behavior: 'smooth' });
-        });
+
+    function showToast(message) {
+        const toast = document.getElementById('customToast');
+        const toastText = document.getElementById('toastText');
+        toastText.innerText = message;
+        toast.style.display = 'flex';
+        setTimeout(() => {
+            toast.style.display = 'none';
+        }, 3000);
     }
-    
-    // التحقق من العروض منتهية الصلاحية كل 5 دقائق
-    setInterval(() => {
-        removeExpiredOffers();
-        renderOffers();
-    }, 300000);
-    
-    window.addEventListener('storage', function(e) {
-        if (e.key === 'elixir_offers') renderOffers();
-    });
-    
-    initCartBadge();
+
+    // تعديل نص المشاركة لصفحة العروض
+ 
+    // ========== تعديل نص المشاركة لصفحة العروض ==========
+    (function() {
+        // تغيير نص المشاركة عند الضغط على الزر
+        const originalShareHandler = async () => {
+            const shareData = {
+                title: 'Elixir | عروض وخصومات',
+                text: '🔥 عروض وخصومات Elixir – خصومات تصل إلى 30% على منتجاتنا الطبيعية. تسوق الآن واستشر ذكاءنا الاصطناعي مجاناً.',
+                url: window.location.href
+            };
+
+            if (navigator.share) {
+                try {
+                    await navigator.share(shareData);
+                } catch (err) {
+                    if (err.name !== 'AbortError') {
+                        prompt('📋 انسخ الرابط:', shareData.url);
+                    }
+                }
+            } else {
+                prompt('📋 انسخ الرابط والمحتوى وشاركه:', shareData.text + '\n\n' + shareData.url);
+            }
+        };
+
+        // البحث عن زر المشاركة واستبدال حدثه
+        setTimeout(() => {
+            const shareBtn = document.querySelector('.share-fixed-btn');
+            if (shareBtn) {
+                // إزالة الحدث القديم وإضافة الحدث الجديد
+                const newBtn = shareBtn.cloneNode(true);
+                shareBtn.parentNode.replaceChild(newBtn, shareBtn);
+                newBtn.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    originalShareHandler();
+                });
+            }
+        }, 500);
+    })();
+
+    // إظهار زر المشاركة فوراً
+    setTimeout(() => {
+        const shareBtn = document.querySelector('.share-fixed-btn');
+        if (shareBtn) shareBtn.style.display = 'flex';
+    }, 300);
+
+
+
+    // إظهار زر المشاركة فوراً في صفحة العروض
+    setTimeout(() => {
+        const shareBtn = document.querySelector('.share-fixed-btn');
+        if (shareBtn) shareBtn.style.display = 'flex';
+    }, 300);
+
     renderOffers();
+    updateFavCount();
 </script>
+
 </body>
 </html>

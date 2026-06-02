@@ -213,6 +213,39 @@
             color: #5db94b;
             text-decoration: none;
         }
+        /* تنسيق رسالة التوست */
+.custom-toast {
+    position: fixed;
+    bottom: 30px;
+    left: 50%;
+    transform: translateX(-50%) translateY(100px);
+    background: #e45050;
+    color: white;
+    padding: 12px 24px;
+    border-radius: 50px;
+    font-family: 'Cairo', sans-serif;
+    font-size: 0.9rem;
+    z-index: 10000;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+    transition: transform 0.3s ease;
+    direction: rtl;
+    white-space: nowrap;
+}
+
+.custom-toast.show {
+    transform: translateX(-50%) translateY(0);
+}
+
+@media (max-width: 550px) {
+    .custom-toast {
+        white-space: normal;
+        text-align: center;
+        max-width: 90%;
+    }
+}
         @media (max-width: 900px) {
             .checkout-grid {
                 flex-direction: column;

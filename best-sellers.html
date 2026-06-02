@@ -3,14 +3,15 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Elixir | جديدنا</title>
+    <title>Elixir | الأكثر مبيعاً</title>
     <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <link rel="stylesheet" href="floating-cart.css">
     <link rel="stylesheet" href="floating-share.css">
-    <link rel="stylesheet" href="new-arrivals.css">
+    <link rel="stylesheet" href="best-sellers.css">
 </head>
 <body>
+
 
 <div class="container">
     <div class="main-header">
@@ -20,7 +21,7 @@
             </a>
             <div>
                 <div class="web-name">Elixir</div>
-                <div class="page-title">جديدنا</div>
+                <div class="page-title">الأكثر مبيعاً</div>
             </div>
         </div>
         <div class="ai-consult-area">
@@ -29,11 +30,11 @@
         </div>
     </div>
 
-    <div class="new-header">
-        <h1> جديدنا </h1>
+    <div class="best-header">
+        <h1> الأكثر مبيعًا</h1>
     </div>
 
-    <div class="products-grid" id="newArrivalsGrid"></div>
+    <div class="products-grid" id="bestSellersGrid"></div>
 
     <div class="back-home">
         <a href="index.html"><i class="fas fa-arrow-right"></i> العودة إلى الرئيسية</a>
@@ -48,25 +49,25 @@
 <script src="floating-share.js"></script>
 
 <script>
-    // ========== منتجات جديدنا ==========
-    const newProducts = [
+    // ========== منتجات الأكثر مبيعاً ==========
+    const bestSellers = [
         { 
-            id: 51, 
-            name: "زيت اللوز الحلو العضوي", 
-            price: 15, 
-            img: "asset/images/almondoil.png"
+            id: 38, 
+            name: "زيت اللافندر العطري", 
+            price: 38, 
+            img: "asset/images/lavender.jpg"
         },
         { 
-            id: 84, 
-            name: "جارام مسالا بهار هندي", 
-            price: 35, 
-            img: "asset/images/garammasala.png"
+            id: 6, 
+            name: " إكليل الجبل", 
+            price: 55, 
+            img: "asset/images/rosemary.png"
         },
         { 
-            id: 91, 
-            name: "تونر البابونج", 
-            price: 58, 
-            img: "asset/images/chamomiletoner.png"
+            id: 39, 
+            name: "زيت الورد الجوري", 
+            price: 185, 
+            img: "asset/images/rose.jpg"
         }
     ];
 
@@ -113,20 +114,20 @@
     }
 
     // ========== عرض المنتجات ==========
-    function renderNewArrivals() {
-        const grid = document.getElementById('newArrivalsGrid');
+    function renderBestSellers() {
+        const grid = document.getElementById('bestSellersGrid');
         let favorites = JSON.parse(localStorage.getItem('elixir_favorites') || '[]');
 
-        if (newProducts.length === 0) {
-            grid.innerHTML = `<div class="no-products" style="text-align:center; padding:60px; background:rgba(255,255,255,0.85); border-radius:30px;"><i class="fas fa-gift"></i><br>لا توجد منتجات جديدة حالياً<br>ترقبوا جديدنا!</div>`;
+        if (bestSellers.length === 0) {
+            grid.innerHTML = `<div class="no-products" style="text-align:center; padding:60px; background:rgba(255,255,255,0.85); border-radius:30px;"><i class="fas fa-crown"></i><br>لا توجد منتجات متاحة حالياً</div>`;
             return;
         }
 
-        grid.innerHTML = newProducts.map(product => {
+        grid.innerHTML = bestSellers.map(product => {
             let isFav = favorites.includes(product.id);
             return `
                 <div class="product-card fade-up">
-                    <div class="new-badge"><i class="fas fa-sparkle"></i> جديد</div>
+                    <div class="best-badge"> الأكثر مبيعًا</div>
                     <div class="fav-icon ${isFav ? 'active' : ''}" data-id="${product.id}">
                         <i class="fa-${isFav ? 'solid' : 'regular'} fa-heart"></i>
                     </div>
@@ -211,12 +212,12 @@
         }, 3000);
     }
 
-    // ========== تعديل نص المشاركة لصفحة جديدنا ==========
+    // ========== تعديل نص المشاركة لصفحة الأكثر مبيعاً ==========
     (function() {
         const originalShareHandler = async () => {
             const shareData = {
-                title: 'Elixir | جديدنا',
-                text: '🎁 اكتشف أحدث المنتجات الطبيعية في Elixir – أعشاب، زيوت، ومستحضرات ورد فاخرة. تسوق الآن واستشر ذكاءنا الاصطناعي مجاناً.',
+                title: 'Elixir | الأكثر مبيعاً',
+                text: '🏆 اكتشف الأكثر مبيعاً في Elixir – منتجاتنا الطبيعية الأكثر طلباً من عملائنا. تسوق الآن واستشر ذكاءنا الاصطناعي مجاناً.',
                 url: window.location.href
             };
 
@@ -225,11 +226,11 @@
                     await navigator.share(shareData);
                 } catch (err) {
                     if (err.name !== 'AbortError') {
-                        prompt('📋 انسخ الرابط:', shareData.url);
+                        prompt(' انسخ الرابط:', shareData.url);
                     }
                 }
             } else {
-                prompt('📋 انسخ الرابط والمحتوى وشاركه:', shareData.text + '\n\n' + shareData.url);
+                prompt(' انسخ الرابط والمحتوى وشاركه:', shareData.text + '\n\n' + shareData.url);
             }
         };
 
@@ -252,7 +253,7 @@
         if (shareBtn) shareBtn.style.display = 'flex';
     }, 300);
 
-    renderNewArrivals();
+    renderBestSellers();
     updateFavCount();
 </script>
 
