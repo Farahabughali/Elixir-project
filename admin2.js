@@ -9,7 +9,6 @@ let orders = [];
 // ---------- البيانات الجديدة ----------
 let categories = [];
 let offers = [];
-let sliders = [];
 let settings = {};
 let wholesaleProductsList = [];
 
@@ -261,38 +260,31 @@ function getPackageColorsByCategory(category) {
 }
 
 // ---------- تحميل البيانات ----------
-function loadAllData() {
-    const storedProducts = localStorage.getItem('elixir_products');
+// ---------- تحميل البيانات ----------
+async function loadAllData() {
+    // ✅ أولاً: تحميل المنتجات من قاعدة البيانات (انتظر حتى تنتهي)
+    await loadProductsFromDatabase();
+    console.log("✅ تم تحميل المنتجات من DB:", products.length);
+
+     updateCategoryChart();  
+    
+    
+    // باقي التحميلات من localStorage
     const storedPackages = localStorage.getItem('elixir_packages');
     const storedEmployees = localStorage.getItem('elixir_employees');
     const storedWholesalers = localStorage.getItem('elixir_wholesalers');
     const storedOrders = localStorage.getItem('elixir_orders');
     const storedCategories = localStorage.getItem('elixir_categories');
     const storedOffers = localStorage.getItem('elixir_offers');
-    const storedSliders = localStorage.getItem('elixir_sliders');
     const storedSettings = localStorage.getItem('elixir_settings');
-     loadCareers();
-
-    // تحميل المنتجات
-    if (storedProducts) products = JSON.parse(storedProducts);
-    else products = [
-        { id: 1, name: "لافندر مجفف", category: "أعشاب طبيعية", price: 5.0, stock: 7, usage: "يساعد على الاسترخاء", warnings: "لا يستخدم للحوامل", image: "",active: true  },
-        { id: 2, name: "زيت الأرغان العضوي", category: "زيوت مركزة", price: 12.5, stock: 3, usage: "ترطيب الشعر", warnings: "للاستخدام الخارجي", image: "",active: true  },
-        { id: 3, name: "صابون الغار", category: "منتجات عناية", price: 4.0, stock: 0, usage: "مضاد للبكتيريا", warnings: "تجنب العين", image: "",active: true  }
-    ];
+    loadCareers();
 
     // تحميل المجموعات
     if (storedPackages) packagesList = JSON.parse(storedPackages);
     else packagesList = [
-    { id: 101, name: "مجموعة الاسترخاء التام", price: 15.0, description: "لافندر، زيت الأرغان، شمعة", itemsCount: 3, active: true, featured: false, image: "", longDescription: "", category: "نشاط", bgColor: "#fff3e0", btnColor: "#ef6c00" },
-    { id: 102, name: "مجموعة النضارة المغربية", price: 22.0, description: "طين مغربي، ليفة، صابون", itemsCount: 4, active: true, featured: false, image: "", longDescription: "", category: "نضارة", bgColor: "#e0f7fa", btnColor: "#00838f" }
-];
-
-    packagesList.forEach(pkg => {
-        if (pkg.image === undefined) pkg.image = "";
-        if (pkg.longDescription === undefined) pkg.longDescription = "";
-        if (pkg.featured === undefined) pkg.featured = false;
-    });
+        { id: 101, name: "مجموعة الاسترخاء التام", price: 15.0, description: "لافندر، زيت الأرغان، شمعة", itemsCount: 3, active: true, featured: false, image: "", longDescription: "", category: "نشاط", bgColor: "#fff3e0", btnColor: "#ef6c00" },
+        { id: 102, name: "مجموعة النضارة المغربية", price: 22.0, description: "طين مغربي، ليفة، صابون", itemsCount: 4, active: true, featured: false, image: "", longDescription: "", category: "نضارة", bgColor: "#e0f7fa", btnColor: "#00838f" }
+    ];
 
     // تحميل الموظفين
     if (storedEmployees) employees = JSON.parse(storedEmployees);
@@ -308,21 +300,22 @@ function loadAllData() {
     // تحميل الطلبات
     if (storedOrders) orders = JSON.parse(storedOrders);
     else {
-       orders = [
-    { id: 1001, customer: "ريما الحسن", items: [{name: "لافندر مجفف", qty: 2, price: 5.0}], total: 10.0, date: "2025-04-01", status: "pending", assignedTo: null },
-    { id: 1002, customer: "ليلى عرفات", items: [{name: "زيت الأرغان", qty: 1, price: 12.5}], total: 12.5, date: "2025-04-02", status: "processing", assignedTo: null },
-    { id: 1003, customer: "نور الشرق", items: [{name: "صابون الغار", qty: 3, price: 4.0}], total: 12.0, date: "2025-04-03", status: "shipped", assignedTo: null },
-       ];
+        orders = [
+            { id: 1001, customer: "ريما الحسن", items: [{name: "لافندر مجفف", qty: 2, price: 5.0}], total: 10.0, date: "2025-04-01", status: "pending", assignedTo: null },
+            { id: 1002, customer: "ليلى عرفات", items: [{name: "زيت الأرغان", qty: 1, price: 12.5}], total: 12.5, date: "2025-04-02", status: "processing", assignedTo: null },
+            { id: 1003, customer: "نور الشرق", items: [{name: "صابون الغار", qty: 3, price: 4.0}], total: 12.0, date: "2025-04-03", status: "shipped", assignedTo: null },
+        ];
     }
 
     // تحميل الفئات
-    if (storedCategories) categories = JSON.parse(storedCategories);
-    else categories = [
-        { id: 1, name: "أعشاب طبيعية", icon: "fa-leaf" },
-        { id: 2, name: "زيوت مركزة", icon: "fa-oil-can" },
-        { id: 3, name: "منتجات عناية", icon: "fa-heart" },
-        { id: 4, name: "بهارات", icon: "fa-mortar-pestle" }
-    ];
+  // تحميل الفئات (ثابتة - لا تتغير)
+categories = [
+    { id: 1, name: "أعشاب طبيعية", icon: "fa-leaf" },
+    { id: 2, name: "زيوت مركزة", icon: "fa-oil-can" },
+    { id: 3, name: "منتجات عناية", icon: "fa-heart" },
+    { id: 4, name: "بهارات", icon: "fa-mortar-pestle" }
+];
+// تجاهل storedCategories نهائياً
 
     // تحميل العروض
     if (storedOffers) offers = JSON.parse(storedOffers);
@@ -339,8 +332,17 @@ function loadAllData() {
         termsOfUse: "",
         privacyPolicy: ""
     };
+    
     updateAllCategoriesDropdowns();
     loadWholesaleProductsList();
+    
+    // عرض باقي الجداول
+    renderPackages();
+    renderEmployeesCards();
+    renderWholesalers();
+    renderOrdersCards();
+    renderOffers();
+    loadSettings();
 }
 
 // ========== حساب المنتجات الأكثر مبيعاً من الطلبات ==========
@@ -382,9 +384,7 @@ function saveAllData() {
     localStorage.setItem('elixir_orders', JSON.stringify(orders));
     localStorage.setItem('elixir_categories', JSON.stringify(categories));
     localStorage.setItem('elixir_offers', JSON.stringify(offers));
-    localStorage.setItem('elixir_sliders', JSON.stringify(sliders));
     localStorage.setItem('elixir_settings', JSON.stringify(settings));
-    localStorage.setItem('elixir_ads', JSON.stringify(advertisements));
     localStorage.setItem('elixir_shipping', JSON.stringify(shippingCompanies));
     localStorage.setItem('elixir_activity_log', JSON.stringify(activityLog));
 }
@@ -454,6 +454,10 @@ function renderProductsTable() {
     if (!tbody) return;
     tbody.innerHTML = '';
     products.forEach(prod => {
+        // تأكد أن السعر رقم
+        if (typeof prod.price !== 'number') {
+            prod.price = parseFloat(prod.price) || 0;
+        }
         const catClass = prod.category === 'أعشاب طبيعية' ? 'bg-emerald-50 text-elixir' : (prod.category === 'زيوت مركزة' ? 'bg-blue-50 text-blue-500' : (prod.category === 'منتجات عناية' ? 'bg-purple-50 text-purple-500' : 'bg-orange-50 text-orange-600'));
         const warningHtml = prod.warnings ? `<span class="text-xs text-red-500 bg-red-50 px-2 py-1 rounded-lg">${prod.warnings}</span>` : '-';
         const stockClass = prod.stock <= 0 ? 'text-red-600 font-bold' : (prod.stock < 5 ? 'text-amber-600' : 'text-green-700');
@@ -465,14 +469,13 @@ const imageHtml = hasImage
         
         tbody.insertAdjacentHTML('beforeend', `
             <tr class="border-b hover:bg-slate-50 ${!prod.active ? 'opacity-60 bg-gray-50' : ''}">
-                <td class="py-3"><div class="flex items-center gap-3">${imageHtml}<div><div class="font-bold">${prod.name}</div><div class="text-[10px] text-slate-400">${prod.usage?.substring(0, 40) || ''}</div></div></div></td>
-                <td><span class="${catClass} px-3 py-1 rounded-xl text-xs">${prod.category}</span></td>
-                <td>${prod.price.toFixed(2)} ₪</td>
-               <td class="${stockClass} font-bold">${prod.stock !== undefined ? prod.stock : 0}</td>
-                <td>${warningHtml}</td>
-                <td class="text-left">
-    <i class="fas ${prod.active ? 'fa-eye' : 'fa-eye-slash'} ${prod.active ? 'text-elixir' : 'text-gray-400'} cursor-pointer ml-2 hover:text-elixir transition" onclick="toggleProductActive(${prod.id})" title="${prod.active ? 'تعطيل المنتج' : 'تفعيل المنتج'}"></i>
-    <i class="fas fa-star text-amber-500 cursor-pointer ml-2 hover:text-amber-600 transition" onclick="addToNewArrivalsFromAdmin(${prod.id})" title="إضافة إلى جديدنا 🌟"></i>
+               <td class="py-3"><div class="flex items-center gap-3">${imageHtml}<div><div class="font-bold">${prod.name}</div><div class="text-[10px] text-slate-400">${(prod.description || '').substring(0, 60)}</div></div></div></td>
+<td><span class="${catClass} px-3 py-1 rounded-xl text-xs">${prod.category}</span></td>
+<td>${prod.price.toFixed(2)} ₪</td>
+<td class="${stockClass} font-bold">${prod.stock !== undefined ? prod.stock : 0}</td>
+<td class="text-left">
+   <i class="fas ${prod.active == 1 ? 'fa-eye' : 'fa-eye-slash'} ${prod.active == 1 ? 'text-elixir' : 'text-gray-400'} cursor-pointer ml-2 hover:text-elixir transition" onclick="toggleProductActive(${prod.product_id || prod.id})" title="${prod.active == 1 ? 'تعطيل المنتج' : 'تفعيل المنتج'}"></i>
+    
     <i class="fas fa-tag text-blue-500 cursor-pointer ml-2 hover:text-blue-600 transition" onclick="openOfferModalFromAdmin(${prod.id})" title="إضافة إلى العروض 🏷️"></i>
     <i class="fas fa-edit text-slate-500 hover:text-elixir cursor-pointer ml-2" onclick="editProduct(${prod.id})"></i>
     <i class="fas fa-trash-alt text-slate-500 hover:text-red-500 cursor-pointer" onclick="deleteProduct(${prod.id})"></i>
@@ -493,15 +496,38 @@ function renderOrdersTable() {
     tbody.innerHTML = '';
 
     orders.forEach(order => {
-        let statusClass = '';
-        let statusText = '';
-        switch(order.status) {
-            case 'pending': statusClass = 'bg-yellow-100 text-yellow-700'; statusText = 'قيد المعالجة'; break;
-            case 'processing': statusClass = 'bg-blue-100 text-blue-700'; statusText = 'قيد التجهيز'; break;
-            case 'shipped': statusClass = 'bg-purple-100 text-purple-700'; statusText = 'تم الشحن'; break;
-            case 'delivered': statusClass = 'bg-green-100 text-green-700'; statusText = 'تم التسليم'; break;
-            default: statusClass = 'bg-gray-100 text-gray-700'; statusText = 'غير محدد';
-        }
+       // داخل دالة renderOrdersCards، بدل switch الحالي بهذا:
+let statusText = '';
+let statusClass = '';
+switch(order.status) {
+    case 'pending': 
+        statusText = ' قيد المعالجة'; 
+        statusClass = 'bg-yellow-100 text-yellow-700'; 
+        break;
+    case 'processing': 
+        statusText = ' قيد التجهيز'; 
+        statusClass = 'bg-blue-100 text-blue-700'; 
+        break;
+    case 'ready': 
+        statusText = ' تم التجهيز'; 
+        statusClass = 'bg-green-100 text-green-700'; 
+        break;
+    case 'shipped': 
+        statusText = ' تم الشحن'; 
+        statusClass = 'bg-purple-100 text-purple-700'; 
+        break;
+    case 'delivered': 
+        statusText = ' تم التسليم'; 
+        statusClass = 'bg-emerald-100 text-emerald-700'; 
+        break;
+    case 'returned': 
+        statusText = '↩ تم الإرجاع'; 
+        statusClass = 'bg-red-100 text-red-700'; 
+        break;
+    default: 
+        statusText = '📋 جديد'; 
+        statusClass = 'bg-gray-100 text-gray-700';
+}
         const itemsSummary = order.items.map(item => `${item.name} (${item.qty})`).join(', ');
 
         let employeeSelect = `<select onchange="updateOrderAssignment(${order.id}, this.value)" class="text-xs border rounded-lg p-1 bg-white">`;
@@ -606,10 +632,10 @@ function openProductModal(productId = null) {
             document.getElementById('productName').value = product.name;
             document.getElementById('productCategory').value = product.category;
             document.getElementById('productPrice').value = product.price;
-            document.getElementById('productWholesalePrice').value = product.wholesalePrice || '';
             document.getElementById('productStock').value = product.stock;
             document.getElementById('productUsage').value = product.usage || '';
             document.getElementById('productWarnings').value = product.warnings || '';
+            document.getElementById('productDescription').value = product.description || '';
             // تعبئة التصنيف الفرعي للمنتج عند التعديل
            const subCategorySelect = document.getElementById('productSubCategory');
           if (subCategorySelect && product.subCategory) {
@@ -656,6 +682,7 @@ async function saveProduct() {
         const stock = parseInt(document.getElementById('productStock').value) || 0;
         const usage = document.getElementById('productUsage').value;
         const warnings = document.getElementById('productWarnings').value;
+        const description = document.getElementById('productDescription').value;
         
         let imageBase64 = '';
         const fileInput = document.getElementById('productImage');
@@ -678,57 +705,97 @@ async function saveProduct() {
             return;
         }
 
+        // 🔥 هنا التصحيح: if واحد فقط
         if (id) {
-    const index = products.findIndex(p => p.id == id);
-    if (index !== -1) {
-        products[index] = { ...products[index], name, category, price, stock, usage, warnings, image: imageBase64 };
-        
-            delete products[index].wholesalePrice;
-        
-        showToast("تم تحديث المنتج", "success");
-    }
-} else {
-    const newId = products.length > 0 ? Math.max(...products.map(p => p.id)) + 1 : 1;
-    let newProduct = { id: newId, name, category, price, stock, usage, warnings, image: imageBase64, addedAt: new Date().toISOString() };
-    
-    products.push(newProduct);
-    showToast("تم إضافة المنتج", "success");
-    
-    // ✅ إضافة المنتج تلقائياً إلى جديدنا
-    let newArrivals = JSON.parse(localStorage.getItem('elixir_new_arrivals') || '[]');
-    
-    // تحديد القسم والنص المناسب حسب الفئة
-    let section = "herbs";
-    let catText = "منتج طبيعي";
-    if (category === "أعشاب طبيعية") { section = "herbs"; catText = "عشبة طبية"; }
-    else if (category === "زيوت مركزة") { section = "oils"; catText = "زيت عطري"; }
-    else if (category === "بهارات") { section = "spices"; catText = "بهارات عربية"; }
-    else if (category === "منتجات عناية") { section = "care"; catText = "عناية شخصية"; }
-    
-    const expiryDate = new Date();
-    expiryDate.setDate(expiryDate.getDate() + 7);
-    
-    newArrivals.push({
-        id: newId,
-        name: name,
-        price: price,
-        img: imageBase64 || "asset/images/placeholder.png",
-        category: category,
-        section: section,
-        catText: catText,
-        desc: usage || "منتج طبيعي 100%",
-        addedAt: new Date().toISOString(),
-        expiryDate: expiryDate.toISOString()
-    });
-    
-    localStorage.setItem('elixir_new_arrivals', JSON.stringify(newArrivals));
-    showToast(`✅ تم إضافة "${name}" إلى جديدنا تلقائياً ✨`, "success");
-}
-        
-        renderProductsTable();
-        renderOrdersTable();
-        saveAllData();
-        closeProductModal();
+            // تعديل منتج موجود
+            const response = await fetch('api/update_product.php', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    id: id,
+                    product_name: name,
+                    price: price,
+                    category: category,
+                    stock: stock,
+                    image: imageBase64,
+                    description: description,
+                    usageinstructions: usage,
+                    medical_warning: warnings
+                })
+            });
+            
+            const result = await response.json();
+            
+            if (result.success) {
+                showToast("✅ تم تحديث المنتج", "success");
+                await loadProductsFromDatabase();
+                renderProductsTable();
+                refreshStats();
+                closeProductModal();
+            } else {
+                showToast("❌ خطأ في التحديث: " + result.error, "error");
+            }
+        } else {
+            // إضافة منتج جديد
+            const response = await fetch('api/add_product.php', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    product_name: name,
+                    price: price,
+                    category: category,
+                    stock: stock,
+                    image: imageBase64,
+                    description: description,
+                    usageinstructions: usage,
+                    medical_warning: warnings
+                })
+            });
+            
+            const result = await response.json();
+            
+            if (result.success) {
+                showToast(`✅ تم إضافة "${name}" إلى قاعدة البيانات`, "success");
+                
+                await loadProductsFromDatabase();
+                renderProductsTable();
+                refreshStats();
+                updateAllCategoriesDropdowns();
+                
+                // ✅ إضافة المنتج إلى جديدنا تلقائياً (لمدة 7 أيام)
+                let newArrivals = JSON.parse(localStorage.getItem('elixir_new_arrivals') || '[]');
+                
+                let section = "herbs";
+                let catText = "منتج طبيعي";
+                if (category === "أعشاب طبيعية") { section = "herbs"; catText = "عشبة طبية"; }
+                else if (category === "زيوت مركزة") { section = "oils"; catText = "زيت عطري"; }
+                else if (category === "بهارات") { section = "spices"; catText = "بهارات عربية"; }
+                else if (category === "منتجات عناية") { section = "care"; catText = "عناية شخصية"; }
+                
+                const expiryDate = new Date();
+                expiryDate.setDate(expiryDate.getDate() + 7);
+                
+                newArrivals.push({
+                    id: result.id,
+                    name: name,
+                    price: price,
+                    img: imageBase64 || "asset/images/placeholder.png",
+                    category: category,
+                    section: section,
+                    catText: catText,
+                    desc: description || usage || "منتج طبيعي 100%",
+                    addedAt: new Date().toISOString(),
+                    expiryDate: expiryDate.toISOString()
+                });
+                
+                localStorage.setItem('elixir_new_arrivals', JSON.stringify(newArrivals));
+                showToast(`✅ تم إضافة "${name}" إلى جديدنا لمدة 7 أيام ✨`, "success");
+                
+                closeProductModal();
+            } else {
+                showToast("❌ خطأ: " + (result.error || "لم يتم إضافة المنتج"), "error");
+            }
+        }
         
     } catch (error) {
         console.error("خطأ:", error);
@@ -739,59 +806,60 @@ async function saveProduct() {
     }
 }
 
+
 window.editProduct = function(productId) {
     openProductModal(productId);
 };
 
 window.deleteProduct = function(productId) {
-    customConfirm("هل تريد حذف هذا المنتج نهائياً؟", () => {
-        // 1. حذف المنتج
-        products = products.filter(p => p.id !== productId);
+    customConfirm("⚠️ هل تريد حذف هذا المنتج نهائياً؟", async () => {
+        // إظهار loader
+        showToast("جاري الحذف...", "info");
         
-        // 2. حذف العروض المرتبطة
-        let offers = JSON.parse(localStorage.getItem('elixir_offers') || '[]');
-        let filteredOffers = offers.filter(o => o.productId !== productId);
-        localStorage.setItem('elixir_offers', JSON.stringify(filteredOffers));
-        
-        // 3. 🔥 حذف من جديدنا (المهم!)
-        let newArrivals = JSON.parse(localStorage.getItem('elixir_new_arrivals') || '[]');
-        let filteredNew = newArrivals.filter(n => n.id !== productId);
-        localStorage.setItem('elixir_new_arrivals', JSON.stringify(filteredNew));
-        
-        renderProductsTable();
-        saveAllData();
-        
-        showToast(`✅ تم حذف المنتج وجميع العروض المرتبطة به`);
+        try {
+            // 1. حذف من قاعدة البيانات
+            const response = await fetch('api/delete_product.php', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ id: productId })
+            });
+            
+            const result = await response.json();
+            
+            if (result.success) {
+                // 2. ✅ حذف العروض المرتبطة من localStorage
+                let offers = JSON.parse(localStorage.getItem('elixir_offers') || '[]');
+                let filteredOffers = offers.filter(o => o.productId != productId && o.productId != productId);
+                localStorage.setItem('elixir_offers', JSON.stringify(filteredOffers));
+                console.log(`✅ تم حذف ${offers.length - filteredOffers.length} عرض مرتبط بالمنتج`);
+                
+                // 3. حذف من جديدنا
+                let newArrivals = JSON.parse(localStorage.getItem('elixir_new_arrivals') || '[]');
+                let filteredNew = newArrivals.filter(n => n.id != productId);
+                localStorage.setItem('elixir_new_arrivals', JSON.stringify(filteredNew));
+                
+                // 4. إعادة تحميل المنتجات وعرض الجدول
+                await loadProductsFromDatabase();
+                renderProductsTable();
+                refreshStats();
+                
+                showToast(`✅ تم حذف المنتج وجميع عروضه بنجاح`, "success");
+                addToActivityLog(`تم حذف المنتج رقم ${productId} وجميع عروضه`);
+                
+                // 5. ✅ تحديث صفحة العروض إذا كانت مفتوحة (اختياري)
+                if (typeof renderOffers === 'function') {
+                    renderOffers();
+                }
+            } else {
+                showToast("❌ خطأ في الحذف: " + result.error, "error");
+            }
+        } catch(err) {
+            console.error("خطأ:", err);
+            showToast("❌ خطأ في الاتصال بالخادم", "error");
+        }
     });
 };
 
-// تبديل حالة تفعيل/تعطيل المنتج
-function toggleProductActive(productId) {
-    const product = products.find(p => p.id === productId);
-    if (product) {
-        product.active = !product.active;
-        
-        if (!product.active) {
-            // حذف العروض المرتبطة
-            let offers = JSON.parse(localStorage.getItem('elixir_offers') || '[]');
-            let filteredOffers = offers.filter(o => o.productId !== productId);
-            localStorage.setItem('elixir_offers', JSON.stringify(filteredOffers));
-            
-            //  حذف من جديدنا
-            let newArrivals = JSON.parse(localStorage.getItem('elixir_new_arrivals') || '[]');
-            let filteredNew = newArrivals.filter(n => n.id !== productId);
-            localStorage.setItem('elixir_new_arrivals', JSON.stringify(filteredNew));
-            
-            showToast(`⛔ تم إخفاء المنتج "${product.name}" وإزالة عروضه وجديدنا`, "warning");
-        } else {
-            showToast(`✅ تم تفعيل المنتج "${product.name}"`, "success");
-        }
-        
-        renderProductsTable();
-        saveAllData();
-        addToActivityLog(`تم ${product.active ? 'تفعيل' : 'إخفاء'} المنتج "${product.name}"`);
-    }
-}
 
 // ========== إدارة المنتجات الأكثر مبيعاً ==========
 let bestSellingProducts = [];
@@ -901,7 +969,8 @@ function isBestSelling(productId) {
 
 
 // ---------- عرض المجموعات ----------
-// ========== عرض المجموعات - نسخة بسيطة ونظيفة ==========
+// ---------- عرض المجموعات ----------
+// ========== عرض المجموعات - مع زر إضافة للعروض ==========
 function renderPackages() {
     const container = document.getElementById('packagesGridContainer');
     if (!container) return;
@@ -925,6 +994,10 @@ function renderPackages() {
                     <div class="flex gap-2">
                         <button onclick="togglePackageFeatured(${pkg.id})" class="text-gray-500 hover:text-yellow-500"><i class="fas fa-${pkg.featured ? 'star' : 'star-o'}"></i></button>
                         <button onclick="togglePackageActive(${pkg.id})" class="${pkg.active ? 'text-green-500' : 'text-gray-400'}"><i class="fas fa-${pkg.active ? 'eye' : 'eye-slash'}"></i></button>
+                        <!-- زر إضافة إلى العروض 🏷️ -->
+                        <button onclick="openOfferModalForPackage(${pkg.id})" class="text-blue-500 hover:text-blue-600 transition" title="إضافة إلى العروض">
+                            <i class="fas fa-tag"></i>
+                        </button>
                         <i class="fas fa-edit cursor-pointer hover:text-elixir" onclick="editPackage(${pkg.id})"></i>
                         <i class="fas fa-trash-alt cursor-pointer hover:text-red-500" onclick="deletePackage(${pkg.id})"></i>
                     </div>
@@ -1129,18 +1202,55 @@ window.deletePackage = function(id) {
 function renderEmployeesCards() {
     const container = document.getElementById('employeesCardsContainer');
     if (!container) return;
+    
+    if (employees.length === 0) {
+        container.innerHTML = '<div class="text-center text-slate-400 py-10">لا يوجد موظفين، أضف موظف جديد</div>';
+        return;
+    }
+    
     container.innerHTML = employees.map(emp => `
         <div class="bg-slate-50 rounded-3xl p-5 shadow-sm border">
             <div class="flex justify-between items-start">
-                <div class="flex items-center gap-3"><div class="w-12 h-12 rounded-full bg-elixir text-white flex items-center justify-center text-xl">${emp.name[0]}</div><div><h4 class="font-bold">${emp.name}</h4><p class="text-xs text-slate-500">${emp.role}</p></div></div>
-                <button onclick="openManualTaskModal(${emp.id})" class="bg-white text-elixir border border-elixir text-xs px-3 py-1 rounded-full hover:bg-elixir hover:text-white"><i class="fas fa-plus ml-1"></i> إضافة مهمة</button>
+                <div class="flex items-center gap-3">
+                    <div class="w-12 h-12 rounded-full bg-elixir text-white flex items-center justify-center text-xl">${emp.name[0]}</div>
+                    <div>
+                        <h4 class="font-bold">${emp.name}</h4>
+                        <p class="text-xs text-slate-500">${emp.role}</p>
+                        <p class="text-xs text-elixir mt-1" dir="ltr">📧 ${emp.email || 'غير محدد'}</p>
+                    </div>
+                </div>
+                <button onclick="openManualTaskModal(${emp.id})" class="bg-white text-elixir border border-elixir text-xs px-3 py-1 rounded-full hover:bg-elixir hover:text-white transition">
+                    <i class="fas fa-plus ml-1"></i> إضافة مهمة
+                </button>
+            </div>
+            <div class="mt-3">
+                <div class="bg-amber-50 p-2 rounded-xl mb-2">
+                    <p class="text-xs text-amber-700"><i class="fas fa-key ml-1"></i> كلمة المرور: <span dir="ltr">••••••</span></p>
+                </div>
             </div>
             <div class="mt-3 max-h-56 overflow-y-auto space-y-2">
-                ${emp.tasks.length ? emp.tasks.map((t, idx) => `<div class="task-item bg-white p-2 rounded-xl flex justify-between"><span class="text-xs">${t.desc}</span><div><button onclick="completeTask(${emp.id}, ${idx})" class="bg-emerald-100 text-emerald-700 text-[10px] px-2 py-1 rounded-full">إنجاز</button> <button onclick="deleteTask(${emp.id}, ${idx})" class="bg-red-50 text-red-500 text-[10px] px-2 py-1 rounded-full"><i class="fas fa-trash"></i></button></div></div>`).join('') : '<div class="text-center text-slate-400 text-xs py-3">✨ لا مهام</div>'}
+                ${emp.tasks && emp.tasks.length ? emp.tasks.map((t, idx) => `<div class="task-item bg-white p-2 rounded-xl flex justify-between"><span class="text-xs">${t.desc}</span><div><button onclick="completeTask(${emp.id}, ${idx})" class="bg-emerald-100 text-emerald-700 text-[10px] px-2 py-1 rounded-full">إنجاز</button> <button onclick="deleteTask(${emp.id}, ${idx})" class="bg-red-50 text-red-500 text-[10px] px-2 py-1 rounded-full"><i class="fas fa-trash"></i></button></div></div>`).join('') : '<div class="text-center text-slate-400 text-xs py-3">✨ لا مهام</div>'}
             </div>
-            <div class="mt-4 text-left"><button onclick="deleteEmployee(${emp.id})" class="text-red-400 text-xs"><i class="fas fa-user-minus"></i> حذف الموظف</button></div>
+            <div class="mt-4 text-left">
+                <button onclick="deleteEmployee(${emp.id})" class="text-red-400 text-xs"><i class="fas fa-user-minus"></i> حذف الموظف</button>
+                <button onclick="resetEmployeePassword(${emp.id})" class="text-amber-600 text-xs mr-3"><i class="fas fa-key"></i> إعادة تعيين كلمة المرور</button>
+            </div>
         </div>
     `).join('');
+}
+
+// دالة إعادة تعيين كلمة المرور
+function resetEmployeePassword(empId) {
+    const emp = employees.find(e => e.id === empId);
+    if (!emp) return;
+    
+    const newPassword = prompt(`إعادة تعيين كلمة المرور للموظف ${emp.name}\nأدخل كلمة المرور الجديدة:`);
+    if (newPassword && newPassword.trim()) {
+        emp.password = newPassword.trim();
+        saveAllData();
+        showToast(`✅ تم تغيير كلمة المرور للموظف ${emp.name}`, "success");
+        addToActivityLog(`تم إعادة تعيين كلمة المرور للموظف ${emp.name}`);
+    }
 }
 
 // ---------- عرض تجار الجملة (قسم منفصل) ----------
@@ -1672,10 +1782,13 @@ function renderOffers() {
                         <p class="text-xs text-slate-400">أضيف في: ${new Date(offer.createdAt).toLocaleDateString('ar-EG')}</p>
                     </div>
                     <div class="flex gap-2">
-                        <button onclick="deleteOfferFromAdmin(${offer.id})" class="text-red-500 hover:text-red-700 p-2 rounded-full hover:bg-red-50 transition" title="حذف العرض">
-                            <i class="fas fa-trash-alt"></i>
-                        </button>
-                    </div>
+    <button onclick="openEditOfferModal(${offer.id})" class="text-blue-500 hover:text-blue-700 p-2 rounded-full hover:bg-blue-50 transition" title="تعديل العرض">
+        <i class="fas fa-edit"></i>
+    </button>
+    <button onclick="deleteOfferFromAdmin(${offer.id})" class="text-red-500 hover:text-red-700 p-2 rounded-full hover:bg-red-50 transition" title="حذف العرض">
+        <i class="fas fa-trash-alt"></i>
+    </button>
+</div>
                 </div>
             </div>
         `;
@@ -1692,6 +1805,154 @@ function deleteOfferFromAdmin(offerId) {
         showToast("✅ تم حذف العرض بنجاح", "success");
         addToActivityLog("تم حذف عرض من قائمة العروض");
     });
+}
+
+// ========== تعديل العروض ==========
+let currentEditingOffer = null;
+
+function openEditOfferModal(offerId) {
+    let allOffers = JSON.parse(localStorage.getItem('elixir_offers')) || [];
+    const offer = allOffers.find(o => o.id == offerId);
+    
+    if (!offer) {
+        showToast("❌ العرض غير موجود", "error");
+        return;
+    }
+    
+    const today = new Date();
+    const minDate = today.toISOString().split('T')[0];
+    
+    const overlay = document.createElement('div');
+    overlay.className = 'fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-[400]';
+    overlay.innerHTML = `
+        <div class="bg-white rounded-3xl p-8 w-96 text-center shadow-2xl">
+            <h3 class="text-2xl font-bold mb-4 text-elixir">✏️ تعديل عرض "${offer.productName}"</h3>
+            
+            <div class="mb-4">
+                <label class="block text-right text-sm font-bold mb-2">💰 نسبة الخصم (%)</label>
+                <input type="number" id="editDiscountPercent" value="${offer.discount}" min="1" max="90" class="w-full border rounded-xl p-3 text-center" required>
+            </div>
+            
+            <div class="mb-4">
+                <label class="block text-right text-sm font-bold mb-2">📅 تاريخ انتهاء العرض (اختياري)</label>
+                <input type="date" id="editEndDate" value="${offer.endDate || ''}" min="${minDate}" class="w-full border rounded-xl p-3">
+                <p class="text-xs text-slate-400 text-right mt-1">⚠️ اتركه فارغاً لجعل العرض دائماً</p>
+            </div>
+            
+            <div class="bg-amber-50 p-3 rounded-xl mb-4 text-right">
+                <p class="text-xs text-amber-700"><i class="fas fa-info-circle ml-1"></i> تاريخ البدء: ${offer.startDate || new Date(offer.createdAt).toISOString().split('T')[0]}</p>
+            </div>
+            
+            <div class="flex gap-3 mt-6">
+                <button id="confirmEditBtn" class="flex-1 bg-elixir text-white py-3 rounded-xl font-bold hover:bg-emerald-700 transition">حفظ التغييرات</button>
+                <button id="cancelEditBtn" class="flex-1 bg-gray-200 text-gray-700 py-3 rounded-xl font-bold hover:bg-gray-300 transition">إلغاء</button>
+            </div>
+        </div>
+    `;
+    document.body.appendChild(overlay);
+    
+    document.getElementById('confirmEditBtn').onclick = () => {
+        const newDiscount = parseInt(document.getElementById('editDiscountPercent').value);
+        if (!newDiscount || newDiscount < 1 || newDiscount > 90) {
+            showToast("⚠️ الرجاء إدخال نسبة خصم صحيحة (1-90)", "error");
+            return;
+        }
+        const newEndDate = document.getElementById('editEndDate').value;
+        
+        const newPrice = (offer.productPrice * (100 - newDiscount) / 100).toFixed(2);
+        
+        // تحديث العرض
+        offer.discount = newDiscount;
+        offer.newPrice = newPrice;
+        offer.endDate = newEndDate || "";
+        offer.lastUpdated = new Date().toISOString();
+        
+        let allOffers = JSON.parse(localStorage.getItem('elixir_offers') || []);
+        const index = allOffers.findIndex(o => o.id == offerId);
+        if (index !== -1) {
+            allOffers[index] = offer;
+            localStorage.setItem('elixir_offers', JSON.stringify(allOffers));
+            
+            if (typeof renderOffers === 'function') renderOffers();
+            
+            showToast(`✅ تم تحديث العرض بنجاح (الخصم: ${newDiscount}%)`, "success");
+            overlay.remove();
+        } else {
+            showToast("❌ حدث خطأ", "error");
+        }
+    };
+    
+    document.getElementById('cancelEditBtn').onclick = () => overlay.remove();
+    overlay.onclick = (e) => { if (e.target === overlay) overlay.remove(); };
+}
+
+function closeEditOfferModal() {
+    document.getElementById('editOfferModal').classList.add('hidden');
+    currentEditingOffer = null;
+}
+
+function updateEditOfferNewPrice() {
+    const discount = parseFloat(document.getElementById('editOfferDiscount').value);
+    const originalPrice = currentEditingOffer ? parseFloat(currentEditingOffer.productPrice) : 0;
+    
+    if (!isNaN(discount) && discount > 0 && discount <= 90) {
+        const newPrice = (originalPrice * (100 - discount) / 100).toFixed(2);
+        document.getElementById('editOfferNewPricePreview').innerHTML = newPrice + ' ₪';
+    } else {
+        document.getElementById('editOfferNewPricePreview').innerHTML = originalPrice.toFixed(2) + ' ₪';
+    }
+}
+
+// ربط حدث تغيير الخصم
+document.addEventListener('DOMContentLoaded', function() {
+    const discountInput = document.getElementById('editOfferDiscount');
+    if (discountInput) {
+        discountInput.addEventListener('input', updateEditOfferNewPrice);
+    }
+});
+
+function saveOfferEdit() {
+    if (!currentEditingOffer) {
+        showToast("❌ لا يوجد عرض قيد التعديل", "error");
+        return;
+    }
+    
+    const newDiscount = parseInt(document.getElementById('editOfferDiscount').value);
+    const newEndDate = document.getElementById('editOfferEndDate').value;
+    
+    // التحقق من صحة الخصم
+    if (isNaN(newDiscount) || newDiscount < 1 || newDiscount > 90) {
+        showToast("⚠️ الرجاء إدخال نسبة خصم صحيحة (1-90)", "error");
+        return;
+    }
+    
+    // حساب السعر الجديد
+    const newPrice = (currentEditingOffer.productPrice * (100 - newDiscount) / 100).toFixed(2);
+    
+    // جلب العروض من localStorage
+    let allOffers = JSON.parse(localStorage.getItem('elixir_offers')) || [];
+    const offerIndex = allOffers.findIndex(o => o.id == currentEditingOffer.id);
+    
+    if (offerIndex !== -1) {
+        // تحديث بيانات العرض
+        allOffers[offerIndex].discount = newDiscount;
+        allOffers[offerIndex].newPrice = newPrice;
+        allOffers[offerIndex].endDate = newEndDate || "";
+        allOffers[offerIndex].lastUpdated = new Date().toISOString();
+        
+        // حفظ التغييرات
+        localStorage.setItem('elixir_offers', JSON.stringify(allOffers));
+        
+        // تحديث الواجهة
+        renderOffers();
+        
+        showToast(`✅ تم تحديث العرض بنجاح (الخصم: ${newDiscount}%)`, "success");
+        addToActivityLog(`تم تعديل عرض "${currentEditingOffer.productName}" - خصم ${newDiscount}%`);
+        
+        closeEditOfferModal();
+    } else {
+        showToast("❌ حدث خطأ أثناء حفظ التغييرات", "error");
+    }
 }
 
 // دالة جديدة لحذف العروض من localStorage
@@ -1798,49 +2059,8 @@ function deleteOffer(id) {
     });
 }
 
-// ---------- إدارة السلايدر ----------
-function renderSliders() {
-    const container = document.getElementById('sliderList');
-    if (!container) return;
-    if (sliders.length === 0) {
-        container.innerHTML = '<div class="text-center text-slate-400 py-4">لا توجد شرائح، أضف شريحة جديدة</div>';
-        return;
-    }
-    container.innerHTML = sliders.map((slide, idx) => `
-        <div class="flex justify-between items-center bg-slate-50 p-3 rounded-xl">
-            <div>
-                <p class="font-bold">${slide.title}</p>
-                <p class="text-sm text-slate-500">${slide.subtitle}</p>
-            </div>
-            <button onclick="deleteSlider(${idx})" class="text-red-500"><i class="fas fa-trash-alt"></i></button>
-        </div>
-    `).join('');
-}
 
-function openSliderModal() { document.getElementById('sliderModal').classList.remove('hidden'); }
-function closeSliderModal() { document.getElementById('sliderModal').classList.add('hidden'); }
 
-function saveSlider() {
-    const title = document.getElementById('sliderTitle').value.trim();
-    const subtitle = document.getElementById('sliderSubtitle').value.trim();
-    if (!title) { showToast("أدخل عنوان الشريحة", "error"); return; }
-    sliders.push({ title, subtitle, image: "" });
-    renderSliders();
-    closeSliderModal();
-    saveAllData();
-    showToast("تم إضافة الشريحة", "success");
-    document.getElementById('sliderTitle').value = '';
-    document.getElementById('sliderSubtitle').value = '';
-}
-
-function deleteSlider(index) {
-    customConfirm("حذف هذه الشريحة؟", () => {
-        sliders.splice(index, 1);
-        renderSliders();
-        saveAllData();
-        showToast("تم الحذف", "success");
-    });
-}
 
 
 // ---------- إعدادات الموقع ----------
@@ -1904,16 +2124,49 @@ function deleteTask(empId, taskIndex) {
 }
 
 function addNewEmployee() {
-    const name = document.getElementById('empName').value.trim();
-    if (!name) { showToast("أدخل الاسم", "error"); return; }
+    const name = document.getElementById('empName')?.value.trim();
+    const role = document.getElementById('empRole')?.value.trim() || "موظف";
+    const email = document.getElementById('empEmail')?.value.trim();
+    const password = document.getElementById('empPassword')?.value.trim();
+    
+    if (!name) {
+        showToast("❌ أدخل اسم الموظف", "error");
+        return;
+    }
+    
+    if (!email) {
+        showToast("❌ أدخل البريد الإلكتروني", "error");
+        return;
+    }
+    
+    if (!password) {
+        showToast("❌ أدخل كلمة المرور", "error");
+        return;
+    }
+    
+    // التحقق من عدم وجود ايميل مكرر
+    if (employees.some(emp => emp.email === email)) {
+        showToast("❌ هذا البريد الإلكتروني مسجل مسبقاً", "error");
+        return;
+    }
+    
     const newId = employees.length > 0 ? Math.max(...employees.map(e => e.id)) + 1 : 101;
-    employees.push({ id: newId, name, role: document.getElementById('empRole').value.trim() || "موظف", tasks: [] });
+    
+    employees.push({
+        id: newId,
+        name: name,
+        role: role,
+        email: email,
+        password: password,
+        tasks: [],
+        createdAt: new Date().toISOString()
+    });
+    
+    saveAllData();
     renderEmployeesCards();
     closeEmployeeModal();
-    saveAllData();
-    showToast(`تم إضافة ${name}`);
-    document.getElementById('empName').value = '';
-    document.getElementById('empRole').value = '';
+    showToast(`✅ تم إضافة الموظف ${name} بنجاح`, "success");
+    addToActivityLog(`تم إضافة موظف جديد: ${name} (${email})`);
 }
 
 function deleteEmployee(id) {
@@ -1925,7 +2178,57 @@ function deleteEmployee(id) {
     });
 }
 
-function openAddEmployeeModal() { document.getElementById('employeeModal').classList.remove('hidden'); }
+function openAddEmployeeModal() { 
+    // إنشاء نافذة منبثقة متطورة
+    const modalHtml = `
+        <div id="customEmployeeModal" class="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-[300]">
+            <div class="bg-white rounded-3xl p-8 w-full max-w-md">
+                <h3 class="text-2xl font-bold mb-6 text-center text-elixir">➕ إضافة موظف جديد</h3>
+                <div class="space-y-4">
+                    <input type="text" id="empName" placeholder="الاسم الكامل" class="w-full border rounded-xl p-3">
+                    <input type="text" id="empRole" placeholder="المنصب (مثال: مدير مخزون)" class="w-full border rounded-xl p-3">
+                    <input type="email" id="empEmail" placeholder="البريد الإلكتروني" class="w-full border rounded-xl p-3" dir="ltr">
+                    <div class="relative">
+                        <input type="password" id="empPassword" placeholder="كلمة المرور" class="w-full border rounded-xl p-3 pl-10" dir="ltr">
+                        <button type="button" onclick="togglePasswordField('empPassword', this)" class="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500">
+                            <i class="fas fa-eye"></i>
+                        </button>
+                    </div>
+                    <div class="flex gap-3 mt-6">
+                        <button onclick="addNewEmployee()" class="flex-1 bg-elixir text-white py-3 rounded-xl font-bold">حفظ</button>
+                        <button onclick="closeEmployeeModal()" class="flex-1 bg-gray-200 py-3 rounded-xl font-bold">إلغاء</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    `;
+    
+    // إزالة أي مودال قديم
+    const oldModal = document.getElementById('customEmployeeModal');
+    if (oldModal) oldModal.remove();
+    
+    // إضافة المودال الجديد
+    document.body.insertAdjacentHTML('beforeend', modalHtml);
+}
+
+function closeEmployeeModal() {
+    const modal = document.getElementById('customEmployeeModal');
+    if (modal) modal.remove();
+}
+
+function togglePasswordField(inputId, btn) {
+    const input = document.getElementById(inputId);
+    const icon = btn.querySelector('i');
+    if (input.type === 'password') {
+        input.type = 'text';
+        icon.classList.remove('fa-eye');
+        icon.classList.add('fa-eye-slash');
+    } else {
+        input.type = 'password';
+        icon.classList.remove('fa-eye-slash');
+        icon.classList.add('fa-eye');
+    }
+}
 function closeEmployeeModal() { document.getElementById('employeeModal').classList.add('hidden'); }
 
 function openManualTaskModal(empId) {
@@ -1975,65 +2278,11 @@ function openTab(evt, tabName) {
     if (tabName === 'products') renderProductsTable();
     if (tabName === 'packages') renderPackages();
     if (tabName === 'orders') renderOrdersCards();
-    if (tabName === 'categories') renderCategories();
+ //   if (tabName === 'categories') renderCategories();
     if (tabName === 'offers') { renderOffers(); renderSliders(); }
     if (tabName === 'settings') loadSettings();
 }
 
-// ========== الإعلانات ==========
-let advertisements = [];
-
-function loadAds() {
-    const stored = localStorage.getItem('elixir_ads');
-    if (stored) advertisements = JSON.parse(stored);
-    else advertisements = [
-        { id: 1, title: "خصم 20% على جميع المنتجات", content: "استخدم كود ELIXIR20", link: "/shop", image: "", active: true, createdAt: new Date().toISOString() }
-    ];
-    renderAds();
-}
-
-function renderAds() {
-    const container = document.getElementById('adsList');
-    if (!container) return;
-    if (advertisements.length === 0) { container.innerHTML = '<div class="text-center text-slate-400 py-6">لا توجد إعلانات</div>'; return; }
-    container.innerHTML = advertisements.map(ad => `
-        <div class="border p-4 rounded-2xl flex justify-between items-center">
-            <div>
-                <h4 class="font-bold">${ad.title}</h4>
-                <p class="text-sm text-slate-600">${ad.content}</p>
-                <div class="flex gap-3 mt-2">
-                    <button onclick="toggleAdActive(${ad.id})" class="text-${ad.active ? 'green' : 'gray'}-500 text-sm">${ad.active ? 'مفعل' : 'غير مفعل'}</button>
-                    <button onclick="editAd(${ad.id})" class="text-blue-500 text-sm"><i class="fas fa-edit"></i> تعديل</button>
-                    <button onclick="deleteAd(${ad.id})" class="text-red-500 text-sm"><i class="fas fa-trash"></i> حذف</button>
-                </div>
-            </div>
-            <div class="text-sm text-slate-400">${new Date(ad.createdAt).toLocaleDateString('ar-EG')}</div>
-        </div>
-    `).join('');
-}
-
-function openAdModal(id = null) {
-    if (id) { const ad = advertisements.find(a => a.id === id); if(ad){ document.getElementById('adModalTitle').innerText = "تعديل إعلان"; document.getElementById('editAdId').value = ad.id; document.getElementById('adTitle').value = ad.title; document.getElementById('adContent').value = ad.content; document.getElementById('adLink').value = ad.link || ''; } }
-    else { document.getElementById('adModalTitle').innerText = "إضافة إعلان جديد"; document.getElementById('editAdId').value = ''; document.getElementById('adTitle').value = ''; document.getElementById('adContent').value = ''; document.getElementById('adLink').value = ''; document.getElementById('adImage').value = ''; }
-    document.getElementById('adModal').classList.remove('hidden');
-}
-
-function closeAdModal() { document.getElementById('adModal').classList.add('hidden'); }
-
-function saveAd() {
-    const id = document.getElementById('editAdId').value;
-    const title = document.getElementById('adTitle').value.trim();
-    const content = document.getElementById('adContent').value.trim();
-    const link = document.getElementById('adLink').value.trim();
-    if (!title || !content) { showToast("يرجى تعبئة الحقول", "error"); return; }
-    if (id) { const idx = advertisements.findIndex(a => a.id == id); if(idx!==-1) advertisements[idx] = { ...advertisements[idx], title, content, link }; showToast("تم التحديث", "success"); }
-    else { const newId = advertisements.length > 0 ? Math.max(...advertisements.map(a=>a.id)) + 1 : 1; advertisements.push({ id: newId, title, content, link, active: true, createdAt: new Date().toISOString(), image: "" }); showToast("تمت الإضافة", "success"); }
-    renderAds(); closeAdModal(); saveAllData();
-}
-
-function toggleAdActive(id) { const ad = advertisements.find(a=>a.id===id); if(ad){ ad.active = !ad.active; renderAds(); saveAllData(); showToast(ad.active ? "تم تفعيل الإعلان" : "تم تعطيل الإعلان"); } }
-function editAd(id) { openAdModal(id); }
-function deleteAd(id) { customConfirm("حذف الإعلان؟", () => { advertisements = advertisements.filter(a=>a.id !== id); renderAds(); saveAllData(); showToast("تم الحذف"); }); }
 
 // ========== شركات التوصيل ==========
 let shippingCompanies = [];
@@ -2108,7 +2357,7 @@ function addToActivityLog(action) { activityLog.push({ action, date: new Date().
 function clearActivityLog() { customConfirm("مسح سجل النشاطات؟", () => { activityLog = []; renderActivityLog(); saveAllData(); showToast("تم مسح السجل"); }); }
 function logoutAllSessions() { showToast("تم تسجيل خروج جميع الجلسات (محاكاة - ستُربط مع PHP لاحقاً)", "info"); addToActivityLog("تم تسجيل خروج جميع الجلسات"); }
 function backupData() { const data = { products, packagesList, employees, wholesalers, orders, categories, offers, sliders, advertisements, shippingCompanies, activityLog, settings }; const blob = new Blob([JSON.stringify(data, null, 2)], {type: 'application/json'}); const url = URL.createObjectURL(blob); const a = document.createElement('a'); a.href = url; a.download = `elixir_backup_${new Date().toISOString().slice(0,19)}.json`; a.click(); URL.revokeObjectURL(url); showToast("تم تصدير النسخة الاحتياطية"); addToActivityLog("تم تصدير نسخة احتياطية للبيانات"); }
-function restoreFromBackup() { const input = document.createElement('input'); input.type = 'file'; input.accept = 'application/json'; input.onchange = e => { const file = e.target.files[0]; const reader = new FileReader(); reader.onload = ev => { try { const data = JSON.parse(ev.target.result); if(data.products) products = data.products; if(data.packagesList) packagesList = data.packagesList; if(data.employees) employees = data.employees; if(data.wholesalers) wholesalers = data.wholesalers; if(data.advertisements) advertisements = data.advertisements; if(data.shippingCompanies) shippingCompanies = data.shippingCompanies;saveAllData(); renderProductsTable(); renderPackages(); renderEmployeesCards(); renderWholesalers(); renderAds(); renderShipping(); loadActivityLog();showToast("تم استعادة البيانات"); addToActivityLog("تم استعادة نسخة احتياطية"); } catch(err) { showToast("ملف غير صالح", "error"); } }; reader.readAsText(file); }; input.click(); }
+function restoreFromBackup() { const input = document.createElement('input'); input.type = 'file'; input.accept = 'application/json'; input.onchange = e => { const file = e.target.files[0]; const reader = new FileReader(); reader.onload = ev => { try { const data = JSON.parse(ev.target.result); if(data.products) products = data.products; if(data.packagesList) packagesList = data.packagesList; if(data.employees) employees = data.employees; if(data.wholesalers) wholesalers = data.wholesalers; if(data.shippingCompanies) shippingCompanies = data.shippingCompanies;saveAllData(); renderProductsTable(); renderPackages(); renderEmployeesCards(); renderWholesalers();  renderShipping(); loadActivityLog();showToast("تم استعادة البيانات"); addToActivityLog("تم استعادة نسخة احتياطية"); } catch(err) { showToast("ملف غير صالح", "error"); } }; reader.readAsText(file); }; input.click(); }
 
 // مستمع الحدث للتبويبات
 document.addEventListener('DOMContentLoaded', () => {
@@ -2159,7 +2408,6 @@ document.addEventListener('DOMContentLoaded', () => {
 // ---------- تهيئة الصفحة والمخططات ----------
 loadAllData();
 loadBestSelling();
-loadAds();
 loadShipping();
 loadActivityLog();
 
@@ -2169,9 +2417,7 @@ renderBestSellingList();
 renderEmployeesCards();
 renderWholesalers();
 renderOrdersTable();
-renderCategories();
 renderOffers();
-renderSliders();
 loadSettings();
 
 addToActivityLog("تم فتح لوحة التحكم");
@@ -2269,20 +2515,30 @@ function addToNewArrivalsFromAdmin(productId) {
 
 // ========== إضافة عرض من لوحة التحكم ==========
 function openOfferModalFromAdmin(productId) {
-    const product = products.find(p => p.id === productId);
+    let product = null;
+    for(let i = 0; i < products.length; i++) {
+        if(products[i].id == productId || products[i].product_id == productId) {
+            product = products[i];
+            break;
+        }
+    }
+    
     if (!product) {
-        showToast("❌ المنتج غير موجود", "error");
+        showToast("❌ المنتج غير موجود!", "error");
         return;
     }
     
-    let section = "herbs";
-    if (product.category === "زيوت مركزة") section = "oils";
-    else if (product.category === "بهارات") section = "spices";
-    else if (product.category === "منتجات عناية") section = "care";
+    // منع إضافة عرض لمنتج مخفي
+    if (product.active == 0 || product.active == false) {
+        showToast("⚠️ لا يمكن إضافة عرض لمنتج مخفي! قم بتفعيل المنتج أولاً", "error");
+        return;
+    }
     
-    const tomorrow = new Date();
-    tomorrow.setDate(tomorrow.getDate() + 1);
-    const minDate = tomorrow.toISOString().split('T')[0];
+    // ✅ اليوم كحد أدنى (ما في داعي لبدء العرض)
+    const today = new Date();
+    const minDate = today.toISOString().split('T')[0];
+    
+    // ✅ تاريخ انتهاء افتراضي بعد 30 يوم
     const defaultEndDate = new Date();
     defaultEndDate.setDate(defaultEndDate.getDate() + 30);
     const defaultDate = defaultEndDate.toISOString().split('T')[0];
@@ -2291,14 +2547,27 @@ function openOfferModalFromAdmin(productId) {
     overlay.className = 'fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-[400]';
     overlay.innerHTML = `
         <div class="bg-white rounded-3xl p-8 w-96 text-center shadow-2xl">
-            <h3 class="text-2xl font-bold mb-4">🎯 إضافة "${product.name}" إلى العروض</h3>
-            <input type="number" id="discountPercent" placeholder="نسبة الخصم (%)" min="1" max="90" class="w-full border rounded-xl p-3 mb-4">
-            <label class="block text-right text-sm mb-2">📅 تاريخ انتهاء العرض:</label>
-            <input type="date" id="endDate" value="${defaultDate}" min="${minDate}" class="w-full border rounded-xl p-3 mb-2">
-            <p class="text-xs text-slate-400 text-right mb-4">⚠️ إذا تركت التاريخ فارغاً سيكون العرض دائماً</p>
-            <div class="flex gap-3">
-                <button id="confirmOfferBtn" class="flex-1 bg-elixir text-white py-2 rounded-xl font-bold">تأكيد</button>
-                <button id="cancelOfferBtn" class="flex-1 bg-gray-200 py-2 rounded-xl font-bold">إلغاء</button>
+            <h3 class="text-2xl font-bold mb-4 text-elixir">🏷️ إضافة "${product.name}" إلى العروض</h3>
+            
+            <div class="mb-4">
+                <label class="block text-right text-sm font-bold mb-2">💰 نسبة الخصم (%)</label>
+                <input type="number" id="discountPercent" placeholder="مثال: 20" min="1" max="90" class="w-full border rounded-xl p-3 text-center" required>
+                <p class="text-xs text-slate-400 text-right mt-1">من 1% إلى 90%</p>
+            </div>
+            
+            <div class="mb-4">
+                <label class="block text-right text-sm font-bold mb-2">📅 تاريخ انتهاء العرض (اختياري)</label>
+                <input type="date" id="endDate" value="${defaultDate}" min="${minDate}" class="w-full border rounded-xl p-3">
+                <p class="text-xs text-slate-400 text-right mt-1">⚠️ اتركه فارغاً لجعل العرض دائماً</p>
+            </div>
+            
+            <div class="bg-amber-50 p-3 rounded-xl mb-4 text-right">
+                <p class="text-xs text-amber-700"><i class="fas fa-info-circle ml-1"></i> تاريخ بدء العرض هو اليوم تلقائياً</p>
+            </div>
+            
+            <div class="flex gap-3 mt-6">
+                <button id="confirmOfferBtn" class="flex-1 bg-elixir text-white py-3 rounded-xl font-bold hover:bg-emerald-700 transition">تأكيد</button>
+                <button id="cancelOfferBtn" class="flex-1 bg-gray-200 text-gray-700 py-3 rounded-xl font-bold hover:bg-gray-300 transition">إلغاء</button>
             </div>
         </div>
     `;
@@ -2312,25 +2581,118 @@ function openOfferModalFromAdmin(productId) {
         }
         const endDate = document.getElementById('endDate').value;
         
-        let offers = JSON.parse(localStorage.getItem('elixir_offers')) || [];
-        const existingIndex = offers.findIndex(o => o.productId === productId);
+        // ✅ جلب العروض الحالية
+        let offers = JSON.parse(localStorage.getItem('elixir_offers') || '[]');
+        
+        // ✅ التأكد من عدم وجود عرض مكرر لنفس المنتج
+        const existingIndex = offers.findIndex(o => o.productId == product.id);
         const newPrice = (product.price * (100 - discountPercent) / 100).toFixed(2);
         
         const offerData = {
             id: Date.now(),
-            productId: productId,
+            productId: product.id,
             productName: product.name,
             productPrice: product.price,
             productImg: product.image || "asset/images/placeholder.png",
+            discount: discountPercent,
+            newPrice: newPrice,
+            startDate: new Date().toISOString().split('T')[0],  // تاريخ اليوم تلقائياً
+            endDate: endDate || "",
+            active: true,
+            createdAt: new Date().toISOString()
+        };
+        
+        if (existingIndex !== -1) {
+            // تعديل عرض موجود
+            offers[existingIndex] = { ...offers[existingIndex], ...offerData };
+            showToast(`✅ تم تحديث عرض "${product.name}" بنجاح`, "success");
+        } else {
+            // إضافة عرض جديد
+            offers.push(offerData);
+            showToast(`✅ تم إضافة "${product.name}" إلى العروض بخصم ${discountPercent}%`, "success");
+        }
+        
+        localStorage.setItem('elixir_offers', JSON.stringify(offers));
+        
+        // ✅ تحديث العرض في لوحة التحكم
+        if (typeof renderOffers === 'function') renderOffers();
+        
+        overlay.remove();
+    };
+    
+    document.getElementById('cancelOfferBtn').onclick = () => overlay.remove();
+    overlay.onclick = (e) => { if (e.target === overlay) overlay.remove(); };
+}
+
+
+// ========== إضافة عرض للبكج (Package) ==========
+// ========== إضافة عرض للمجموعة (Package) - نفس شكل نافذة المنتجات ==========
+function openOfferModalForPackage(packageId) {
+    const pkg = packagesList.find(p => p.id === packageId);
+    if (!pkg) {
+        showToast("❌ المجموعة غير موجودة", "error");
+        return;
+    }
+
+    //  التحقق من أن البكج غير مخفي 
+    if (pkg.active == false) {
+        showToast("⚠️ لا يمكن إضافة عرض لبكج مخفي! قم بتفعيل البكج أولاً", "error");
+        return;
+    }
+    
+    const tomorrow = new Date();
+    tomorrow.setDate(tomorrow.getDate() + 1);
+    const minDate = tomorrow.toISOString().split('T')[0];
+    const defaultEndDate = new Date();
+    defaultEndDate.setDate(defaultEndDate.getDate() + 30);
+    const defaultDate = defaultEndDate.toISOString().split('T')[0];
+    
+    const overlay = document.createElement('div');
+    overlay.className = 'fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-[400]';
+    overlay.innerHTML = `
+        <div class="bg-white rounded-3xl p-8 w-96 text-center shadow-2xl">
+            <h3 class="text-2xl font-bold mb-4">🎯 إضافة "${pkg.name}" إلى العروض</h3>
+            <input type="number" id="discountPercentPackage" placeholder="نسبة الخصم (%)" min="1" max="90" class="w-full border rounded-xl p-3 mb-4">
+            <label class="block text-right text-sm mb-2">📅 تاريخ انتهاء العرض:</label>
+            <input type="date" id="endDatePackage" value="${defaultDate}" min="${minDate}" class="w-full border rounded-xl p-3 mb-2">
+            <p class="text-xs text-slate-400 text-right mb-4">⚠️ إذا تركت التاريخ فارغاً سيكون العرض دائماً</p>
+            <div class="flex gap-3">
+                <button id="confirmOfferPackageBtn" class="flex-1 bg-elixir text-white py-2 rounded-xl font-bold">تأكيد</button>
+                <button id="cancelOfferPackageBtn" class="flex-1 bg-gray-200 py-2 rounded-xl font-bold">إلغاء</button>
+            </div>
+        </div>
+    `;
+    document.body.appendChild(overlay);
+    
+    document.getElementById('confirmOfferPackageBtn').onclick = () => {
+        const discountPercent = parseInt(document.getElementById('discountPercentPackage').value);
+        if (!discountPercent || discountPercent < 1 || discountPercent > 90) {
+            showToast("⚠️ الرجاء إدخال نسبة خصم صحيحة (1-90)", "error");
+            return;
+        }
+        const endDate = document.getElementById('endDatePackage').value;
+        
+        let offers = JSON.parse(localStorage.getItem('elixir_offers')) || [];
+        const existingIndex = offers.findIndex(o => o.productId === packageId && o.section === "packages");
+        const newPrice = (pkg.price * (100 - discountPercent) / 100).toFixed(2);
+        
+        const offerData = {
+            id: Date.now(),
+            productId: packageId,
+            productName: pkg.name,
+            productPrice: pkg.price,
+            productImg: pkg.image || "asset/images/placeholder.png",
             discount: discountPercent,
             newPrice: newPrice,
             startDate: new Date().toISOString().split('T')[0],
             endDate: endDate || "",
             active: true,
             createdAt: new Date().toISOString(),
-            section: section,
-            category: product.category,
-            desc: product.usage || "منتج طبيعي"
+            section: "packages",
+            category: pkg.category || "packages",
+            desc: pkg.description || "بكج مميز",
+            bgColor: pkg.bgColor,
+            btnColor: pkg.btnColor
         };
         
         if (existingIndex !== -1) offers[existingIndex] = { ...offers[existingIndex], ...offerData };
@@ -2338,14 +2700,13 @@ function openOfferModalFromAdmin(productId) {
         
         localStorage.setItem('elixir_offers', JSON.stringify(offers));
         overlay.remove();
-        showToast(`✅ تم إضافة "${product.name}" إلى العروض بخصم ${discountPercent}% ✨`);
+        showToast(`✅ تم إضافة "${pkg.name}" إلى العروض بخصم ${discountPercent}% ✨`);
         if (typeof renderOffers === 'function') renderOffers();
     };
     
-    document.getElementById('cancelOfferBtn').onclick = () => overlay.remove();
+    document.getElementById('cancelOfferPackageBtn').onclick = () => overlay.remove();
     overlay.onclick = (e) => { if (e.target === overlay) overlay.remove(); };
 }
-
 
 // ========== إدارة الطلبات - نظام البطاقات ==========
 
@@ -2459,12 +2820,15 @@ function renderOrdersCards() {
                 </div>
                 
                 <div class="order-actions">
-                    <select class="status-select" onchange="updateOrderStatusCard(${order.id}, this.value)">
-                        <option value="pending" ${order.status === 'pending' ? 'selected' : ''}>⏳ قيد المعالجة</option>
-                        <option value="processing" ${order.status === 'processing' ? 'selected' : ''}>🔧 قيد التجهيز</option>
-                        <option value="shipped" ${order.status === 'shipped' ? 'selected' : ''}>🚚 تم الشحن</option>
-                        <option value="delivered" ${order.status === 'delivered' ? 'selected' : ''}>✅ تم التسليم</option>
-                    </select>
+                    // داخل الـ html حق orders-actions، غير options الـ select:
+<select class="status-select" onchange="updateOrderStatusCard(${order.id}, this.value)">
+    <option value="pending" ${order.status === 'pending' ? 'selected' : ''}> قيد المعالجة</option>
+    <option value="processing" ${order.status === 'processing' ? 'selected' : ''}> قيد التجهيز</option>
+    <option value="ready" ${order.status === 'ready' ? 'selected' : ''}> تم التجهيز</option>
+    <option value="shipped" ${order.status === 'shipped' ? 'selected' : ''}> تم الشحن</option>
+    <option value="delivered" ${order.status === 'delivered' ? 'selected' : ''}> تم التسليم</option>
+    <option value="returned" ${order.status === 'returned' ? 'selected' : ''}>↩ تم الإرجاع</option>
+</select>
                     <button class="btn-delete" onclick="deleteOrderCard(${order.id})">
                         <i class="fas fa-trash-alt"></i> حذف الطلب
                     </button>
@@ -2487,8 +2851,20 @@ window.updateOrderStatusCard = function(orderId, newStatus) {
         order.lastUpdated = new Date().toISOString();
         saveAllData();
         renderOrdersCards();
-        showToast(`✅ تم تحديث حالة الطلب #${orderId}`, "success");
-        addToActivityLog(`تم تحديث حالة الطلب #${orderId} إلى ${newStatus}`);
+        
+        let statusText = '';
+        switch(newStatus) {
+            case 'pending': statusText = 'قيد المعالجة'; break;
+            case 'processing': statusText = 'قيد التجهيز'; break;
+            case 'ready': statusText = 'تم التجهيز'; break;
+            case 'shipped': statusText = 'تم الشحن'; break;
+            case 'delivered': statusText = 'تم التسليم'; break;
+            case 'returned': statusText = 'تم الإرجاع'; break;
+            default: statusText = newStatus;
+        }
+        
+        showToast(`✅ تم تحديث حالة الطلب #${orderId} إلى ${statusText}`, "success");
+        addToActivityLog(`تم تحديث حالة الطلب #${orderId} إلى ${statusText}`);
     }
 };
 
@@ -2654,11 +3030,97 @@ function refreshBestSellingChart() {
 
 // تحديث الرسم البياني بعد تغيير الطلبات
 window.updateBestSellingChart = updateBestSellingChart;
-new Chart(document.getElementById('categoryChart').getContext('2d'), {
-    type: 'doughnut',
-    data: { labels: ['أعشاب', 'زيوت', 'عناية', 'بهارات'], datasets: [{ data: [40, 25, 20, 15], backgroundColor: ['#438e56', '#87ba93', '#1a2e21', '#f59e0b'] }] },
-    options: { cutout: '70%' }
-});
+
+ // ========== رسم بياني لتوزيع الفئات (من قاعدة البيانات - مباشر) ==========
+function updateCategoryChart() {
+    console.log("🔄 جاري تحديث الرسم البياني من API...");
+    
+    fetch('api/get_all_products.php')
+        .then(res => res.json())
+        .then(data => {
+            console.log("📊 البيانات المستلمة:", data);
+            
+            if (data.error || !Array.isArray(data)) {
+                console.error("❌ خطأ في البيانات:", data);
+                return;
+            }
+            
+            let categoryStats = {
+                'أعشاب طبيعية': 0,
+                'زيوت مركزة': 0,
+                'منتجات عناية': 0,
+                'بهارات': 0
+            };
+            
+            data.forEach(product => {
+                if (categoryStats.hasOwnProperty(product.category)) {
+                    categoryStats[product.category]++;
+                }
+            });
+            
+            const labels = ['أعشاب', 'زيوت', 'عناية', 'بهارات'];
+            const values = [
+                categoryStats['أعشاب طبيعية'],
+                categoryStats['زيوت مركزة'],
+                categoryStats['منتجات عناية'],
+                categoryStats['بهارات']
+            ];
+            
+            console.log("📊 القيم النهائية:", values);
+            
+            const canvas = document.getElementById('categoryChart');
+            if (!canvas) {
+                console.error("❌ عنصر categoryChart غير موجود!");
+                return;
+            }
+            
+            const ctx = canvas.getContext('2d');
+            if (!ctx) {
+                console.error("❌ لا يمكن الحصول على context للرسم!");
+                return;
+            }
+            
+            // ✅ التحقق الآمن من وجود الرسم البياني القديم
+            if (window.categoryChart && typeof window.categoryChart.destroy === 'function') {
+                window.categoryChart.destroy();
+            }
+            
+            // ✅ إنشاء رسم بياني جديد
+            window.categoryChart = new Chart(ctx, {
+                type: 'doughnut',
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        data: values,
+                        backgroundColor: ['#438e56', '#87ba93', '#1a2e21', '#f59e0b'],
+                        borderWidth: 0
+                    }]
+                },
+                options: {
+                    cutout: '70%',
+                    responsive: true,
+                    maintainAspectRatio: true,
+                    plugins: {
+                        legend: { position: 'bottom', labels: { font: { size: 12 } } },
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    const total = context.dataset.data.reduce((a, b) => a + b, 0);
+                                    const percent = total ? Math.round((context.raw / total) * 100) : 0;
+                                    return `${context.label}: ${context.raw} منتج (${percent}%)`;
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+            
+            console.log("✅ تم إنشاء الرسم البياني بنجاح!");
+        })
+        .catch(error => {
+            console.error("❌ خطأ في جلب البيانات:", error);
+        });
+}
 
 
 
@@ -2699,14 +3161,25 @@ document.addEventListener('keydown', function(e) {
 
 
 // ========== إدارة منتجات الجملة ==========
+// تحميل منتجات الجملة من API
 function loadWholesaleProductsList() {
-    const stored = localStorage.getItem('elixir_wholesale_products_list');
-    if (stored) {
-        wholesaleProductsList = JSON.parse(stored);
-    } else {
-        wholesaleProductsList = [];
-    }
-    renderWholesaleProductsTable();
+    console.log("جاري تحميل منتجات الجملة...");
+   fetch('api/wholesale_products.php')
+        .then(response => response.json())
+        .then(data => {
+            console.log("تم تحميل المنتجات:", data);
+            if (Array.isArray(data)) {
+                wholesaleProductsList = data;
+            } else {
+                wholesaleProductsList = [];
+            }
+            renderWholesaleProductsTable();
+        })
+        .catch(error => {
+            console.error('خطأ في جلب المنتجات:', error);
+            wholesaleProductsList = [];
+            renderWholesaleProductsTable();
+        });
 }
 
 function saveWholesaleProductsList() {
@@ -2718,47 +3191,47 @@ function renderWholesaleProductsTable() {
     if (!tbody) return;
     
     if (!wholesaleProductsList || wholesaleProductsList.length === 0) {
-        tbody.innerHTML = '<tr><td colspan="6" class="text-center py-8 text-slate-400">لا توجد منتجات جملة، أضف منتجاً</td></tr>';
+        tbody.innerHTML = '<tr><td colspan="5" class="text-center py-8 text-slate-400">لا توجد منتجات جملة، أضف منتجاً</td></tr>';
         return;
     }
     
     tbody.innerHTML = '';
     wholesaleProductsList.forEach(prod => {
-        // صورة قابلة للضغط
-        const imageHtml = prod.image && prod.image !== "" 
-            ? `<img src="${prod.image}" class="w-10 h-10 rounded-lg object-cover cursor-pointer hover:opacity-80 transition" onclick="openImagePreview('${prod.image}')" title="اضغط للتكبير">` 
-            : '<div class="w-10 h-10 bg-gray-100 rounded-lg flex items-center justify-center"><i class="fas fa-image text-gray-400"></i></div>';
-        
-        // أيقونة العين (إخفاء/إظهار)
-        const isHidden = prod.hidden === true;
+        const productName = prod.product_name || prod.productName || 'غير محدد';
+        const category = prod.category || 'غير محدد';
+        const retailPrice = prod.retail_price || prod.retailPrice || 0;
+        const wholesalePrice = prod.wholesale_price || prod.wholesalePrice || 0;
+        const prodId = prod.id;
+        const isHidden = prod.hidden === 1;
         const eyeIcon = isHidden ? 'fa-eye-slash' : 'fa-eye';
         const eyeColor = isHidden ? 'text-gray-400' : 'text-green-600';
-        const eyeTitle = isHidden ? 'المنتج مخفي عن تجار الجملة' : 'المنتج ظاهر لتجار الجملة';
         
+        // ✅ هون التغيير المهم - استخدم openEditWholesalePriceModal بدل openEditWholesaleModal
         tbody.innerHTML += `
             <tr class="border-b hover:bg-slate-50 ${isHidden ? 'opacity-50 bg-gray-50' : ''}">
                 <td class="py-3">
                     <div class="flex items-center gap-3">
-                        ${imageHtml}
-                        <span class="font-bold">${prod.productName}</span>
+                        <span class="font-bold">${productName}</span>
                     </div>
                  </td>
-                 <td>${prod.category}</td>
-                 <td class="text-slate-500">${prod.retailPrice} ₪</td>
-                 <td class="text-elixir font-bold">${prod.wholesalePrice} ₪</td>
+                 <td>${category}</td>
+                 <td class="text-slate-500">${parseFloat(retailPrice).toFixed(2)} ₪</td>
+                 <td class="text-elixir font-bold">${parseFloat(wholesalePrice).toFixed(2)} ₪</td>
                  <td>
                     <i class="fas ${eyeIcon} ${eyeColor} cursor-pointer ml-3 text-lg hover:opacity-75 transition" 
-                       onclick="toggleWholesaleProductVisibility(${prod.id})" 
-                       title="${eyeTitle}"></i>
+                       onclick="toggleWholesaleProductVisibility(${prodId})" 
+                       title="${isHidden ? 'إظهار المنتج' : 'إخفاء المنتج'}"></i>
                     <i class="fas fa-edit text-slate-500 hover:text-elixir cursor-pointer ml-2" 
-                       onclick="editWholesaleProductItem(${prod.id})" title="تعديل"></i>
+                       onclick="openEditWholesalePriceModal(${prodId})" title="تعديل السعر"></i>
                     <i class="fas fa-trash-alt text-slate-500 hover:text-red-500 cursor-pointer" 
-                       onclick="deleteWholesaleProductItem(${prod.id})" title="حذف"></i>
-                 </td>
+                       onclick="deleteWholesaleProductItem(${prodId})" title="حذف"></i>
+                   </td>
              </tr>
         `;
     });
 }
+
+
 
 
 // تبديل حالة إخفاء/إظهار منتج الجملة
@@ -2766,30 +3239,79 @@ window.toggleWholesaleProductVisibility = function(id) {
     const product = wholesaleProductsList.find(p => p.id === id);
     if (!product) return;
     
-    product.hidden = !product.hidden;
-    saveWholesaleProductsList();
-    renderWholesaleProductsTable();
+    const currentHidden = product.hidden === 1;
+    const newHidden = currentHidden ? 0 : 1;
+    const action = newHidden === 1 ? 'إخفاء' : 'إظهار';
     
-    const status = product.hidden ? 'مخفي' : 'ظاهر';
-    showToast(`✅ ${product.productName} الآن ${status} لتجار الجملة`, "success");
-    addToActivityLog(`تم ${status} منتج الجملة "${product.productName}"`);
+    fetch('api/wholesale_products.php', {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ id: id, hidden: newHidden })
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            showToast(`✅ تم ${action} المنتج ${product.product_name || product.productName}`, "success");
+            loadWholesaleProductsList();
+        } else {
+            showToast(data.error || "حدث خطأ", "error");
+        }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        showToast("خطأ في الاتصال بالخادم", "error");
+    });
 };
 
 // فتح مودال إضافة منتج للجملة
+// فتح مودال إضافة منتج للجملة
 window.openWholesaleProductModal = function() {
-    console.log("فتح مودال");
+    console.log("جاري تحميل المنتجات من قاعدة البيانات...");
     const select = document.getElementById('wholesaleProductSelectStore');
     if (!select) {
-        console.error("ال select غير موجود");
+        console.error("الـ select غير موجود");
         return;
     }
-    const existingProductIds = (wholesaleProductsList || []).map(p => p.productId);
-    const availableProducts = products.filter(p => !existingProductIds.includes(p.id) && p.active !== false);
     
-    select.innerHTML = '<option value="">-- اختر منتج --</option>';
-    availableProducts.forEach(p => {
-        select.innerHTML += `<option value="${p.id}" data-name="${p.name}" data-category="${p.category}" data-price="${p.price}" data-img="${p.image || ''}">${p.name} (${p.category} - ${p.price} ₪)</option>`;
-    });
+    // جلب المنتجات من قاعدة البيانات عبر API
+    fetch('api/get_products.php')
+        .then(res => res.json())
+        .then(allProducts => {
+            console.log("تم جلب المنتجات:", allProducts);
+            
+            // جلب المنتجات المضافة مسبقاً للجملة
+            fetch('api/wholesale_products.php')
+                .then(res => res.json())
+                .then(existingProducts => {
+                    // التأكد من أن existingProducts مصفوفة
+                    const existingProductIds = Array.isArray(existingProducts) ? existingProducts.map(p => p.product_id) : [];
+                    
+                    // فلترة المنتجات التي لم تضف بعد
+                    // ملاحظة: استخدم product_id بدلاً من id
+                    const availableProducts = allProducts.filter(p => !existingProductIds.includes(p.product_id));
+                    
+                    select.innerHTML = '<option value="">-- اختر منتج --</option>';
+                    availableProducts.forEach(p => {
+                        // استخدم product_id بدلاً من id
+                        select.innerHTML += `<option value="${p.product_id}" data-name="${p.product_name}" data-category="${p.category}" data-price="${p.price}" data-img="${p.image || ''}">${p.product_name} (${p.category} - ${p.price} ₪)</option>`;
+                    });
+                    
+                    if (availableProducts.length === 0) {
+                        select.innerHTML = '<option value="">-- جميع المنتجات مضافه --</option>';
+                        showToast("جميع المنتجات مضاف مسبقاً لقائمة الجملة", "info");
+                    } else {
+                        showToast(`✅ تم تحميل ${availableProducts.length} منتج متاح`, "success");
+                    }
+                })
+                .catch(err => {
+                    console.error("خطأ في جلب منتجات الجملة:", err);
+                    showToast("حدث خطأ في تحميل البيانات", "error");
+                });
+        })
+        .catch(error => {
+            console.error('خطأ في جلب المنتجات من قاعدة البيانات:', error);
+            showToast("حدث خطأ في جلب المنتجات من قاعدة البيانات", "error");
+        });
     
     document.getElementById('wholesaleProductModalTitle').innerText = "➕ إضافة منتج للجملة";
     document.getElementById('editWholesaleProductItemId').value = '';
@@ -2801,93 +3323,273 @@ window.closeWholesaleProductModalForm = function() {
     document.getElementById('wholesaleProductModalForm').classList.add('hidden');
 };
 
+// حفظ منتج الجملة - يرسل البيانات إلى API
+// حفظ منتج الجملة
 window.saveWholesaleProductItem = function() {
-    const editId = document.getElementById('editWholesaleProductItemId').value;
-    const select = document.getElementById('wholesaleProductSelectStore');
-    const productId = parseInt(select.value);
-    const wholesalePrice = parseFloat(document.getElementById('wholesaleProductPriceStore').value);
+    console.log("تم الضغط على زر حفظ");
     
-    if (!productId || isNaN(wholesalePrice)) {
-        showToast("يرجى اختيار المنتج وإدخال سعر الجملة", "error");
+    // جلب العناصر
+    const select = document.getElementById('wholesaleProductSelectStore');
+    const priceInput = document.getElementById('wholesaleProductPriceStore');
+    
+    // التحقق من وجود العناصر
+    if (!select) {
+        console.error("الـ select غير موجود");
+        showToast("خطأ في النموذج", "error");
         return;
     }
     
-    const selectedOption = select.options[select.selectedIndex];
-    const productName = selectedOption.getAttribute('data-name');
-    const category = selectedOption.getAttribute('data-category');
-    const retailPrice = parseFloat(selectedOption.getAttribute('data-price'));
-    const image = selectedOption.getAttribute('data-img');
-    
-    if (editId) {
-        // تعديل: نحدث البيانات كاملة
-        const index = wholesaleProductsList.findIndex(p => p.id == editId);
-        if (index !== -1) {
-            // نسمح بتغيير المنتج نفسه وليس فقط السعر
-            wholesaleProductsList[index] = {
-                ...wholesaleProductsList[index],
-                productId: productId,
-                productName: productName,
-                category: category,
-                retailPrice: retailPrice,
-                wholesalePrice: wholesalePrice,
-                image: image
-            };
-            showToast("✅ تم تحديث منتج الجملة", "success");
-        }
-    } else {
-        // إضافة جديدة
-        const newId = wholesaleProductsList.length > 0 ? Math.max(...wholesaleProductsList.map(p => p.id)) + 1 : 1;
-        wholesaleProductsList.push({
-            id: newId,
-            productId: productId,
-            productName: productName,
-            category: category,
-            retailPrice: retailPrice,
-            wholesalePrice: wholesalePrice,
-            image: image
-        });
-        showToast(`✅ تم إضافة ${productName} إلى قائمة منتجات الجملة`, "success");
+    if (!priceInput) {
+        console.error("حقل السعر غير موجود");
+        showToast("خطأ في النموذج", "error");
+        return;
     }
     
-    saveWholesaleProductsList();
-    renderWholesaleProductsTable();
-    closeWholesaleProductModalForm();
-};
-
-window.editWholesaleProductItem = function(id) {
-    const product = wholesaleProductsList.find(p => p.id === id);
-    if (!product) return;
+    // جلب القيم
+    const selectedValue = select.value;
+    const wholesalePrice = parseFloat(priceInput.value);
     
-    const select = document.getElementById('wholesaleProductSelectStore');
-    // تعبئة كل المنتجات المتاحة
-    const existingProductIds = wholesaleProductsList.map(p => p.productId);
-    const availableProducts = products.filter(p => !existingProductIds.includes(p.id) && p.active !== false);
+    console.log("selectedValue:", selectedValue);
+    console.log("wholesalePrice:", wholesalePrice);
+    console.log("selectedIndex:", select.selectedIndex);
+    console.log("selectedOption:", select.options[select.selectedIndex]);
     
-    // نضيف المنتج الحالي أولاً (حتى لو كان موجود في القائمة)
-    select.innerHTML = `<option value="${product.productId}" data-name="${product.productName}" data-category="${product.category}" data-price="${product.retailPrice}" data-img="${product.image}" selected>${product.productName}</option>`;
+    // التحقق من اختيار منتج
+    if (!selectedValue || selectedValue === "") {
+        showToast("يرجى اختيار منتج", "error");
+        return;
+    }
     
-    // نضيف باقي المنتجات
-    availableProducts.forEach(p => {
-        select.innerHTML += `<option value="${p.id}" data-name="${p.name}" data-category="${p.category}" data-price="${p.price}" data-img="${p.image || ''}">${p.name} (${p.category} - ${p.price} ₪)</option>`;
+    const productId = parseInt(selectedValue);
+    
+    if (isNaN(productId) || productId <= 0) {
+        showToast("المنتج المختار غير صالح", "error");
+        return;
+    }
+    
+    if (isNaN(wholesalePrice) || wholesalePrice <= 0) {
+        showToast("يرجى إدخال سعر جملة صحيح", "error");
+        return;
+    }
+    
+    // جلب اسم المنتج من الـ option
+    const selectedOption = select.options[select.selectedIndex];
+    const productName = selectedOption ? selectedOption.getAttribute('data-name') || selectedOption.textContent : 'المنتج';
+    
+    console.log("سيتم الإرسال:", { product_id: productId, wholesale_price: wholesalePrice, productName: productName });
+    
+    // إرسال الطلب إلى API
+    fetch('api/wholesale_products.php', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+            product_id: productId,
+            wholesale_price: wholesalePrice
+        })
+    })
+    .then(response => response.json())
+    .then(data => {
+        console.log("استجابة API:", data);
+        if (data.success === true) {
+            showToast(`✅ تم إضافة ${productName} إلى قائمة الجملة`, "success");
+            loadWholesaleProductsList();
+            closeWholesaleProductModalForm();
+        } else {
+            showToast(data.error || "حدث خطأ في الإضافة", "error");
+        }
+    })
+    .catch(error => {
+        console.error("خطأ في الاتصال:", error);
+        showToast("خطأ في الاتصال بالخادم", "error");
     });
-    
-    document.getElementById('wholesaleProductModalTitle').innerText = "✏️ تعديل منتج الجملة";
-    document.getElementById('editWholesaleProductItemId').value = product.id;
-    document.getElementById('wholesaleProductPriceStore').value = product.wholesalePrice;
-    document.getElementById('wholesaleProductModalForm').classList.remove('hidden');
 };
 
+
+
+
+
+
+// حذف منتج الجملة
 window.deleteWholesaleProductItem = function(id) {
     const product = wholesaleProductsList.find(p => p.id === id);
     if (!product) return;
     
-    customConfirm(`هل تريد حذف "${product.productName}" من قائمة منتجات الجملة؟`, () => {
-        wholesaleProductsList = wholesaleProductsList.filter(p => p.id !== id);
-        saveWholesaleProductsList();
-        renderWholesaleProductsTable();
-        showToast(`🗑️ تم حذف ${product.productName} من منتجات الجملة`, "success");
+    customConfirm(`⚠️ هل تريد حذف "${product.product_name || product.productName}" من قائمة منتجات الجملة نهائياً؟`, () => {
+        fetch('api/wholesale_products.php', {
+            method: 'DELETE',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ id: id })
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                showToast("🗑️ تم الحذف بنجاح", "success");
+                loadWholesaleProductsList();
+            } else {
+                showToast(data.error || "حدث خطأ", "error");
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            showToast("خطأ في الاتصال بالخادم", "error");
+        });
     });
 };
+
+
+
+
+
+
+
+
+
+
+
+
+// ========== دوال تعديل منتج الجملة - الحل النهائي ==========
+
+// فتح نافذة تعديل السعر - النسخة المصححة
+window.openEditWholesalePriceModal = function(id) {
+    console.log("✅ تم الضغط على تعديل للمنتج رقم:", id);
+    
+    // البحث عن المنتج في القائمة
+    let product = null;
+    for (let i = 0; i < wholesaleProductsList.length; i++) {
+        if (wholesaleProductsList[i].id == id) {
+            product = wholesaleProductsList[i];
+            break;
+        }
+    }
+    
+    if (!product) {
+        showToast("❌ المنتج غير موجود في القائمة", "error");
+        return;
+    }
+    
+    const productName = product.product_name || product.productName || "غير محدد";
+   let currentPrice = product.wholesale_price || product.wholesalePrice || 0;
+currentPrice = parseFloat(currentPrice);
+if (isNaN(currentPrice)) currentPrice = 0;
+    
+    // ✅ تحويل currentPrice إلى رقم إذا كان نصاً
+    currentPrice = parseFloat(currentPrice);
+    if (isNaN(currentPrice)) currentPrice = 0;
+    
+    console.log("اسم المنتج:", productName);
+    console.log("السعر الحالي:", currentPrice);
+    
+    // تعبئة البيانات في المودال
+    const priceIdInput = document.getElementById('editWholesalePriceId');
+    const productDisplay = document.getElementById('editWholesalePriceProductDisplay');
+    const currentPriceDisplay = document.getElementById('editWholesalePriceCurrentPriceDisplay');
+    const newPriceInput = document.getElementById('editWholesalePriceNewPrice');
+    
+    if (!priceIdInput || !productDisplay || !currentPriceDisplay || !newPriceInput) {
+        console.error("❌ عناصر المودال غير موجودة في الـ HTML");
+        showToast("خطأ: عناصر المودال غير موجودة", "error");
+        return;
+    }
+    
+    priceIdInput.value = id;
+    productDisplay.innerHTML = productName;
+    currentPriceDisplay.innerHTML = currentPrice.toFixed(2) + ' ₪';
+    newPriceInput.value = currentPrice;
+    
+    // إظهار المودال
+    const modal = document.getElementById('editWholesalePriceModal');
+    if (modal) {
+        modal.classList.remove('hidden');
+        console.log("✅ تم فتح نافذة التعديل للمنتج: " + productName);
+        showToast("✅ نافذة التعديل مفتوحة", "success");
+    } else {
+        console.error("❌ المودال editWholesalePriceModal غير موجود في الـ HTML");
+        showToast("خطأ: نافذة التعديل غير موجودة", "error");
+    }
+};
+
+// إغلاق نافذة التعديل
+window.closeEditWholesalePriceModal = function() {
+    const modal = document.getElementById('editWholesalePriceModal');
+    if (modal) modal.classList.add('hidden');
+    document.getElementById('editWholesalePriceNewPrice').value = '';
+};
+
+// حفظ التعديل
+window.saveWholesalePriceEdit = function() {
+    const id = parseInt(document.getElementById('editWholesalePriceId').value);
+    const newPrice = parseFloat(document.getElementById('editWholesalePriceNewPrice').value);
+    
+    if (isNaN(newPrice) || newPrice <= 0) {
+        showToast("❌ يرجى إدخال سعر صحيح أكبر من 0", "error");
+        return;
+    }
+    
+    fetch('api/wholesale_products.php', {
+        method: 'PUT',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ id: id, wholesale_price: newPrice })
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            showToast("✅ تم تحديث السعر بنجاح", "success");
+            window.closeEditWholesalePriceModal();
+            loadWholesaleProductsList(); // تحديث الجدول
+        } else {
+            showToast(data.error || "حدث خطأ أثناء التحديث", "error");
+        }
+    })
+    .catch(error => {
+        console.error("خطأ:", error);
+        showToast("خطأ في الاتصال بالخادم", "error");
+    });
+};
+
+// تأكيد أن الدوال معرفة
+console.log("✅ دوال تعديل منتجات الجملة تم تحميلها بنجاح");
+
+
+
+
+
+
+
+
+
+
+
+// تحميل المنتجات من قاعدة البيانات
+async function loadProductsFromDatabase() {
+    try {
+        const response = await fetch('api/get_all_products.php');
+        const data = await response.json();
+        
+        console.log("📦 البيانات من API:", data);
+        
+        if (!data.error && Array.isArray(data)) {
+            products = data;
+            console.log("✅ تم تحميل", products.length, "منتج");
+            renderProductsTable();
+            document.getElementById('totalProductsCount').innerText = products.length;
+            document.getElementById('outOfStockCounter').innerText = products.filter(p => p.stock == 0).length;
+            
+           
+           
+        }
+    } catch(error) {
+        console.error("خطأ في جلب المنتجات:", error);
+    }
+}
+
+
+
+
+
 
 // تصحيح الإحصائيات
 function refreshStats() {
@@ -2908,6 +3610,386 @@ setTimeout(refreshStats, 100);
 
 
 
+// ========== دالة تبديل حالة المنتج (تفعيل/تعطيل) ==========
+// ========== دالة تبديل حالة المنتج (تفعيل/تعطيل) - النسخة النهائية ==========
+window.toggleProductActive = function(productId) {
+    console.log("🔥 تم النقر على المنتج:", productId);
+    
+    // البحث عن المنتج
+    let product = null;
+    for(let i = 0; i < products.length; i++) {
+        if(products[i].product_id == productId || products[i].id == productId) {
+            product = products[i];
+            break;
+        }
+    }
+    
+    if(!product) {
+        showToast("❌ المنتج غير موجود!", "error");
+        return;
+    }
+    
+    const newStatus = product.active == 1 ? 0 : 1;
+    const action = newStatus == 1 ? 'تفعيل' : 'إخفاء';
+    const productName = product.name || product.product_name;
+    
+    customConfirm(`⚠️ هل تريد ${action} المنتج "${productName}"؟`, async () => {
+        const icon = document.querySelector(`.fa-eye, .fa-eye-slash[onclick*="toggleProductActive(${productId})"]`);
+        if(icon) {
+            icon.classList.remove('fa-eye', 'fa-eye-slash');
+            icon.classList.add('fa-spinner', 'fa-spin');
+        }
+        
+        try {
+            const response = await fetch('api/update_product_status.php', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ 
+                    id: product.product_id || product.id, 
+                    active: newStatus 
+                })
+            });
+            
+            const result = await response.json();
+            
+            if(result.success) {
+                product.active = newStatus;
+                await loadProductsFromDatabase();
+                renderProductsTable();
+                
+                if (newStatus === 0) {
+                    // إخفاء: حذف من جديدنا ومن العروض
+                    let newArrivals = JSON.parse(localStorage.getItem('elixir_new_arrivals') || '[]');
+                    let filteredNew = newArrivals.filter(n => n.id != productId && n.id != product.product_id);
+                    localStorage.setItem('elixir_new_arrivals', JSON.stringify(filteredNew));
+                    
+                    let offers = JSON.parse(localStorage.getItem('elixir_offers') || '[]');
+                    let filteredOffers = offers.filter(o => o.productId != productId && o.productId != product.product_id);
+                    localStorage.setItem('elixir_offers', JSON.stringify(filteredOffers));
+                    
+                    console.log(`🗑️ تم حذف المنتج "${productName}" من جديدنا ومن العروض بسبب إخفائه`);
+                } else {
+                    // ✅ تفعيل: نضيف العرض مرة أخرى إذا كان موجود أصلاً
+                    // نتحقق إذا كان المنتج له عرض في localStorage قبل الإخفاء
+                    let allOffers = JSON.parse(localStorage.getItem('elixir_offers_all') || '[]');
+                    let originalOffer = allOffers.find(o => o.productId == productId || o.productId == product.product_id);
+                    
+                    if (originalOffer) {
+                        // العرض موجود أصلاً، نعيد إضافته
+                        let currentOffers = JSON.parse(localStorage.getItem('elixir_offers') || '[]');
+                        if (!currentOffers.some(o => o.productId == productId || o.productId == product.product_id)) {
+                            currentOffers.push(originalOffer);
+                            localStorage.setItem('elixir_offers', JSON.stringify(currentOffers));
+                            console.log(`✅ تم إعادة العرض للمنتج "${productName}" بعد التفعيل`);
+                        }
+                    }
+                    
+                    showToast(`✅ تم تفعيل المنتج "${productName}"`, "success");
+                }
+                
+                showToast(`✅ تم ${action} المنتج "${productName}"`, "success");
+            } else {
+                showToast("❌ خطأ: " + (result.error || "فشل التحديث"), "error");
+                renderProductsTable();
+            }
+        } catch(err) {
+            console.error("خطأ:", err);
+            showToast("❌ خطأ في الاتصال بالخادم", "error");
+            renderProductsTable();
+        }
+    });
+};
+
+
+
+
+// ========== تنظيف المنتجات المنتهية من جديدنا تلقائياً ==========
+function cleanExpiredNewArrivals() {
+    let newArrivals = JSON.parse(localStorage.getItem('elixir_new_arrivals') || '[]');
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    
+    let expiredCount = 0;
+    let validArrivals = newArrivals.filter(product => {
+        // إذا كان المنتج مخفي (active=0) أو تم حذفه من قاعدة البيانات، احذفه من جديدنا
+        const stillExists = products.some(p => p.id == product.id);
+        if (!stillExists) {
+            expiredCount++;
+            return false;
+        }
+        
+        // إذا كان عنده expiryDate وانتهى، احذفه
+        if (product.expiryDate) {
+            const expiryDate = new Date(product.expiryDate);
+            expiryDate.setHours(0, 0, 0, 0);
+            if (expiryDate < today) {
+                expiredCount++;
+                return false;
+            }
+        }
+        return true;
+    });
+    
+    if (expiredCount > 0) {
+        localStorage.setItem('elixir_new_arrivals', JSON.stringify(validArrivals));
+        console.log(` تم إزالة ${expiredCount} منتج/ة منتهية من جديدنا`);
+    }
+}
+
+
+
+
+
+// ========== مزامنة المهام مع الموظفين (الإضافة الجديدة) ==========
+
+// 1. تعديل دالة addManualTask عشان ترسل المهمة للموظف
+const originalAddManualTask = addManualTask;
+window.addManualTask = function() {
+    const empId = parseInt(document.getElementById('targetEmployeeId').value);
+    const emp = employees.find(e => e.id === empId);
+    if (!emp) { showToast("موظف غير موجود", "error"); return; }
+    
+    const type = document.getElementById('taskType').value;
+    let desc = document.getElementById('taskDescription').value.trim();
+    
+    if (type === 'restock') {
+        const productId = parseInt(document.getElementById('restockProductId').value);
+        const amount = parseInt(document.getElementById('restockAmount').value) || 5;
+        const product = products.find(p => p.id === productId);
+        if (!product) { showToast("اختر منتجاً", "error"); return; }
+        desc = `🔄 إعادة تعبئة: ${product.name} (+${amount})`;
+        
+        const taskData = {
+            id: Date.now(),
+            text: desc,
+            status: "pending",
+            type: "restock",
+            productId: productId,
+            amount: amount,
+            assignedAt: new Date().toLocaleString('ar-EG')
+        };
+        
+        // إضافة للموظف في نظام الأدمن
+        emp.tasks.push(taskData);
+        
+        // إرسال للموظف عبر localStorage
+        syncTaskToEmployee(emp.email, taskData);
+        
+    } else {
+        if (!desc) { showToast("أدخل وصف المهمة", "error"); return; }
+        
+        const taskData = {
+            id: Date.now(),
+            text: desc,
+            status: "pending",
+            type: "general",
+            assignedAt: new Date().toLocaleString('ar-EG')
+        };
+        
+        emp.tasks.push(taskData);
+        syncTaskToEmployee(emp.email, taskData);
+    }
+    
+    renderEmployeesCards();
+    closeManualTaskModal();
+    saveAllData();
+    showToast(`✅ تم إضافة مهمة إلى ${emp.name} وتم إرسالها له`, "success");
+    addToActivityLog(`تم إضافة مهمة للموظف ${emp.name}: ${desc}`);
+};
+
+// 2. دالة إرسال المهمة للموظف
+function syncTaskToEmployee(employeeEmail, taskData) {
+    // جلب بيانات الموظف من localStorage الخاص به
+    let employeeData = localStorage.getItem(`elixir_employee_${employeeEmail}`);
+    
+    if (employeeData) {
+        let empData = JSON.parse(employeeData);
+        if (!empData.tasks) empData.tasks = [];
+        empData.tasks.push(taskData);
+        localStorage.setItem(`elixir_employee_${employeeEmail}`, JSON.stringify(empData));
+        console.log(`✅ تم إرسال المهمة للموظف ${employeeEmail}`);
+    } else {
+        // إذا الموظف لم يسجل دخوله بعد، ننشئ له حساب جديد
+        const emp = employees.find(e => e.email === employeeEmail);
+        if (emp) {
+            const newEmployeeData = {
+                email: emp.email,
+                name: emp.name,
+                role: emp.role,
+                loggedIn: false,
+                tasks: [taskData],
+                completedTasks: [],
+                cancelledTasks: []
+            };
+            localStorage.setItem(`elixir_employee_${employeeEmail}`, JSON.stringify(newEmployeeData));
+            console.log(`✅ تم إنشاء حساب مؤقت للموظف ${employeeEmail} وحفظ المهمة`);
+        }
+    }
+}
+
+// 3. مراقبة المهام المنجزة من الموظفين (تشتغل كل 5 ثواني)
+function startTaskWatcher() {
+    setInterval(() => {
+        employees.forEach(emp => {
+            if (emp.email) {
+                const employeeData = localStorage.getItem(`elixir_employee_${emp.email}`);
+                if (employeeData) {
+                    const empData = JSON.parse(employeeData);
+                    
+                    // التحقق من وجود مهام مكتملة جديدة
+                    if (empData.completedTasks && empData.completedTasks.length > 0) {
+                        empData.completedTasks.forEach(completedTask => {
+                            // التأكد إنها ما انحطت قبل كدا
+                            const alreadySynced = emp.tasks.some(t => t.id === completedTask.id && t.syncedToAdmin);
+                            if (!alreadySynced) {
+                                // إضافة سجل في الـ activity log
+                                addToActivityLog(`✅ ${emp.name} أنجز المهمة: ${completedTask.text}`);
+                                showToast(`🎉 إنجاز: ${emp.name} أكمل "${completedTask.text}"`, "success");
+                                
+                                // إذا كانت المهمة من نوع restock، نحدث المخزون
+                                if (completedTask.type === 'restock' && completedTask.productId) {
+                                    const product = products.find(p => p.id === completedTask.productId);
+                                    if (product) {
+                                        product.stock = (product.stock || 0) + (completedTask.amount || 0);
+                                        renderProductsTable();
+                                        addToActivityLog(`📦 تم تحديث مخزون ${product.name} +${completedTask.amount}`);
+                                    }
+                                }
+                                
+                                // وضع علامة إنه تمت مزامنتها
+                                const taskInAdmin = emp.tasks.find(t => t.id === completedTask.id);
+                                if (taskInAdmin) {
+                                    taskInAdmin.syncedToAdmin = true;
+                                    taskInAdmin.completedAt = completedTask.completedAt;
+                                }
+                                saveAllData();
+                                renderEmployeesCards();
+                            }
+                        });
+                    }
+                }
+            }
+        });
+    }, 5000); // كل 5 ثواني
+}
+
+// 4. تشغيل المراقبة عند تحميل الصفحة
+setTimeout(() => {
+    startTaskWatcher();
+    console.log("✅ بدأ نظام مراقبة مهام الموظفين");
+}, 3000);
+
+// 5. تعديل دالة completeTask في الأدمن (لما الأدمن ينجز مهمة يدوي)
+const originalCompleteTask = completeTask;
+window.completeTask = function(empId, taskIndex) {
+    const emp = employees.find(e => e.id === empId);
+    if (!emp || !emp.tasks[taskIndex]) return;
+    const task = emp.tasks[taskIndex];
+    if (task.completed) return;
+    
+    // تنفيذ المهمة
+    if (task.action === 'restock' && task.productId) {
+        const prod = products.find(p => p.id === task.productId);
+        if (prod) { 
+            prod.stock += task.amount; 
+            showToast(`✅ تمت إعادة تعبئة ${prod.name} +${task.amount}`);
+            addToActivityLog(`🔄 تم إعادة تعبئة ${prod.name} +${task.amount} بواسطة الأدمن`);
+        }
+    } else {
+        showToast(`✅ تم إنجاز المهمة: ${task.desc}`);
+        addToActivityLog(`✅ تم إنجاز المهمة "${task.desc}" للموظف ${emp.name} بواسطة الأدمن`);
+    }
+    
+    task.completed = true;
+    emp.tasks = emp.tasks.filter(t => !t.completed);
+    
+    // تحديث في localStorage حق الموظف
+    if (emp.email) {
+        const employeeData = localStorage.getItem(`elixir_employee_${emp.email}`);
+        if (employeeData) {
+            let empData = JSON.parse(employeeData);
+            // إضافة للمهام المنجزة
+            if (!empData.completedTasks) empData.completedTasks = [];
+            empData.completedTasks.push({
+                id: task.id,
+                text: task.desc,
+                type: task.action,
+                completedAt: new Date().toLocaleString('ar-EG'),
+                completedBy: "admin"
+            });
+            // حذف من المهام الحالية
+            if (empData.tasks) {
+                empData.tasks = empData.tasks.filter(t => t.id !== task.id);
+            }
+            localStorage.setItem(`elixir_employee_${emp.email}`, JSON.stringify(empData));
+        }
+    }
+    
+    renderEmployeesCards();
+    renderProductsTable();
+    saveAllData();
+};
+
+// 6. دالة إنشاء حساب للموظف عند إضافته (عشان يظهر في login)
+const originalAddNewEmployee = addNewEmployee;
+window.addNewEmployee = function() {
+    const name = document.getElementById('empName')?.value.trim();
+    const role = document.getElementById('empRole')?.value.trim() || "موظف";
+    const email = document.getElementById('empEmail')?.value.trim();
+    const password = document.getElementById('empPassword')?.value.trim();
+    
+    if (!name) { showToast("❌ أدخل اسم الموظف", "error"); return; }
+    if (!email) { showToast("❌ أدخل البريد الإلكتروني", "error"); return; }
+    if (!password) { showToast("❌ أدخل كلمة المرور", "error"); return; }
+    if (employees.some(emp => emp.email === email)) {
+        showToast("❌ هذا البريد الإلكتروني مسجل مسبقاً", "error");
+        return;
+    }
+    
+    const newId = employees.length > 0 ? Math.max(...employees.map(e => e.id)) + 1 : 101;
+    
+    const newEmployee = {
+        id: newId,
+        name: name,
+        role: role,
+        email: email,
+        password: password,
+        tasks: [],
+        createdAt: new Date().toISOString()
+    };
+    
+    employees.push(newEmployee);
+    
+    // إنشاء حساب للموظف في localStorage الخاص به
+    const employeeAccount = {
+        email: email,
+        name: name,
+        role: role,
+        password: password,
+        loggedIn: false,
+        tasks: [],
+        completedTasks: [],
+        cancelledTasks: []
+    };
+    localStorage.setItem(`elixir_employee_${email}`, JSON.stringify(employeeAccount));
+    
+    saveAllData();
+    renderEmployeesCards();
+    closeEmployeeModal();
+    showToast(`✅ تم إضافة الموظف ${name} بنجاح وتم إنشاء حساب له`, "success");
+    addToActivityLog(`تم إضافة موظف جديد: ${name} (${email})`);
+};
+
+
+
+
+
+
+// استدعاء الدالة عند تحميل الصفحة
+setTimeout(cleanExpiredNewArrivals, 1000);
+
+// استدعاء الدالة كل ساعة للتنظيف
+setInterval(cleanExpiredNewArrivals, 3600000);
 
 
 
@@ -2919,5 +4001,3 @@ setTimeout(function() {
         console.log("⚠️ updateBestSellingChart غير معرفة");
     }
 }, 1000);
-
-
