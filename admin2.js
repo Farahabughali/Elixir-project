@@ -346,29 +346,41 @@ categories = [
 }
 
 // ========== حساب المنتجات الأكثر مبيعاً من الطلبات ==========
+// ========== حساب المنتجات الأكثر مبيعاً من الطلبات ==========
 function getBestSellingProductsFromOrders(limit = 5) {
-    // قاموس لتجميع الكميات المباعة لكل منتج
-    let salesMap = new Map();
+    // إذا ما في طلبات، ترجع مصفوفة فاضية
+    if (!orders || orders.length === 0) {
+        return [];
+    }
+    
+    // قاموس لتجميع عدد المرات اللي انطلب فيها كل منتج (وليس الكمية)
+    let requestCountMap = new Map();
     
     // المرور على جميع الطلبات
     orders.forEach(order => {
         if (order.items && order.items.length > 0) {
+            // استخدم Set عشان نحسب كل منتج مرة وحدة في كل طلب
+            const productsInThisOrder = new Set();
+            
             order.items.forEach(item => {
                 const productName = item.name;
-                const quantity = item.qty || item.quantity || 1;
-                
-                if (salesMap.has(productName)) {
-                    salesMap.set(productName, salesMap.get(productName) + quantity);
+                productsInThisOrder.add(productName);
+            });
+            
+            // زود العداد لكل منتج ظهر في هذا الطلب
+            productsInThisOrder.forEach(productName => {
+                if (requestCountMap.has(productName)) {
+                    requestCountMap.set(productName, requestCountMap.get(productName) + 1);
                 } else {
-                    salesMap.set(productName, quantity);
+                    requestCountMap.set(productName, 1);
                 }
             });
         }
     });
     
-    // تحويل الخريطة إلى مصفوفة وترتيبها تنازلياً حسب الكمية
-    let sortedProducts = Array.from(salesMap.entries())
-        .map(([name, total]) => ({ name, total }))
+    // تحويل الخريطة إلى مصفوفة وترتيبها تنازلياً حسب عدد المرات
+    let sortedProducts = Array.from(requestCountMap.entries())
+        .map(([name, count]) => ({ name, total: count }))
         .sort((a, b) => b.total - a.total)
         .slice(0, limit);
     
@@ -2961,14 +2973,40 @@ function refreshOrdersData() {
 
 // ========== رسم بياني للمنتجات الأكثر مبيعاً ==========
 function updateBestSellingChart() {
-    const bestSelling = getBestSellingProductsFromOrders(6); // أول 6 منتجات
+    const bestSelling = getBestSellingProductsFromOrders(6);
+    
+    // ✅ إذا ما في منتجات، نعرض رسم بياني فاضي أو رسالة
+    if (bestSelling.length === 0) {
+        const ctx = document.getElementById('mainChart').getContext('2d');
+        if (window.bestSellingChart) window.bestSellingChart.destroy();
+        
+        window.bestSellingChart = new Chart(ctx, {
+            type: 'bar',
+            data: {
+                labels: ['لا توجد بيانات'],
+                datasets: [{
+                    label: 'عدد مرات الطلب',
+                    data: [0],
+                    backgroundColor: '#438e56',
+                    borderRadius: 8
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: true,
+                plugins: {
+                    tooltip: { callbacks: { label: () => 'لا توجد طلبات بعد' } }
+                }
+            }
+        });
+        return;
+    }
     
     const labels = bestSelling.map(item => item.name.length > 15 ? item.name.substring(0, 12) + '...' : item.name);
     const data = bestSelling.map(item => item.total);
     
     const ctx = document.getElementById('mainChart').getContext('2d');
     
-    // تدمير الرسم البياني القديم إذا كان موجوداً
     if (window.bestSellingChart) {
         window.bestSellingChart.destroy();
     }
@@ -2978,7 +3016,7 @@ function updateBestSellingChart() {
         data: {
             labels: labels,
             datasets: [{
-                label: 'الكمية المباعة (قطعة)',
+                label: 'عدد مرات الطلب',  // ✅ غيرنا النص هنا
                 data: data,
                 backgroundColor: '#438e56',
                 borderRadius: 8,
@@ -2996,7 +3034,7 @@ function updateBestSellingChart() {
                 tooltip: {
                     callbacks: {
                         label: function(context) {
-                            return `الكمية: ${context.raw} قطعة`;
+                            return `عدد المرات: ${context.raw} مرة`;  // ✅ غيرنا النص هنا
                         }
                     }
                 }
@@ -3006,7 +3044,7 @@ function updateBestSellingChart() {
                     beginAtZero: true,
                     title: {
                         display: true,
-                        text: 'عدد القطع المباعة',
+                        text: 'عدد مرات الطلب',  // ✅ غيرنا النص هنا
                         font: { size: 12, family: 'Cairo' }
                     },
                     grid: { color: '#e0e0e0' }
@@ -3980,6 +4018,198 @@ window.addNewEmployee = function() {
     showToast(`✅ تم إضافة الموظف ${name} بنجاح وتم إنشاء حساب له`, "success");
     addToActivityLog(`تم إضافة موظف جديد: ${name} (${email})`);
 };
+
+
+
+
+
+
+
+
+
+
+/*
+// ========== إرسال مهمة لموظف  ==========
+function sendTaskToEmployee() {
+    const email = document.getElementById('employeeSelect').value;
+    const taskText = document.getElementById('newTaskInput').value.trim();
+    
+    if (!email) {
+        showToast("❌ يرجى اختيار موظف", "error");
+        return;
+    }
+    
+    if (!taskText) {
+        showToast("❌ يرجى كتابة المهمة", "error");
+        return;
+    }
+    
+    // جلب الموظف من localStorage
+    let employeesData = JSON.parse(localStorage.getItem('elixir_employees')) || [];
+    const employee = employeesData.find(e => e.email === email);
+    
+    if (!employee) {
+        showToast("❌ الموظف غير موجود", "error");
+        return;
+    }
+    
+    // إنشاء المهمة بنفس صيغة زميلتك
+    const taskData = {
+        id: Date.now(),
+        text: taskText,
+        assignedTo: email,
+        completed: false,
+        createdAt: new Date().toLocaleString('ar-EG')
+    };
+    
+    // 1. حفظ في elixir_all_tasks (نظام زميلتك)
+    let allTasks = JSON.parse(localStorage.getItem('elixir_all_tasks') || '[]');
+    allTasks.push(taskData);
+    localStorage.setItem('elixir_all_tasks', JSON.stringify(allTasks));
+    
+    // 2. أيضاً حفظ في نظام الموظف الفردي (للتأكيد)
+    let employeeData = localStorage.getItem(`elixir_employee_${email}`);
+    if (employeeData) {
+        let empData = JSON.parse(employeeData);
+        if (!empData.tasks) empData.tasks = [];
+        empData.tasks.push({
+            id: taskData.id,
+            text: taskData.text,
+            status: 'pending',
+            assignedAt: taskData.createdAt
+        });
+        localStorage.setItem(`elixir_employee_${email}`, JSON.stringify(empData));
+    }
+    
+    // تنظيف الحقل
+    document.getElementById('newTaskInput').value = '';
+    
+    showToast(`✅ تم إرسال المهمة إلى ${employee.name}`, "success");
+    addToActivityLog(`📋 تم إرسال مهمة "${taskText}" إلى ${employee.name}`);
+}
+
+// تحديث قائمة الموظفين في الـ select
+function updateEmployeeSelect() {
+    const select = document.getElementById('employeeSelect');
+    if (!select) return;
+    
+    let employeesData = JSON.parse(localStorage.getItem('elixir_employees')) || [];
+    select.innerHTML = '<option value="">-- اختر موظف --</option>';
+    employeesData.forEach(emp => {
+        if (emp.email) {
+            select.innerHTML += `<option value="${emp.email}">${emp.name} (${emp.role})</option>`;
+        }
+    });
+}
+
+// ========== مراقبة المهام المنجزة من الموظفين ==========
+function startEmployeeTaskWatcher() {
+    setInterval(() => {
+        let allTasks = JSON.parse(localStorage.getItem('elixir_all_tasks') || '[]');
+        let employeesData = JSON.parse(localStorage.getItem('elixir_employees')) || [];
+        
+        allTasks.forEach(task => {
+            // إذا المهمة مكتملة وما أضيفت للسجل بعد
+            if (task.completed && !task.notifiedToAdmin) {
+                const employee = employeesData.find(e => e.email === task.assignedTo);
+                if (employee) {
+                    // إضافة إشعار في لوحة الأدمن
+                    showToast(`🎉 ${employee.name} أنجز المهمة: "${task.text}"`, "success");
+                    addToActivityLog(`✅ ${employee.name} أنجز المهمة: ${task.text}`);
+                    
+                    // وضع علامة إنه تم الإشعار
+                    task.notifiedToAdmin = true;
+                    task.completedAt = task.completedAt || new Date().toLocaleString('ar-EG');
+                    localStorage.setItem('elixir_all_tasks', JSON.stringify(allTasks));
+                    
+                    // تحديث واجهة الأدمن
+                    renderEmployeesCards();
+                }
+            }
+        });
+    }, 3000); // كل 3 ثواني
+}
+
+// تشغيل المراقبة عند تحميل الصفحة
+setTimeout(() => {
+    startEmployeeTaskWatcher();
+    console.log("✅ بدأت مراقبة مهام الموظفين");
+}, 3000);
+
+
+
+
+
+// ========== البحث في جدول المنتجات ==========
+let searchProductsTimeout = null;
+
+function filterProductsTable() {
+    const searchTerm = document.getElementById('searchProductsInput')?.value.toLowerCase().trim() || '';
+    
+    const rows = document.querySelectorAll('#productsTableBody tr');
+    let visibleCount = 0;
+    
+    rows.forEach(row => {
+        const productName = row.querySelector('td:first-child .font-bold')?.innerText.toLowerCase() || '';
+        const productCategory = row.querySelector('td:nth-child(2) span')?.innerText.toLowerCase() || '';
+        const productPrice = row.querySelector('td:nth-child(3)')?.innerText.toLowerCase() || '';
+        
+        if (productName.includes(searchTerm) || 
+            productCategory.includes(searchTerm) || 
+            productPrice.includes(searchTerm)) {
+            row.style.display = '';
+            visibleCount++;
+        } else {
+            row.style.display = 'none';
+        }
+    });
+    
+    const tbody = document.getElementById('productsTableBody');
+    const noResultRow = document.getElementById('noSearchResultRow');
+    
+    if (visibleCount === 0 && rows.length > 0 && searchTerm !== '') {
+        if (!noResultRow) {
+            const tr = document.createElement('tr');
+            tr.id = 'noSearchResultRow';
+            tr.innerHTML = `<td colspan="5" class="text-center py-8 text-slate-400">
+                                <i class="fas fa-search text-3xl mb-2 opacity-50"></i>
+                                <p>❌ لا توجد منتجات مطابقة لـ "${searchTerm}"</p>
+                            </td>`;
+            tbody.appendChild(tr);
+        }
+    } else if (noResultRow) {
+        noResultRow.remove();
+    }
+}
+
+function initProductSearch() {
+    const searchInput = document.getElementById('searchProductsInput');
+    if (searchInput) {
+        searchInput.addEventListener('input', function() {
+            if (searchProductsTimeout) clearTimeout(searchProductsTimeout);
+            searchProductsTimeout = setTimeout(() => {
+                filterProductsTable();
+            }, 300);
+        });
+    }
+}
+
+const originalRenderProductsTable = renderProductsTable;
+window.renderProductsTable = function() {
+    originalRenderProductsTable();
+    setTimeout(() => {
+        filterProductsTable();
+    }, 100);
+};
+
+setTimeout(initProductSearch, 500);
+*/
+
+
+
+
+
+
 
 
 
