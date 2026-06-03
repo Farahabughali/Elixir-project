@@ -1989,7 +1989,7 @@ function editOffer(offerId) {
     document.getElementById('offerModalTitle').innerText = "تعديل العرض";
     document.getElementById('offerModal').classList.remove('hidden');
 }
-
+/*
 function openOfferModal(offerId = null) {
     const selectProduct = document.getElementById('offerProductId');
     selectProduct.innerHTML = '<option value="">اختر المنتج</option>' + products.map(p => `<option value="${p.id}">${p.name}</option>`).join('');
@@ -2000,6 +2000,7 @@ function openOfferModal(offerId = null) {
     document.getElementById('offerModalTitle').innerText = "إضافة عرض جديد";
     document.getElementById('offerModal').classList.remove('hidden');
 }
+
 
 function closeOfferModal() { document.getElementById('offerModal').classList.add('hidden'); }
 
@@ -2058,7 +2059,7 @@ function deleteOffer(id) {
         showToast("تم الحذف", "success");
     });
 }
-
+*/
 
 
 
