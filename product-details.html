@@ -7,8 +7,6 @@
     <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <link rel="stylesheet" href="product-details.css">
-    <link rel="stylesheet" href="floating-share.css">
-
 </head>
 <body>
 
@@ -43,10 +41,6 @@
         </div>
         <button class="add-to-cart" id="add-to-cart-btn">+ إضافة إلى السلة</button>
     </div>
-<button class="share-product-btn" onclick="shareCurrentProduct()">
-    <i class="fas fa-share-alt"></i> مشاركة المنتج
-</button>
-
 
     <div class="delivery-note">
         <i class="fas fa-map-marker-alt"></i> نُوصل لكل مدن فلسطين: جنين، نابلس، رام الله، الخليل، بيت لحم، القدس، أريحا وغيرها.
@@ -69,23 +63,9 @@
 </div>
 <link rel="stylesheet" href="floating-cart.css">
 <script src="floating-cart.js"></script>
-<link rel="stylesheet" href="floating-share.css">
 <script>
     // هالجزء حيتم التعامل معه من قِبل صاحبتك (Backend)
     // البيانات اللي راح تستلمها من PHP حتستخدمها في displayProduct(productData)
-
-function shareCurrentProduct() {
-    const productName = document.querySelector('h1').innerText;
-    const productPrice = document.querySelector('.price')?.innerText;
-    const productUrl = window.location.href;
-    const text = `🛍️ ${productName} بسعر ${productPrice} – منتج طبيعي 100% من Elixir.\n\n${productUrl}`;
-    
-    if (navigator.share) {
-        navigator.share({ title: productName, text: text, url: productUrl });
-    } else {
-        prompt('انسخ رابط المنتج:', productUrl);
-    }
-}
 </script>
 
 </body>
