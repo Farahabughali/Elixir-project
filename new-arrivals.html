@@ -48,27 +48,175 @@
 <script src="floating-share.js"></script>
 
 <script>
-    // ========== منتجات جديدنا ==========
-    const newProducts = [
+    // ========== المنتجات الثابتة (تضل للأبد) ==========
+    const FIXED_PRODUCTS = [
         { 
             id: 51, 
             name: "زيت اللوز الحلو العضوي", 
             price: 15, 
-            img: "asset/images/almondoil.png"
+            img: "asset/images/almondoil.png",
+            isFixed: true  // علامة إنه منتج ثابت
         },
         { 
             id: 84, 
             name: "جارام مسالا بهار هندي", 
             price: 35, 
-            img: "asset/images/garammasala.png"
+            img: "asset/images/garammasala.png",
+            isFixed: true
         },
         { 
             id: 91, 
             name: "تونر البابونج", 
             price: 58, 
-            img: "asset/images/chamomiletoner.png"
+            img: "asset/images/chamomiletoner.png",
+            isFixed: true
         }
     ];
+
+    // ========== تحميل المنتجات (ثابتة + من الأدمن) ==========
+    function getAllNewArrivals() {
+        // 1. جلب المنتجات المؤقتة من localStorage (اللي يضيفها الأدمن)
+        let tempProducts = JSON.parse(localStorage.getItem('elixir_new_arrivals') || '[]');
+        
+        // 2. فلترة المنتجات المؤقتة: اللي لم تنتهي صلاحيتها (7 أيام)
+        const today = new Date();
+        today.setHours(0, 0, 0, 0);
+        
+        let validTempProducts = tempProducts.filter(product => {
+            // المنتجات اللي مالها expiryDate (الثابتة) نضيفها من مكان ثاني
+            if (!product.expiryDate) return true;
+            const expiryDate = new Date(product.expiryDate);
+            expiryDate.setHours(0, 0, 0, 0);
+            return expiryDate >= today;
+        });
+        
+        // تحديث localStorage إذا تغيرت القائمة
+        if (validTempProducts.length !== tempProducts.length) {
+            localStorage.setItem('elixir_new_arrivals', JSON.stringify(validTempProducts));
+        }
+        
+        // 3. دمج المنتجات الثابتة + المنتجات المؤقتة
+        let allProducts = [...FIXED_PRODUCTS, ...validTempProducts];
+        
+        // إزالة أي تكرار (لو صدفة نفس الـ id)
+        const uniqueIds = new Set();
+        allProducts = allProducts.filter(product => {
+            if (uniqueIds.has(product.id)) return false;
+            uniqueIds.add(product.id);
+            return true;
+        });
+        
+        return allProducts;
+    }
+
+    // ========== عرض المنتجات في الصفحة ==========
+    function renderNewArrivals() {
+        const grid = document.getElementById('newArrivalsGrid');
+        let products = getAllNewArrivals();
+        let favorites = JSON.parse(localStorage.getItem('elixir_favorites') || '[]');
+
+        if (products.length === 0) {
+            grid.innerHTML = `<div class="no-products" style="text-align:center; padding:60px; background:rgba(255,255,255,0.85); border-radius:30px;">
+                <i class="fas fa-gift" style="font-size:50px; color:#438e56;"></i><br>
+                <strong style="font-size:20px;">لا توجد منتجات جديدة حالياً</strong><br>
+                <span style="color:#666;">ترقبوا إضافاتنا القادمة!</span>
+            </div>`;
+            return;
+        }
+
+        grid.innerHTML = products.map(product => {
+            let isFav = favorites.includes(product.id);
+            const productImg = product.img && product.img !== "" ? product.img : "asset/images/placeholder.png";
+            
+            return `
+                <div class="product-card fade-up">
+                    <div class="new-badge"><i class="fas fa-sparkle"></i> جديد</div>
+                    <div class="fav-icon ${isFav ? 'active' : ''}" data-id="${product.id}">
+                        <i class="fa-${isFav ? 'solid' : 'regular'} fa-heart"></i>
+                    </div>
+                    <img class="product-img" src="${productImg}" alt="${product.name}" onerror="this.src='asset/images/placeholder.png'">
+                    <div class="product-info">
+                        <div class="product-title">${product.name}</div>
+                        <div class="price-row">
+                            <span class="price">${parseFloat(product.price).toFixed(2)} ₪</span>
+                            ${product.oldPrice ? `<span class="old-price">${product.oldPrice} ₪</span>` : ''}
+                        </div>
+                        <div class="btn-group">
+                            <button class="details-btn view-details" data-id="${product.id}"> عرض التفاصيل</button>
+                            <button class="add-cart-btn add-to-cart" data-id="${product.id}" data-name="${product.name}" data-price="${product.price}" data-img="${productImg}"> إضافة إلى السلة</button>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }).join('');
+
+        attachEventListeners();
+        animateCards();
+    }
+
+    function attachEventListeners() {
+        document.querySelectorAll('.fav-icon').forEach(icon => {
+            icon.removeEventListener('click', handleFavClick);
+            icon.addEventListener('click', handleFavClick);
+        });
+
+        document.querySelectorAll('.view-details').forEach(btn => {
+            btn.removeEventListener('click', handleViewDetails);
+            btn.addEventListener('click', handleViewDetails);
+        });
+
+        document.querySelectorAll('.add-to-cart').forEach(btn => {
+            btn.removeEventListener('click', handleAddToCart);
+            btn.addEventListener('click', handleAddToCart);
+        });
+    }
+
+    function handleFavClick(e) {
+        e.stopPropagation();
+        const icon = e.currentTarget;
+        const id = parseInt(icon.getAttribute('data-id'));
+        const rect = icon.getBoundingClientRect();
+        burstHearts(rect.left + rect.width / 2, rect.top + rect.height / 2);
+        
+        let favorites = JSON.parse(localStorage.getItem('elixir_favorites') || '[]');
+        const index = favorites.indexOf(id);
+        if (index === -1) {
+            favorites.push(id);
+            icon.classList.add('active');
+            icon.innerHTML = '<i class="fa-solid fa-heart"></i>';
+        } else {
+            favorites.splice(index, 1);
+            icon.classList.remove('active');
+            icon.innerHTML = '<i class="fa-regular fa-heart"></i>';
+        }
+        localStorage.setItem('elixir_favorites', JSON.stringify(favorites));
+        updateFavCount();
+    }
+
+    function handleViewDetails(e) {
+        e.preventDefault();
+        const id = e.currentTarget.dataset.id;
+        window.location.href = `product-details.html?id=${id}`;
+    }
+
+    function handleAddToCart(e) {
+        e.preventDefault();
+        const btn = e.currentTarget;
+        const id = parseInt(btn.dataset.id);
+        const name = btn.dataset.name;
+        const price = parseFloat(btn.dataset.price);
+        const img = btn.dataset.img;
+        addToCart(id, name, price, img);
+    }
+
+    function animateCards() {
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) entry.target.classList.add('visible');
+            });
+        }, { threshold: 0.1 });
+        document.querySelectorAll('.fade-up').forEach(el => observer.observe(el));
+    }
 
     // ========== حركة القلوب المتطايرة ==========
     function burstHearts(x, y) {
@@ -86,101 +234,13 @@
         }
     }
 
-    // ========== دوال المفضلة ==========
+    // ========== دوال السلة والمفضلة ==========
     function updateFavCount() {
         let favorites = JSON.parse(localStorage.getItem('elixir_favorites') || '[]');
         const countSpan = document.querySelector('.favorite-count');
         if (countSpan) countSpan.innerText = favorites.length;
     }
 
-    function toggleFavorite(icon, productId) {
-        const rect = icon.getBoundingClientRect();
-        burstHearts(rect.left + rect.width / 2, rect.top + rect.height / 2);
-        
-        let favorites = JSON.parse(localStorage.getItem('elixir_favorites') || '[]');
-        const index = favorites.indexOf(productId);
-        if (index === -1) {
-            favorites.push(productId);
-            icon.classList.add('active');
-            icon.innerHTML = '<i class="fa-solid fa-heart"></i>';
-        } else {
-            favorites.splice(index, 1);
-            icon.classList.remove('active');
-            icon.innerHTML = '<i class="fa-regular fa-heart"></i>';
-        }
-        localStorage.setItem('elixir_favorites', JSON.stringify(favorites));
-        updateFavCount();
-    }
-
-    // ========== عرض المنتجات ==========
-    function renderNewArrivals() {
-        const grid = document.getElementById('newArrivalsGrid');
-        let favorites = JSON.parse(localStorage.getItem('elixir_favorites') || '[]');
-
-        if (newProducts.length === 0) {
-            grid.innerHTML = `<div class="no-products" style="text-align:center; padding:60px; background:rgba(255,255,255,0.85); border-radius:30px;"><i class="fas fa-gift"></i><br>لا توجد منتجات جديدة حالياً<br>ترقبوا جديدنا!</div>`;
-            return;
-        }
-
-        grid.innerHTML = newProducts.map(product => {
-            let isFav = favorites.includes(product.id);
-            return `
-                <div class="product-card fade-up">
-                    <div class="new-badge"><i class="fas fa-sparkle"></i> جديد</div>
-                    <div class="fav-icon ${isFav ? 'active' : ''}" data-id="${product.id}">
-                        <i class="fa-${isFav ? 'solid' : 'regular'} fa-heart"></i>
-                    </div>
-                    <img class="product-img" src="${product.img}" alt="${product.name}" onerror="this.src='asset/images/placeholder.png'">
-                    <div class="product-info">
-                        <div class="product-title">${product.name}</div>
-                        <div class="price-row">
-                            <span class="price">${product.price} ₪</span>
-                        </div>
-                        <div class="btn-group">
-                            <button class="details-btn view-details" data-id="${product.id}"> عرض التفاصيل</button>
-                            <button class="add-cart-btn add-to-cart" data-id="${product.id}" data-name="${product.name}" data-price="${product.price}" data-img="${product.img}"> إضافة إلى السلة</button>
-                        </div>
-                    </div>
-                </div>
-            `;
-        }).join('');
-
-        document.querySelectorAll('.fav-icon').forEach(icon => {
-            icon.addEventListener('click', (e) => {
-                e.stopPropagation();
-                const id = parseInt(icon.getAttribute('data-id'));
-                toggleFavorite(icon, id);
-            });
-        });
-
-        document.querySelectorAll('.view-details').forEach(btn => {
-            btn.addEventListener('click', (e) => {
-                e.preventDefault();
-                const id = btn.dataset.id;
-                window.location.href = `product-details.html?id=${id}`;
-            });
-        });
-
-        document.querySelectorAll('.add-to-cart').forEach(btn => {
-            btn.addEventListener('click', (e) => {
-                e.preventDefault();
-                const id = parseInt(btn.dataset.id);
-                const name = btn.dataset.name;
-                const price = parseFloat(btn.dataset.price);
-                const img = btn.dataset.img;
-                addToCart(id, name, price, img);
-            });
-        });
-
-        const observer = new IntersectionObserver((entries) => {
-            entries.forEach(entry => {
-                if (entry.isIntersecting) entry.target.classList.add('visible');
-            });
-        }, { threshold: 0.1 });
-        document.querySelectorAll('.fade-up').forEach(el => observer.observe(el));
-    }
-
-    // ========== إضافة إلى السلة ==========
     function addToCart(id, name, price, img) {
         let cart = JSON.parse(localStorage.getItem('elixir_cart') || '[]');
         const existing = cart.find(item => item.id === id);
@@ -191,13 +251,8 @@
         }
         localStorage.setItem('elixir_cart', JSON.stringify(cart));
         
-        showToast(`✅ تمت إضافة ${name} إلى السلة يتمنى ${name} أن ينال إعجابكم`);
+        showToast(`✅ تمت إضافة ${name} إلى السلة`);
         
-        const headerBadge = document.querySelector('.cart-count');
-        if (headerBadge) {
-            const total = cart.reduce((sum, i) => sum + i.quantity, 0);
-            headerBadge.innerText = total;
-        }
         if (window.updateFloatingCart) window.updateFloatingCart();
     }
 
@@ -211,7 +266,7 @@
         }, 3000);
     }
 
-    // ========== تعديل نص المشاركة لصفحة جديدنا ==========
+    // ========== تعديل نص المشاركة ==========
     (function() {
         const originalShareHandler = async () => {
             const shareData = {
@@ -246,14 +301,38 @@
         }, 500);
     })();
 
-    // إظهار زر المشاركة فوراً
+    // ========== تشغيل التنظيف التلقائي كل ساعة ==========
+    function cleanExpiredArrivals() {
+        let arrivals = JSON.parse(localStorage.getItem('elixir_new_arrivals') || '[]');
+        const today = new Date();
+        today.setHours(0, 0, 0, 0);
+        
+        const validArrivals = arrivals.filter(product => {
+            if (!product.expiryDate) return true;
+            const expiryDate = new Date(product.expiryDate);
+            expiryDate.setHours(0, 0, 0, 0);
+            return expiryDate >= today;
+        });
+        
+        if (validArrivals.length !== arrivals.length) {
+            localStorage.setItem('elixir_new_arrivals', JSON.stringify(validArrivals));
+            renderNewArrivals();
+        }
+    }
+
+    // التنظيف عند تحميل الصفحة وكل ساعة
+    cleanExpiredArrivals();
+    setInterval(cleanExpiredArrivals, 3600000);
+
+    // تشغيل العرض
+    renderNewArrivals();
+    updateFavCount();
+    
+    // إظهار زر المشاركة
     setTimeout(() => {
         const shareBtn = document.querySelector('.share-fixed-btn');
         if (shareBtn) shareBtn.style.display = 'flex';
     }, 300);
-
-    renderNewArrivals();
-    updateFavCount();
 </script>
 
 </body>
