@@ -236,19 +236,90 @@
                 <div class="bg-white p-10 rounded-[3rem] border border-slate-50 shadow-sm"><h4 class="font-bold mb-8 flex items-center gap-2"><i class="fas fa-pie-chart text-elixir"></i> توزيع الفئات</h4><canvas id="categoryChart" height="250"></canvas></div>
             </div>
         </div>
-
-        <!-- إدارة المنتجات -->
-        <div id="products" class="tab-content"><div class="bg-white p-10 rounded-[3rem] border border-slate-50 shadow-sm"><div class="flex justify-between items-center mb-10"><div><h3 class="text-2xl font-bold">المخزون الحالي مع الكميات</h3><p class="text-slate-400 text-sm mt-1">إدارة المنتجات والمخزون - الموظفون يستطيعون إعادة التعبئة</p></div><button onclick="openProductModal()" class="bg-elixir text-white px-8 py-4 rounded-2xl font-bold shadow-lg shadow-emerald-200 hover:scale-105 transition-all"><i class="fas fa-plus ml-2"></i> إضافة صنف جديد</button></div><div class="overflow-x-auto"><table class="w-full text-right" id="productsTable"><thead><tr class="text-slate-400 border-b border-slate-50"><th class="pb-6 pr-4 font-bold">المنتج/الصورة</th><th class="pb-6 font-bold">الفئة</th><th class="pb-6 font-bold">السعر</th><th class="pb-6 font-bold">المخزون</th><th class="pb-6 pl-4 text-left font-bold">التحكم</th></tr></thead><tbody id="productsTableBody"></tbody></table></div></div></div>
-
+<!--**********************************************************************************************-->
+       <!-- إدارة المنتجات -->
+<div id="products" class="tab-content">
+    <div class="bg-white p-10 rounded-[3rem] border border-slate-50 shadow-sm">
+        <div class="flex flex-wrap justify-between items-center gap-4 mb-10">
+            <div>
+                <h3 class="text-2xl font-bold">المخزون الحالي مع الكميات</h3>
+                <p class="text-slate-400 text-sm mt-1">إدارة المنتجات والمخزون - الموظفون يستطيعون إعادة التعبئة</p>
+            </div>
+            <div class="flex gap-3 items-center">
+                <!-- شريط البحث -->
+                <div class="relative">
+                    <input type="text" id="searchProductsInput" placeholder="🔍 ابحث عن منتج..." 
+                           class="border rounded-2xl py-2 px-4 w-64 pr-10 focus:outline-none focus:border-elixir">
+                    <i class="fas fa-search absolute left-3 top-1/2 -translate-y-1/2 text-gray-400"></i>
+                </div>
+                <button onclick="openProductModal()" class="bg-elixir text-white px-6 py-2 rounded-2xl font-bold shadow-lg shadow-emerald-200 hover:scale-105 transition-all">
+                    <i class="fas fa-plus ml-2"></i> إضافة صنف جديد
+                </button>
+            </div>
+        </div>
+        
+        <div class="overflow-x-auto">
+            <table class="w-full text-right" id="productsTable">
+                <thead>
+                    <tr class="text-slate-400 border-b border-slate-50">
+                        <th class="pb-6 pr-4 font-bold">المنتج/الصورة</th>
+                        <th class="pb-6 font-bold">الفئة</th>
+                        <th class="pb-6 font-bold">السعر</th>
+                        <th class="pb-6 font-bold">المخزون</th>
+                        <th class="pb-6 pl-4 text-left font-bold">التحكم</th>
+                    </tr>
+                </thead>
+                <tbody id="productsTableBody"></tbody>
+            </table>
+        </div>
+    </div>
+</div>
+<!--**********************************************************************************************-->
         <!-- إدارة المجموعات -->
         <div id="packages" class="tab-content"><div class="bg-white p-10 rounded-[3rem] border border-slate-50 shadow-sm"><div class="flex flex-wrap justify-between items-center gap-4 mb-10"><div><h3 class="text-2xl font-bold">المجموعات (Packages)</h3><p class="text-slate-400 text-sm mt-1">إدارة مجموعات الهدايا المنسقة – إضافة / تعديل / حذف</p></div><button onclick="openPackageModal()" class="bg-elixir text-white px-8 py-4 rounded-2xl font-bold shadow-lg shadow-emerald-200 hover:scale-105 transition-all"><i class="fas fa-box ml-2"></i> إنشاء مجموعة جديدة</button></div><div id="packagesGridContainer" class="grid grid-cols-1 md:grid-cols-2 gap-6"></div></div></div>
 
 
-
+<!--................................................................................................-->
         <!-- إدارة الموظفين -->
-        <div id="staff" class="tab-content"><div class="bg-white p-10 rounded-[3rem] border border-slate-50 shadow-sm"><div class="flex flex-wrap justify-between items-center gap-4 mb-10"><div><h3 class="text-2xl font-bold">إدارة الموظفين & المهام</h3><p class="text-slate-400 text-sm mt-1">أضف مهام يدوية أو وزع مهام المخزون التلقائية</p></div><div class="flex gap-3"><button onclick="openAddEmployeeModal()" class="bg-elixir text-white px-6 py-3 rounded-2xl font-bold shadow"><i class="fas fa-user-plus ml-2"></i> إضافة موظف</button><button onclick="distributeTasksEqually()" class="bg-amber-600 text-white px-6 py-3 rounded-2xl font-bold shadow"><i class="fas fa-chart-line ml-2"></i> توزيع المهام بالتساوي</button></div></div><div id="employeesCardsContainer" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8"></div></div></div>
-
-
+<div id="staff" class="tab-content">
+    <div class="bg-white p-10 rounded-[3rem] border border-slate-50 shadow-sm">
+        <div class="flex flex-wrap justify-between items-center gap-4 mb-10">
+            <div>
+                <h3 class="text-2xl font-bold">إدارة الموظفين & المهام</h3>
+                <p class="text-slate-400 text-sm mt-1">أضف مهام يدوية أو وزع مهام المخزون التلقائية</p>
+            </div>
+            <div class="flex gap-3">
+                <button onclick="openAddEmployeeModal()" class="bg-elixir text-white px-6 py-3 rounded-2xl font-bold shadow">
+                    <i class="fas fa-user-plus ml-2"></i> إضافة موظف
+                </button>
+                <button onclick="distributeTasksEqually()" class="bg-amber-600 text-white px-6 py-3 rounded-2xl font-bold shadow">
+                    <i class="fas fa-chart-line ml-2"></i> توزيع المهام بالتساوي
+                </button>
+            </div>
+        </div>
+        
+        <div id="employeesCardsContainer" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8"></div>
+        
+        
+        <div class="bg-white p-6 rounded-3xl shadow-sm border border-slate-100 mt-6">
+            <h3 class="text-xl font-bold mb-4 flex items-center gap-2">
+                <i class="fas fa-paper-plane text-elixir"></i> إرسال مهمة للموظف
+            </h3>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <select id="employeeSelect" class="border rounded-xl p-3 bg-white">
+                    <option value="">-- اختر الموظف --</option>
+                </select>
+                <input type="text" id="newTaskInput" class="border rounded-xl p-3" placeholder="أدخل وصف المهمة...">
+                <button onclick="sendTaskToEmployee()" class="bg-elixir text-white rounded-xl p-3 font-bold hover:bg-emerald-700 transition">
+                    <i class="fas fa-paper-plane ml-2"></i> إرسال المهمة
+                </button>
+            </div>
+        </div>
+       
+        
+    </div>
+</div>
+<!--................................................................................................-->
 
         <!-- طلبات التوظيف -->
 <div id="careers" class="tab-content">
