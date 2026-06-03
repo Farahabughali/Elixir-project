@@ -1,0 +1,328 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Elixir | تفاصيل البكج</title>
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <link rel="stylesheet" href="package-details.css">
+</head>
+<body>
+
+<div class="container" id="packageDetailsContainer">
+    <a href="packages.html" class="back-link"><i class="fas fa-arrow-right"></i> العودة إلى البكجات</a>
+    <div id="packageContent">
+        <!-- يتم تعبئة المحتوى ديناميكياً -->
+    </div>
+</div>
+
+<div id="customToast" style="display:none; position:fixed; bottom:20px; right:20px; background:#438e56; color:white; padding:12px 20px; border-radius:30px; z-index:9999;">
+    <i class="fas fa-check-circle"></i> <span id="toastText"></span>
+</div>
+
+<script>
+    // ========== بيانات البكجات (معلومات مفصلة) ==========
+    const packagesData = {
+        121: {
+            id: 121,
+            name: "بكج النشاط والتوازن",
+            shortDesc: "منتجات تمنحك الطاقة والنشاط، مع زيت النعناع المنعش والعسل الطبيعي وزيت الليمون وإكليل الجبل.",
+            longDesc: "مجموعة من المنتجات الطبيعية المختارة للمساعدة في تعزيز النشاط والحيوية وتحسين المزاج ودعم الشعور بالانتعاش والتوازن.",
+            price: 65,
+            oldPrice: 85,
+            img: "asset/images/balance-package.png",
+            benefits: [
+                "يساعد على تعزيز النشاط والحيوية",
+                "يساهم في تحسين المزاج والشعور بالانتعاش",
+                "يحتوي على مضادات أكسدة طبيعية",
+                "قد يساعد على تقليل الشعور بالإرهاق",
+                "يدعم التركيز والانتباه",
+                "يوفر تجربة عطرية منعشة ومريحة"
+            ],
+            howToUse: "يمكن تناول العسل يوميًا باعتدال. تستخدم الزيوت العطرية في أجهزة التبخير أو بعد تخفيفها بزيت ناقل. يمكن استنشاق الروائح العطرية عند الحاجة للشعور بالانتعاش.",
+            warnings: "الزيوت العطرية لا تستخدم مباشرة على الجلد دون تخفيف. يجب اختبار الحساسية قبل الاستخدام. لا يُعطى العسل للأطفال دون عمر السنة. تستشير الحوامل الطبيب قبل استخدام الزيوت العطرية.",
+            source: "ويب طب"
+        },
+        122: {
+            id: 122,
+            name: "بكج جوهر الورد",
+            shortDesc: "زيت الورد الجوري، ماء الورد، مرطب الورد وبتلات الورد المجففة للعناية الفاخرة.",
+            longDesc: "مجموعة مستوحاة من الورد الطبيعي تجمع بين العناية بالبشرة والاسترخاء والعطور الطبيعية، لتوفير تجربة جمالية متكاملة.",
+            price: 110,
+            oldPrice: 140,
+            img: "asset/images/roseessence-package.png",
+            benefits: [
+                "يساعد على ترطيب البشرة وإنعاشها",
+                "يساهم في تهدئة البشرة الحساسة",
+                "يساعد على تحسين مظهر البشرة وإضفاء النضارة عليها",
+                "يمنح شعورًا بالاسترخاء والراحة",
+                "يضفي رائحة زهرية طبيعية ومميزة"
+            ],
+            howToUse: "يستخدم ماء الورد كتونر أو بخاخ منعش. يستخدم كريم الورد للترطيب اليومي. يمكن استخدام زيت الورد بعد تخفيفه. تُستخدم بتلات الورد في الحمامات العطرية أو الوصفات الطبيعية.",
+            warnings: "يجب اختبار الحساسية قبل الاستخدام. تجنب ملامسة العينين. للاستخدام الخارجي فقط بالنسبة للزيوت والكريمات. يُحفظ بعيدًا عن أشعة الشمس المباشرة.",
+            source: "ويب طب"
+        },
+        123: {
+            id: 123,
+            name: "بكج عالم البهارات",
+            shortDesc: "بهارات مشكلة، غارام ماسالا، شاورما وبابريكا – جولة في مطابخ العالم.",
+            longDesc: "مجموعة متنوعة من أشهر البهارات العالمية المستخدمة لإضافة نكهات وروائح مميزة للأطعمة المختلفة.",
+            price: 45,
+            oldPrice: 60,
+            img: "asset/images/spices-package.jpg",
+            benefits: [
+                "تساعد على تحسين نكهة الطعام",
+                "تحتوي على مركبات طبيعية مضادة للأكسدة",
+                "تساهم بعض مكوناتها في دعم الهضم",
+                "تضيف تنوعًا ونكهة غنية للأطباق",
+                "تساعد على تعزيز الشهية لدى بعض الأشخاص"
+            ],
+            howToUse: "تُضاف إلى الأطعمة أثناء الطهي أو التتبيل. تستخدم بكميات معتدلة حسب الرغبة. تُحفظ في عبوات محكمة الإغلاق.",
+            warnings: "الإفراط في تناول البهارات الحارة قد يسبب تهيج المعدة. قد تسبب بعض التوابل حساسية لدى بعض الأشخاص. تُستخدم باعتدال لمرضى القولون أو المعدة الحساسة.",
+            source: "ويب طب"
+        },
+        124: {
+            id: 124,
+            name: "بكج النضارة والإشراقة",
+            shortDesc: "تونر ماء الورد، صابون زيتون، كريم ورد وزيت لوز حلو لنضارة فائقة.",
+            longDesc: "مجموعة متكاملة للعناية بالبشرة وتنظيفها وترطيبها، تجمع بين التنقية العميقة والتغذية الطبيعية.",
+            price: 75,
+            oldPrice: 95,
+            img: "asset/images/freshness-package.jpg",
+            benefits: [
+                "يساعد على إنعاش البشرة",
+                "يساهم في تهدئة البشرة وتقليل الاحمرار",
+                "يساعد على تنظيف البشرة وتنقيتها",
+                "يمنح البشرة مظهرًا أكثر حيوية وإشراقًا",
+                "يساهم في تقليل الإفرازات الدهنية الزائدة للبشرة"
+            ],
+            howToUse: "يُستخدم التونر بعد تنظيف البشرة. يُطبق زيت الورد بعد تخفيفه عند الحاجة. يمكن استخدام مستحضرات البابونج ضمن روتين العناية اليومي.",
+            warnings: "يجب اختبار الحساسية قبل الاستخدام. تجنب ملامسة العينين. يُوقف الاستخدام عند حدوث تهيج جلدي. للاستخدام الخارجي فقط.",
+            source: "ويب طب"
+        },
+        125: {
+            id: 125,
+            name: "بكج الهدوء والتأمل",
+            shortDesc: "زيت اللافندر، شاي البابونج، زيت الياسمين وبتلات الورد للاسترخاء العميق.",
+            longDesc: "مجموعة من المنتجات العطرية والطبيعية المصممة للمساعدة على الاسترخاء وخلق أجواء هادئة ومريحة.",
+            price: 46,
+            oldPrice: 65,
+            img: "asset/images/calm-package.jpg",
+            benefits: [
+                "يساعد على تعزيز الشعور بالهدوء",
+                "يساهم في تقليل التوتر والإجهاد",
+                "يساعد على تحسين المزاج",
+                "يوفر أجواء مناسبة للتأمل والاسترخاء",
+                "يمنح إحساسًا بالراحة النفسية"
+            ],
+            howToUse: "تُستخدم الزيوت العطرية في أجهزة التبخير. يمكن تحضير شاي النعناع كمشروب دافئ. تُستخدم بتلات الورد في الحمامات العطرية أو الديكور الطبيعي.",
+            warnings: "عدم استخدام الزيوت العطرية مباشرة على الجلد دون تخفيف. يُستشار الطبيب للحامل قبل استخدام الزيوت العطرية. يجب اختبار الحساسية قبل الاستخدام الموضعي.",
+            source: "ويب طب"
+        },
+        126: {
+            id: 126,
+            name: "بكج العناية الفاخرة للبشرة",
+            shortDesc: "صابونة طين أبيض، زيت أركان، تونر ماء ورد ومرطب ورد لبشرة فاخرة.",
+            longDesc: "مجموعة متكاملة للعناية بالبشرة وتنظيفها وترطيبها، تجمع بين التنقية العميقة والتغذية الطبيعية.",
+            price: 80,
+            oldPrice: 110,
+            img: "asset/images/luxury-package.jpg",
+            benefits: [
+                "يساعد على تنظيف البشرة بعمق",
+                "يساهم في إزالة الشوائب وخلايا الجلد الميتة",
+                "يساعد على ترطيب البشرة وتغذيتها",
+                "يمنح البشرة نعومة وإشراقًا",
+                "يساعد على تحسين مظهر البشرة بشكل عام"
+            ],
+            howToUse: "تُستخدم الليفة المغربية أثناء الاستحمام. يُستخدم الصابون لتنظيف البشرة. يُطبق زيت الأرجان بعد التنظيف. يُستخدم كريم الورد للترطيب اليومي.",
+            warnings: "تجنب الفرك العنيف للبشرة. يجب اختبار الحساسية قبل الاستخدام. يُوقف الاستخدام عند حدوث تهيج أو احمرار شديد. للاستخدام الخارجي فقط.",
+            source: "ويب طب"
+        },
+        127: {
+            id: 127,
+            name: "بكج الشفاء الطبيعي",
+            shortDesc: "عسل أعشاب، زيت حبة سوداء، تونر بابونج وزيت شجرة الشاي للشفاء الطبيعي.",
+            longDesc: "مجموعة من الأعشاب والزيوت الطبيعية والعسل، تم اختيارها لدعم الصحة العامة والعناية بالجهاز التنفسي والبشرة وتعزيز المناعة.",
+            price: 68,
+            oldPrice: 88,
+            img: "asset/images/healing-package.jpg",
+            benefits: [
+                "يساعد على دعم الجهاز التنفسي",
+                "يساهم في تهدئة الحلق وتخفيف السعال",
+                "يحتوي على مركبات طبيعية مضادة للأكسدة",
+                "يساعد على دعم المناعة",
+                "يساهم في العناية بالبشرة وتنقيتها",
+                "يساعد على تخفيف بعض أعراض الحساسية الموسمية"
+            ],
+            howToUse: "تُحضر الأعشاب كمشروبات عشبية. يمكن تناول العسل باعتدال. تُستخدم الزيوت موضعيًا بعد التخفيف أو حسب التعليمات المناسبة لكل زيت.",
+            warnings: "يجب عدم الإفراط في تناول الأعشاب. يُستشار الطبيب للحامل أو المرضع قبل الاستخدام. يجب اختبار حساسية الجلد قبل استخدام الزيوت. لا يُعطى العسل للأطفال دون عمر السنة.",
+            source: "ويب طب"
+        },
+        128: {
+            id: 128,
+            name: "بكج العناية بالشعر",
+            shortDesc: "زيت إكليل الجبل، زيت جوز الهند، زيت الخروع وزيت الأرجان للعناية الفائقة بالشعر.",
+            longDesc: "مجموعة متكاملة من الزيوت الطبيعية المختارة للعناية بالشعر وفروة الرأس، تجمع بين الترطيب والتغذية وتقوية الشعر وتحسين مظهره وصحته.",
+            price: 85,
+            oldPrice: 120,
+            img: "asset/images/hair-package.jpg",
+            benefits: [
+                "يساعد على ترطيب الشعر الجاف والمتقصف",
+                "يساهم في تقوية الشعر وتقليل التكسر",
+                "يدعم صحة فروة الرأس",
+                "يساعد على تحسين مظهر كثافة الشعر",
+                "يمنح الشعر نعومة ولمعانًا طبيعيًا",
+                "يساهم في تغذية الشعر بالأحماض الدهنية والفيتامينات الطبيعية"
+            ],
+            howToUse: "تُمزج كميات مناسبة من الزيوت أو يُستخدم كل زيت منفردًا. تُدلك فروة الرأس بلطف. يُوزع الزيت على الشعر من الجذور حتى الأطراف. يُترك لمدة 30-60 دقيقة ثم يُغسل بالشامبو. يُستخدم مرة أو مرتين أسبوعيًا.",
+            warnings: "للاستخدام الخارجي فقط. يجب إجراء اختبار حساسية قبل الاستخدام. تجنب ملامسة العينين. قد لا يناسب بعض أنواع فروة الرأس الدهنية عند الإفراط في الاستخدام. يُستشار الطبيب للحامل أو المرضع قبل استخدام الزيوت العطرية.",
+            source: "ويب طب"
+        }
+    };
+
+    let currentQuantity = 1;
+
+    // الحصول على id البكج من الرابط
+    const urlParams = new URLSearchParams(window.location.search);
+    const packageId = parseInt(urlParams.get('id'));
+
+    // عرض تفاصيل البكج
+    function renderPackageDetails() {
+        const pkg = packagesData[packageId];
+        if (!pkg) {
+            document.getElementById('packageContent').innerHTML = '<div style="text-align:center; padding:50px;"><i class="fas fa-exclamation-triangle"></i> عذراً، هذا البكج غير موجود</div>';
+            return;
+        }
+       
+        const oldPriceHtml = pkg.oldPrice ? `<span class="old-price">${pkg.oldPrice} ₪</span>` : '';
+        
+        const html = `
+            <div class="product-main">
+                <div class="product-gallery">
+                    <img class="main-img" src="${pkg.img}" alt="${pkg.name}" onerror="this.src='asset/images/placeholder.png'">
+                </div>
+                <div class="product-info">
+                    <h1 class="product-title">${pkg.name}</h1>
+                    <p class="short-desc">${pkg.shortDesc}</p>
+                    <div class="price-row">
+                        ${oldPriceHtml}
+                        <span class="new-price">${pkg.price} ₪</span>
+                    </div>
+                    <div class="quantity-control">
+                        <button class="qty-btn" id="decreaseQty">-</button>
+                        <span class="qty-value" id="qtyValue">1</span>
+                        <button class="qty-btn" id="increaseQty">+</button>
+                    </div>
+                    <button class="add-to-cart-btn" id="addToCartBtn"> إضافة إلى السلة</button>
+                    <a href="checkout.html" class="checkout-btn" style="text-decoration: none;"> إتمام الشراء</a>
+                    <div class="share-buttons">
+                        <button class="share-btn" id="shareWhatsapp" onclick="window.location.href='https://wa.me/970598288142?text=السلام عليكم ورحة الله وبركاته، أريد السؤال عن المزيد من التفاصيل عن هذه المجموعة    ${pkg.name} - السعر: ${pkg.price} ₪'"><i class="fab fa-whatsapp"></i> واتساب/ تواصل معنا لمزيد من التفاصيل</button>
+                        <button class="share-btn" id="copyLinkBtn"><i class="fas fa-link"></i> نسخ الرابط</button>
+                    </div>
+                </div>
+            </div>
+            <div class="details-section">
+                <div class="detail-card">
+                    <h3> الفوائد</h3>
+                    <ul>
+                        ${pkg.benefits.map(b => `<li>${b}</li>`).join('')}
+                    </ul>
+                </div>
+                <div class="detail-card">
+                    <h3><i class="fas fa-hand-sparkles"></i> طريقة الاستخدام</h3>
+                    <p>${pkg.howToUse}</p>
+                </div>
+                <div class="detail-card warning">
+                    <h3><i class="fas fa-exclamation-triangle"></i> التحذيرات</h3>
+                    <p>${pkg.warnings}</p>
+                </div>
+                <div class="detail-card source">
+    <h3><i class="fas fa-book-open"></i> المصدر</h3>
+    <p><a href="https://www.webteb.com/" target="_blank" rel="noopener noreferrer">🌐 ويب طب - Webteb</a></p>
+</div>
+            </div>
+        `;
+        
+        document.getElementById('packageContent').innerHTML = html;
+
+        // ربط أحداث الكمية
+        document.getElementById('decreaseQty').addEventListener('click', () => {
+            if (currentQuantity > 1) currentQuantity--;
+            document.getElementById('qtyValue').innerText = currentQuantity;
+        });
+        document.getElementById('increaseQty').addEventListener('click', () => {
+            currentQuantity++;
+            document.getElementById('qtyValue').innerText = currentQuantity;
+        });
+
+        // إضافة إلى السلة
+        document.getElementById('addToCartBtn').addEventListener('click', () => {
+            addToCart(pkg.id, pkg.name, pkg.price, pkg.img, currentQuantity);
+        });
+
+       
+
+        // نسخ الرابط
+        document.getElementById('copyLinkBtn').addEventListener('click', () => {
+            navigator.clipboard.writeText(window.location.href);
+            showToast('✅ تم نسخ الرابط بنجاح ');
+        });
+    }
+
+    function addToCart(id, name, price, img, quantity) {
+        let cart = JSON.parse(localStorage.getItem('elixir_cart') || '[]');
+        const existing = cart.find(item => item.id === id);
+        if (existing) {
+            existing.quantity += quantity;
+        } else {
+            cart.push({ id, name, price, img, quantity: quantity });
+        }
+        localStorage.setItem('elixir_cart', JSON.stringify(cart));
+        updateCartBadge();
+        showToast(`✅ تمت إضافة ${name} بنجاح`);
+    }
+
+    function updateCartBadge() {
+        const cart = JSON.parse(localStorage.getItem('elixir_cart') || '[]');
+        const total = cart.reduce((sum, i) => sum + i.quantity, 0);
+        const badge = document.querySelector('.cart-count');
+        if (badge) badge.innerText = total;
+    }
+
+    function showToast(message) {
+        const toast = document.getElementById('customToast');
+        const toastText = document.getElementById('toastText');
+        toastText.innerText = message;
+        toast.style.display = 'flex';
+        setTimeout(() => {
+            toast.style.display = 'none';
+        }, 3000);
+    }
+
+    // ========== قلوب متطايرة للمفضلة (اختياري) ==========
+    function burstHearts(x, y) {
+        for (let i = 0; i < 12; i++) {
+            const heart = document.createElement('div');
+            heart.innerHTML = '❤️';
+            heart.classList.add('heart-particle');
+            const offsetX = (Math.random() - 0.5) * 60;
+            const offsetY = (Math.random() - 0.5) * 50;
+            heart.style.left = (x + offsetX) + 'px';
+            heart.style.top = (y + offsetY) + 'px';
+            heart.style.animationDelay = (Math.random() * 0.2) + 's';
+            document.body.appendChild(heart);
+            setTimeout(() => heart.remove(), 1000);
+        }
+    }
+
+
+    
+
+    updateCartBadge();
+    renderPackageDetails();
+    addFavoriteIcon();
+</script>
+
+</body>
+</html>

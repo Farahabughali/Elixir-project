@@ -26,7 +26,7 @@
         <div class="container" style="max-width:1400px; margin:0 auto; padding:0 1.5rem;">
             <div class="page-header" style="text-align:center; margin-bottom:2rem;">
                 <h1 style="color:#2c5f2d; background:rgba(255,255,255,0.6); display:inline-block; padding:0.5rem 2rem; border-radius:50px;">
-                     منتجاتي المفضلة
+                    <i class="fa-regular fa-heart"></i> منتجاتي المفضلة <i class="fa-regular fa-heart"></i>
                 </h1>
             </div>
             <div class="products-grid" id="favoritesGrid"></div>
@@ -109,7 +109,7 @@ const allProducts = [
     { id: 67, name: "زيت الباتشولي", category: "للشعر", desc: "مضاد للفطريات، يمنح رائحة ترابية دافئة", price: 45, img: "asset/images/patchouli.jpg" },
         { id: 68, name: "بهارات مشكلة (عربية)", category: "عربية", desc: "خليط متكامل من البهارات العربية الأصيلة، مثالي للأرز واللحوم", price: 12, rating: 4.8, img: "asset/images/spice-mix.jpg" },
         { id: 69, name: "بهارات الكبسة", category: "عربية", desc: "خليط بهارات الكبسة الخليجية، يضفي نكهة رائعة على الأرز والدجاج", price: 10, rating: 4.7, img: "asset/images/kabsa-spice.jpg" },
-        { id: 70, name: "بهارات اللحم", category: "عربية", desc: "مزيج قوي ومناسب للحوم والقدور، يمنح نكهة عميقة", price: 14, rating: 4.9, img: "asset/images/meat-spice.jpg" },
+        { id: 70, name: "بهارات اللحم)", category: "عربية", desc: "مزيج قوي ومناسب للحوم والقدور، يمنح نكهة عميقة", price: 14, rating: 4.9, img: "asset/images/meat-spice.jpg" },
         { id: 71, name: "بهارات المندي", category: "عربية", desc: "خليط المندي العطري، يستخدم للأرز واللحم", price: 11, rating: 4.6, img: "asset/images/mandi-spice.jpg" },
         { id: 72, name: "سماق", category: "عربية", desc: "بهار حامض قليلًا، يستخدم على اللحوم والسلطات", price: 8, rating: 4.5, img: "asset/images/sumac.jpg" },
         { id: 73, name: "كمون", category: "عربية", desc: "من أهم البهارات في المطبخ العربي، يعزز الهضم", price: 7, rating: 4.6, img: "asset/images/cumin-spice.jpg" },
@@ -160,13 +160,24 @@ const allProducts = [
         { id: 118, name: "مرطب بلون دم الغزال للشفاه والخدود", category: "مرطب", desc: "منتج طبيعي مزدوج المفعول يجمع بين الترطيب واللون الوردي الطبيعي.", price: 30, rating: 4.7, img: "asset/images/ghazal.jpg" },
         { id: 119, name: "بودرة الورد الطبيعي", category: "أخرى", desc: "منتج طبيعي 100% متعدد الاستخدامات، يستخلص من الورد الطبيعي.", price: 18, rating: 4.6, img: "asset/images/rose-powder.jpg" },
         { id: 120, name: "الليفة الطبيعية (اللوفا)", category: "أخرى", desc: "ليفة فاخرة من قلب الطبيعة مصممة خصيصاً للتنظيف العميق للحصول على بشرة منتعشة.", price: 25, rating: 4.9, img: "asset/images/nature-loofah.png" },
-
+{ id: 121, name: "بكج النشاط والتوازن", category: "بكجات", desc: "بكج يجمع بين شاي الأعشاب المنعش، العسل الطبيعي ومستحضرات مهدئة تساعد على استعادة النشاط وتحقيق توازن صحي للجسم والعقل", price: 65, img: "asset/images/balance-package.png" },
+{ id: 122, name: "بكج جوهر الورد", category: "بكجات", desc: "بكج فاخر مستوحى من الورد الطبيعي، يحتوي على زيوت ومستحضرات تساعد على ترطيب البشرة وتغذيتها ومنحها نعومة وإشراقة طبيعية", price: 110, img: "asset/images/roseessence-package.png" },
+{ id: 123, name: "بكج عالم البهارات", category: "بكجات", desc: "بكج يجمع أشهى البهارات العالمية: بهارات مشكلة، غارام ماسالا، شاورما وبابريكا – جولة في مطابخ العالم", price: 45, img: "asset/images/spices-package.jpg" },
+{ id: 124, name: "بكج النضارة والإشراقة", category: "بكجات", desc: "بكج متكامل للعناية بالبشرة: تونر، صابون زيتون، كريم ورد، وزيت لوز حلو – لإشراقة طبيعية ونضارة دائمة", price: 75, img: "asset/images/freshness-package.jpg" },
+{ id: 125, name: "بكج الهدوء والتأمل", category: "بكجات", desc: "بكج مثالي للاسترخاء: زيت اللافندر، البابونج، الياسمين، والريحان – ليمنحك لحظات من الهدوء والتأمل العميق", price: 46, img: "asset/images/calm-package.jpg" },
+{ id: 126, name: "بكج العناية الفاخرة للبشرة", category: "بكجات", desc: "بكج عناية فاخر: طين أبيض مغربي، زيت أرجان، ماء ورد، وكريم مغذي – لبشرة ناعمة ومشرقة", price: 80, img: "asset/images/luxury-package.jpg" },
+{ id: 127, name: "بكج الشفاء الطبيعي", category: "بكجات", desc: "بكج يدعم المناعة والشفاء الطبيعي: عسل متعدد الأعشاب، حبة سوداء، بابونج، وزيت شجرة الشاي", price: 68, img: "asset/images/healing-package.jpg"},
+{ id: 128, name: "بكج العناية بالشعر", category: "بكجات", desc: "بكج متكامل للشعر: زيت إكليل الجبل، زيت جوز الهند، زيت الخروع، وزيت الأرجان – لتقوية وترطيب ونمو صحي للشعر", price: 85, img: "asset/images/hair-package.jpg" }
 
     ];
 
 // ========== دالة عرض المنتجات المحفوظة ==========
 function displayFavorites() {
+    // تنظيف المفضلة من المعرفات غير الموجودة
     let favorites = JSON.parse(localStorage.getItem('elixir_favorites')) || [];
+    favorites = favorites.filter(id => allProducts.some(p => p.id === id));
+    localStorage.setItem('elixir_favorites', JSON.stringify(favorites));
+    
     const emptyStateDiv = document.getElementById('emptyState');
     const favoritesContentDiv = document.getElementById('favoritesContent');
     const grid = document.getElementById('favoritesGrid');
@@ -189,23 +200,9 @@ function displayFavorites() {
     let html = '';
     favProducts.forEach(product => {
         let categoryText = "";
-        if (product.category === "نباتي") categoryText = "زيت نباتي ثابت";
-       else if (product.category === "تونر") categoryText = " تونرات طبيعية";
-       else if (product.category === "صابون") categoryText = " صابونات طبيعية";
-         else if (product.category === "مقشر") categoryText = " مقشرات طبيعية";
-         else if (product.category === "مرطب") categoryText = " مرطبات طبيعية";
-         else if (product.category === "عطري") categoryText = " زيوت عطرية طبيعية";
+        if (product.category === "عطري") categoryText = "زيت عطري";
         else if (product.category === "نباتي") categoryText = "زيت نباتي ثابت";
-        else if (product.category === "للشعر") categoryText = "منتج للشعر";
-        else if (product.category === "للبشرة") categoryText = "منتج للبشرة";
-        else if (product.category === "علاجي") categoryText = "منتج علاجي";
-        else if (product.category === "عطرية") categoryText = " منتجات عطرية طبيعية";
-        else if (product.category === "طبية") categoryText = " منتجات علاجية طبيعية";
-        else if (product.category === "خلطات أعشاب") categoryText = "خلطات أعشاب";
-        else if (product.category === "خلطات ") categoryText = "خلطات بهارات";
-        else if (product.category === "عربية") categoryText = "بهارات عربية";
-        else if (product.category === "عالمية") categoryText = "بهارات عالمية";
-        else categoryText = "أخرى";
+        else categoryText = "للبشرة والشعر";
 
         html += `
             <div class="fav-card" data-id="${product.id}">
@@ -282,6 +279,9 @@ document.addEventListener('DOMContentLoaded', function() {
     displayFavorites();
     updateFavCountInHeader();
 });
+
+
+
     </script>
 </body>
 </html>

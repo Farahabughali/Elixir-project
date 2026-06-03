@@ -3,251 +3,503 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Elixir | لوحة التحكم</title>
+    <title>Elixir | لوحة تحكم الموظف</title>
     <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
-   <link rel="stylesheet" href="employee-dashboard.css">
+    <link rel="stylesheet" href="employee-dashboard.css">
 </head>
 <body>
 
 <div class="dashboard-container">
-    <div class="header">
+    <div class="dashboard-header">
         <div class="welcome">
-            <h2><i class="fas fa-user-check"></i> مرحباً، <span id="empName">...</span></h2>
-            <p><span id="empRole"></span> @ Elixir</p>
+            <h2><i class="fas fa-user-cog"></i> مرحباً، <span id="empName">...</span></h2>
+            <p>لوحة تحكم الموظفين | Elixir</p>
         </div>
         <button class="logout-btn" onclick="logout()"><i class="fas fa-sign-out-alt"></i> تسجيل خروج</button>
     </div>
 
-    <div class="tasks-grid">
-        <!-- المهام الحالية -->
-        <div class="task-card">
-            <h3><i class="fas fa-spinner"></i> المهام الحالية</h3>
-            <ul class="task-list" id="currentTasksList"></ul>
-        </div>
+    <div class="tabs">
+        <button class="tab-btn active" data-tab="products"> كل المنتجات</button>
+        <button class="tab-btn" data-tab="tasks"> المهام</button>
+        <button class="tab-btn" data-tab="orders"> الطلبات</button>
+    </div>
 
-        <!-- المهام السابقة (المكتملة) -->
-        <div class="task-card">
-            <h3><i class="fas fa-check-circle"></i> المهام السابقة / المنجزة</h3>
-            <ul class="task-list" id="completedTasksList"></ul>
+    <div id="productsTab" class="tab-content active">
+        <h3><i class="fas fa-boxes"></i> جميع منتجات Elixir</h3>
+        
+        <div class="search-bar">
+            <input type="text" id="searchProductInput" class="search-input" placeholder="🔍 بحث عن منتج...">
+            <button class="add-product-btn" onclick="toggleAddForm()"><i class="fas fa-plus"></i> إضافة منتج جديد</button>
         </div>
-
-        <!-- المهام الملغاة -->
-        <div class="task-card">
-            <h3><i class="fas fa-trash-alt"></i> المهام الملغاة</h3>
-            <ul class="task-list" id="cancelledTasksList"></ul>
+        
+        <div id="addProductForm" class="add-product-form">
+            <input type="text" id="newName" placeholder="اسم المنتج">
+            <select id="newCategory"><option value="أعشاب">أعشاب</option><option value="زيوت">زيوت</option><option value="بهارات">بهارات</option><option value="عناية">عناية</option><option value="بكجات">بكجات</option></select>
+            <textarea id="newDesc" placeholder="وصف المنتج" rows="2"></textarea>
+            <input type="number" id="newPrice" placeholder="السعر">
+            <input type="number" id="newStock" placeholder="الكمية">
+            <input type="text" id="newImg" placeholder="مسار الصورة">
+            <button class="form-submit" onclick="addNewProduct()"><i class="fas fa-save"></i> حفظ المنتج</button>
+        </div>
+        
+        <div class="products-table">
+            <table>
+                <thead><tr><th>الصورة</th><th>المنتج</th><th>القسم</th><th>الوصف</th><th>السعر</th><th>الكمية</th><th>الإجراءات</th></tr></thead>
+                <tbody id="productsTableBody"></tbody>
+            </table>
         </div>
     </div>
 
-    <a href="index.html" class="back-link"><i class="fas fa-arrow-right"></i> العودة للرئيسية</a>
+    <div id="tasksTab" class="tab-content"><h3><i class="fas fa-tasks"></i> مهامي</h3><div id="tasksList"></div></div>
+    <div id="ordersTab" class="tab-content"><h3><i class="fas fa-shopping-cart"></i> طلبات العملاء</h3><div id="ordersList"></div></div>
 </div>
 
 <script>
-    let currentEmployee = null;
-    let currentEmployeeEmail = null;
+    // =================== جميع منتجات Elixir (128 منتجاً) ===================
+    const allProductsData = [
+        // أعشاب وخلطات طبية (id 1-37)
+        { id: 1, name: "عسل طبيعي متعدد الأعشاب", category: "أعشاب", desc: "يعتبر مضاداً طبيعياً للأكسدة والبكتيريا، مما يساعد في تقوية الجسم", price: 12, img: "asset/images/herbalhoney.png", stock: 50 },
+        { id: 2, name: "عشبة البابونج", category: "أعشاب", desc: "مهدئ طبيعي، يساعد على الاسترخاء والنوم، مفيد للجهاز الهضمي", price: 12, img: "asset/images/chamomileherb.jpg", stock: 100 },
+        { id: 3, name: "عشبة النعناع الفلفلي", category: "أعشاب", desc: "منعش، يخفف عسر الهضم والصداع، يمنح طاقة", price: 10, img: "asset/images/peppermintherb.jpg", stock: 80 },
+        { id: 4, name: "عشبة الزعتر", category: "أعشاب", desc: "مضاد للسعال والتهاب الحلق، يقوي المناعة", price: 14, img: "asset/images/thymeherb.jpg", stock: 60 },
+        { id: 5, name: "عشبة المريمية", category: "أعشاب", desc: "تخفف التعرق الليلي وأعراض سن اليأس، مضادة للالتهابات", price: 15, img: "asset/images/sageherb.jpg", stock: 45 },
+        { id: 6, name: "إكليل الجبل", category: "أعشاب", desc: "يحسن الذاكرة، ينشط الدورة الدموية، يقوي الشعر", price: 13, img: "asset/images/rosemary.png", stock: 70 },
+        { id: 7, name: "اللافندر", category: "أعشاب", desc: "مهدئ للأعصاب، يساعد على النوم العميق، يخفف التوتر", price: 16, img: "asset/images/lavenderherb.jpg", stock: 55 },
+        { id: 8, name: "الحبة السوداء", category: "أعشاب", desc: "تقوي المناعة، تعالج مشاكل الجلد والشعر، مضادة للالتهابات", price: 18, img: "asset/images/blackseedherb.jpg", stock: 90 },
+        { id: 9, name: "اليانسون النجمي", category: "أعشاب", desc: "مفيد للجهاز الهضمي، يخفف المغص والانتفاخات، مدر للحليب", price: 11, img: "asset/images/anise.jpg", stock: 65 },
+        { id: 10, name: "الكركديه", category: "أعشاب", desc: "يخفض ضغط الدم، غني بمضادات الأكسدة، منعش", price: 9, img: "asset/images/hibiscus.jpg", stock: 85 },
+        { id: 11, name: "الزنجبيل", category: "أعشاب", desc: "مضاد للغثيان، يخفف آلام المفاصل، يعزز المناعة", price: 12, img: "asset/images/ginger.jpg", stock: 75 },
+        { id: 12, name: "القرفة", category: "أعشاب", desc: "تنظم سكر الدم، مضادة للأكسدة، تحسن الهضم", price: 10, img: "asset/images/cinnamon.jpg", stock: 95 },
+        { id: 13, name: "البردقوش", category: "أعشاب", desc: "مهدئ للأعصاب، يساعد على الهضم، مفيد للنساء", price: 13, img: "asset/images/marjoram.jpg", stock: 40 },
+        { id: 14, name: "الشمر", category: "أعشاب", desc: "مفيد للهضم، يخفف الانتفاخات، مدر للحليب", price: 11, img: "asset/images/fennel.jpg", stock: 50 },
+        { id: 15, name: "العرقسوس", category: "أعشاب", desc: "ملين للمعدة، يخفف السعال، مفيد للجهاز التنفسي", price: 9, img: "asset/images/licorice.jpg", stock: 60 },
+        { id: 16, name: "الخطمية", category: "أعشاب", desc: "ملطف للحلق، مضاد للسعال، مفيد للجهاز التنفسي", price: 12, img: "asset/images/marshmallow.jpg", stock: 30 },
+        { id: 17, name: "القراص", category: "أعشاب", desc: "مضاد للحساسية، غني بالحديد، مفيد للشعر", price: 10, img: "asset/images/nettle.jpg", stock: 55 },
+        { id: 18, name: "الجنكة بيلوبا", category: "أعشاب", desc: "يحسن الذاكرة والتركيز، ينشط الدورة الدموية الدماغية", price: 22, img: "asset/images/ginkgo.jpg", stock: 25 },
+        { id: 19, name: "الاشواغاندا", category: "أعشاب", desc: "مكيف طبيعي، يقلل التوتر والقلق، يعزز الطاقة", price: 25, img: "asset/images/ashwagandha.jpg", stock: 20 },
+        { id: 20, name: "الريحان المقدس", category: "أعشاب", desc: "مضاد للإجهاد، يعزز المناعة، مفيد للجهاز التنفسي", price: 14, img: "asset/images/holybasil.jpg", stock: 35 },
+        { id: 21, name: "البقدونس", category: "أعشاب", desc: "مدر للبول، غني بالفيتامينات، مفيد للكلى", price: 6, img: "asset/images/parsley.jpg", stock: 100 },
+        { id: 22, name: "الكزبرة", category: "أعشاب", desc: "مضادة للأكسدة، تساعد على الهضم، تخفض الكوليسترول", price: 8, img: "asset/images/coriander.jpg", stock: 80 },
+        { id: 23, name: "الحلبة", category: "أعشاب", desc: "مفيدة للرضاعة، تنظم السكر، تقوي الشعر", price: 10, img: "asset/images/fenugreek.jpg", stock: 70 },
+        { id: 24, name: "المليسا", category: "أعشاب", desc: "مضادة للقلق، تحسن المزاج، تساعد على النوم", price: 15, img: "asset/images/lemonbalm.jpg", stock: 40 },
+        { id: 25, name: "الزوفا", category: "أعشاب", desc: "مقشع، مضاد للسعال، مفيد للجهاز التنفسي", price: 12, img: "asset/images/hyssop.jpg", stock: 45 },
+        { id: 26, name: "الآس", category: "أعشاب", desc: "معطر طبيعي، قابض، مفيد للبشرة", price: 14, img: "asset/images/myrtle.jpg", stock: 30 },
+        { id: 27, name: "الأقحوان", category: "أعشاب", desc: "يخفض الحرارة، مفيد للعينين، مهدئ", price: 11, img: "asset/images/chrysanthemum.jpg", stock: 50 },
+        { id: 28, name: "القرنفل", category: "أعشاب", desc: "مسكن لآلام الأسنان، مضاد للالتهابات", price: 9, img: "asset/images/cloveherb.jpg", stock: 60 },
+        { id: 29, name: "الهيل", category: "أعشاب", desc: "منعش للفم، مفيد للهضم، مضاد للأكسدة", price: 20, img: "asset/images/cardamomherb.jpg", stock: 40 },
+        { id: 30, name: "الكركم", category: "أعشاب", desc: "مضاد قوي للالتهابات، غني بمضادات الأكسدة", price: 15, img: "asset/images/turmeric.jpg", stock: 65 },
+        { id: 31, name: "الجنسنغ", category: "أعشاب", desc: "مقوي عام، يزيد الطاقة، يحسن الأداء الذهني", price: 35, img: "asset/images/ginseng.jpg", stock: 15 },
+        { id: 32, name: "الإخناسيا", category: "أعشاب", desc: "مقوي للمناعة، يقي من نزلات البرد", price: 22, img: "asset/images/echinacea.jpg", stock: 20 },
+        { id: 33, name: "القطيفة", category: "أعشاب", desc: "مضادة للالتهابات، تهدئ البشرة، مفيدة للجروح", price: 13, img: "asset/images/calendula.jpg", stock: 35 },
+        { id: 34, name: "الريحان", category: "أعشاب", desc: "مضاد للتوتر، يحسن المزاج، مفيد للجهاز الهضمي", price: 12, img: "asset/images/basil.jpg", stock: 55 },
+        { id: 35, name: "الزعفران", category: "أعشاب", desc: "مضاد للاكتئاب، يحسن المزاج، غني بمضادات الأكسدة", price: 50, img: "asset/images/saffron.jpg", stock: 10 },
+        { id: 36, name: "الكمون", category: "أعشاب", desc: "يساعد على الهضم، مضاد للأكسدة، يخفض الكوليسترول", price: 8, img: "asset/images/cumin.jpg", stock: 75 },
+        { id: 37, name: "القرطم", category: "أعشاب", desc: "مضاد للالتهابات، مفيد للقلب والشرايين", price: 18, img: "asset/images/safflower.jpg", stock: 25 },
+        // زيوت عطرية ونباتية (id 38-67)
+        { id: 38, name: "زيت اللافندر العطري", category: "زيوت", desc: "مهدئ للأعصاب، يساعد على الاسترخاء والنوم العميق", price: 38, img: "asset/images/lavender.jpg", stock: 45 },
+        { id: 39, name: "زيت الورد الجوري", category: "زيوت", desc: "مضاد للشيخوخة، مرطب طبيعي للبشرة", price: 185, img: "asset/images/rose.jpg", stock: 20 },
+        { id: 40, name: "زيت إكليل الجبل", category: "زيوت", desc: "منشط للدورة الدموية، يقوي بصيلات الشعر", price: 55, img: "asset/images/rosemary.png", stock: 35 },
+        { id: 41, name: "زيت النعناع الفلفلي", category: "زيوت", desc: "يخفف الصداع وانسداد الأنف، منعش ومنشط", price: 30, img: "asset/images/peppermint.jpg", stock: 40 },
+        { id: 42, name: "زيت الياسمين", category: "زيوت", desc: "مضاد للتوتر، يحسن المزاج، يمنح رائحة فواحة", price: 45, img: "asset/images/jasmine-oil.png", stock: 25 },
+        { id: 43, name: "زيت شجرة الشاي", category: "زيوت", desc: "مطهر طبيعي، مضاد لحب الشباب والفطريات", price: 42, img: "asset/images/teatree.jpg", stock: 30 },
+        { id: 44, name: "زيت البابونج", category: "زيوت", desc: "مهدئ للبشرة الحساسة، يخفف الالتهابات", price: 48, img: "asset/images/chamomileoil.png", stock: 25 },
+        { id: 45, name: "زيت البرتقال الحلو", category: "زيوت", desc: "منشط للذهن، يخفف القلق، يضيء البشرة", price: 35, img: "asset/images/orangeoil.jpg", stock: 35 },
+        { id: 46, name: "زيت الليمون", category: "زيوت", desc: "مضاد للبكتيريا، ينقي الهواء، يمنح طاقة", price: 32, img: "asset/images/lemon.jpg", stock: 40 },
+        { id: 47, name: "زيت اليانغ يانغ", category: "زيوت", desc: "متوازن للهرمونات، يمنح رائحة استوائية جذابة", price: 50, img: "asset/images/ylang.jpg", stock: 15 },
+        { id: 48, name: "زيت المريمية", category: "زيوت", desc: "يساعد في تخفيف التعرق الليلي وأعراض سن اليأس", price: 40, img: "asset/images/sage.jpg", stock: 20 },
+        { id: 49, name: "زيت الزعتر", category: "زيوت", desc: "مضاد للسعال والتهاب الحلق، يقوي المناعة", price: 38, img: "asset/images/thyme.jpg", stock: 25 },
+        { id: 50, name: "زيت الزيتون البكر الفلسطيني", category: "زيوت", desc: "مرطب طبيعي، غني بمضادات الأكسدة", price: 45, img: "asset/images/olive.jpg", stock: 50 },
+        { id: 51, name: "زيت اللوز الحلو", category: "زيوت", desc: "مرطب عميق، غني بفيتامين E، مناسب لجميع البشرة", price: 42, img: "asset/images/almondoil.png", stock: 40 },
+        { id: 52, name: "زيت جوز الهند العضوي", category: "زيوت", desc: "للشعر والبشرة، يرطب ويغذي بعمق", price: 35, img: "asset/images/coconut.jpg", stock: 35 },
+        { id: 53, name: "زيت الأرجان المغربي", category: "زيوت", desc: "لترطيب البشرة والشعر، غني بمضادات الأكسدة", price: 75, img: "asset/images/argan.jpg", stock: 20 },
+        { id: 54, name: "زيت الجوجوبا", category: "زيوت", desc: "مشابه لزيت البشرة الطبيعي، مناسب للبشرة الدهنية", price: 65, img: "asset/images/jojoba.jpg", stock: 15 },
+        { id: 55, name: "زيت السمسم", category: "زيوت", desc: "غني بفيتامين E، يحمي البشرة من الشمس", price: 30, img: "asset/images/sesame.jpg", stock: 30 },
+        { id: 56, name: "زيت الخروع", category: "زيوت", desc: "يطيل الشعر ويكثفه، ينعم الحواجب والرموش", price: 28, img: "asset/images/castor.jpg", stock: 45 },
+        { id: 57, name: "زيت المشمش", category: "زيوت", desc: "خفيف وسريع الامتصاص، مناسب للبشرة الحساسة", price: 50, img: "asset/images/apricot.jpg", stock: 20 },
+        { id: 58, name: "زيت بذور العنب", category: "زيوت", desc: "قابض طبيعي، مناسب للبشرة الدهنية والمختلطة", price: 40, img: "asset/images/grapeseed.jpg", stock: 25 },
+        { id: 59, name: "زيت الأفوكادو", category: "زيوت", desc: "غني بالأحماض الدهنية، مثالي للبشرة الجافة والتالفة", price: 60, img: "asset/images/avocado.jpg", stock: 20 },
+        { id: 60, name: "زيت الخروع الأسود", category: "زيوت", desc: "يقوي الشعر ويمنع التساقط، يطيل الرموش", price: 35, img: "asset/images/blackcastor.jpg", stock: 30 },
+        { id: 61, name: "زيت الروزماري للشعر", category: "زيوت", desc: "يحفز نمو الشعر، يقلل القشرة", price: 48, img: "asset/images/rosemaryhair.jpg", stock: 25 },
+        { id: 62, name: "زيت اللوز المر", category: "زيوت", desc: "يفتح البشرة، يقلل الهالات السوداء", price: 38, img: "asset/images/bitteralmond.jpg", stock: 20 },
+        { id: 63, name: "زيت الورد المسك", category: "زيوت", desc: "يقلل علامات التمدد والندبات", price: 55, img: "asset/images/mosquerose.jpg", stock: 15 },
+        { id: 64, name: "زيت الأوكالبتوس", category: "زيوت", desc: "يفتح المجاري التنفسية، يخفف آلام العضلات", price: 32, img: "asset/images/eucalyptus.jpg", stock: 25 },
+        { id: 65, name: "زيت القرنفل", category: "زيوت", desc: "مسكن لآلام الأسنان، مضاد للالتهابات", price: 30, img: "asset/images/clove.jpg", stock: 30 },
+        { id: 66, name: "زيت الحبة السوداء", category: "زيوت", desc: "يقوي المناعة، يعالج مشاكل الجلد والشعر", price: 40, img: "asset/images/blackseed.jpg", stock: 35 },
+        { id: 67, name: "زيت الباتشولي", category: "زيوت", desc: "مضاد للفطريات، يمنح رائحة ترابية دافئة", price: 45, img: "asset/images/patchouli.jpg", stock: 20 },
+        // بهارات (id 68-88)
+        { id: 68, name: "بهارات مشكلة (عربية)", category: "بهارات", desc: "خليط متكامل من البهارات العربية الأصيلة، مثالي للأرز واللحوم", price: 12, img: "asset/images/spice-mix.jpg", stock: 80 },
+        { id: 69, name: "بهارات الكبسة", category: "بهارات", desc: "خليط بهارات الكبسة الخليجية، يضفي نكهة رائعة على الأرز والدجاج", price: 10, img: "asset/images/kabsa-spice.jpg", stock: 70 },
+        { id: 70, name: "بهارات اللحم", category: "بهارات", desc: "مزيج قوي ومناسب للحوم والقدور، يمنح نكهة عميقة", price: 14, img: "asset/images/meat-spice.jpg", stock: 60 },
+        { id: 71, name: "بهارات المندي", category: "بهارات", desc: "خليط المندي العطري، يستخدم للأرز واللحم", price: 11, img: "asset/images/mandi-spice.jpg", stock: 55 },
+        { id: 72, name: "سماق", category: "بهارات", desc: "بهار حامض قليلًا، يستخدم على اللحوم والسلطات", price: 8, img: "asset/images/sumac.jpg", stock: 90 },
+        { id: 73, name: "كمون", category: "بهارات", desc: "من أهم البهارات في المطبخ العربي، يعزز الهضم", price: 7, img: "asset/images/cumin-spice.jpg", stock: 100 },
+        { id: 74, name: "كزبرة جافة مطحونة", category: "بهارات", desc: "نكهة دافئة وحلوة قليلًا، تستخدم في الطبخ والصلصات", price: 6, img: "asset/images/coriander-spice.jpg", stock: 85 },
+        { id: 75, name: "كركم", category: "بهارات", desc: "بهار ذهبي مضاد للأكسدة، يستخدم في الطبخ الهندي والعلاجات", price: 9, img: "asset/images/turmeric-spice.jpg", stock: 75 },
+        { id: 76, name: "زنجبيل مطحون", category: "بهارات", desc: "يضفي نكهة حارة ودافئة، مفيد للجهاز الهضمي", price: 10, img: "asset/images/ginger-spice.jpg", stock: 80 },
+        { id: 77, name: "هيل (حبهان)", category: "بهارات", desc: "بهار عطري يستخدم في القهوة والشاي والحلويات", price: 25, img: "asset/images/cardamom-spice.jpg", stock: 40 },
+        { id: 78, name: "قرنفل (كبش قرنفل)", category: "بهارات", desc: "نكهة قوية وحادة، يستخدم في الأرز والمخللات", price: 12, img: "asset/images/clove-spice.jpg", stock: 60 },
+        { id: 79, name: "فلفل أسود مطحون", category: "بهارات", desc: "أشهر بهار في العالم، يضفي حرارة ونكهة", price: 8, img: "asset/images/black-pepper.jpg", stock: 95 },
+        { id: 80, name: "بابريكا (فلفل حلو مجفف)", category: "بهارات", desc: "لون أحمر ونكهة مدخنة خفيفة، مثالية للدجاج", price: 9, img: "asset/images/paprika.jpg", stock: 70 },
+        { id: 81, name: "فلفل حار مطحون (شطة)", category: "بهارات", desc: "حرارة قوية تضفي نكهة حارة للأطباق", price: 8, img: "asset/images/chili.jpg", stock: 80 },
+        { id: 82, name: "قرفة مطحونة", category: "بهارات", desc: "نكهة دافئة وحلوة، تستخدم في الحلويات واللحوم", price: 10, img: "asset/images/cinnamon-spice.jpg", stock: 85 },
+        { id: 83, name: "يانسون نجمي", category: "بهارات", desc: "نكهة عرق السوس، يستخدم في الأطباق الآسيوية", price: 18, img: "asset/images/star-anise.jpg", stock: 35 },
+        { id: 84, name: "بهارات غارام ماسالا", category: "بهارات", desc: "خليط بهارات هندي دافئ، مثالي للكاري واللحوم", price: 22, img: "asset/images/garam-masala.jpg", stock: 40 },
+        { id: 85, name: "بهارات شاورما", category: "بهارات", desc: "خليط خاص للشاورما والدجاج المشوي", price: 12, img: "asset/images/shawarma-spice.jpg", stock: 65 },
+        { id: 86, name: "بهارات فاهيتا", category: "بهارات", desc: "مزيج مكسيكي مثالي للحوم والخضروات المشوية", price: 11, img: "asset/images/fajita-spice.jpg", stock: 50 },
+        { id: 87, name: "بهارات الشوربة", category: "بهارات", desc: "خليط بهارات خاص للحساء", price: 13, img: "asset/images/soup-spice.jpg", stock: 55 },
+        { id: 88, name: "سبع بهارات", category: "بهارات", desc: "بهارات أساسية في المطبخ العربي تضاف على كثير من الأكلات", price: 10, img: "asset/images/seven-spices.jpg", stock: 75 },
+        // تونرات وصابون وعناية (id 89-120)
+        { id: 89, name: "تونر ماء الورد وإكليل الجبل", category: "عناية", desc: "تونر منعش ومنقي للبشرة، يجمع بين فوائد ماء الورد المهدئة وزيت إكليل الجبل المنشط للدورة الدموية.", price: 28, img: "asset/images/toner-rosemary-rose.jpg", stock: 30 },
+        { id: 90, name: "تونر النعناع والشاي الأخضر", category: "عناية", desc: "تونر منعش للبشرة الدهنية والمختلطة، يقلل من إفراز الزيوت، يساعد على تقليل اللمعان وتضييق المسام مع شعور بالانتعاش.", price: 22, img: "asset/images/toner-mint.jpg", stock: 35 },
+        { id: 91, name: "تونر البابونج", category: "عناية", desc: "تونر مهدئ ولطيف للبشرة الحساسة، يساعد في تهدئة الالتهابات وتقليل الاحمرار بفضل خلاصة البابونج الطبيعية.", price: 24, img: "asset/images/chamomiletoner.png", stock: 40 },
+        { id: 92, name: "صابون زيت الزيتون الطبيعي", category: "عناية", desc: "صابون طبيعي مصنوع من زيت الزيتون البكر، يُستخدم للعناية بالبشرة، يتميز بخصائصه المرطبة والمغذية.", price: 18, img: "asset/images/olive-soap.jpg", stock: 60 },
+        { id: 93, name: "صابونة الفحم النشط", category: "عناية", desc: "صابونة تحتوي على فحم نشط بخصائص امتصاص عالية، تُستخدم لتنظيف البشرة بعمق وإزالة الزيوت والشوائب.", price: 22, img: "asset/images/charcoal-soap.jpg", stock: 50 },
+        { id: 94, name: "صابون العسل الطبيعي", category: "عناية", desc: "صابون طبيعي مصنوع من العسل، لاحتوائه على عناصر غذائية ومضادات أكسدة.", price: 20, img: "asset/images/honey-soap.jpg", stock: 55 },
+        { id: 95, name: "صابون الصبار الطبيعي (الألوفيرا)", category: "عناية", desc: "صابون طبيعي غني بهلام الألوفيرا، يعمل على تنظيف البشرة بلطف مع ترطيب عميق، وتهدئة التهيج.", price: 21, img: "asset/images/aloe-soap.jpg", stock: 45 },
+        { id: 96, name: "صابون الشوفان الطبيعي", category: "عناية", desc: "صابون طبيعي غني بالشوفان، يتميز بخصائصه المغذية والمهدئة، مناسب للبشرة الحساسة والجافة.", price: 19, img: "asset/images/oat-soap.jpg", stock: 40 },
+        { id: 97, name: "صابون الطين الأبيض المغربي", category: "عناية", desc: "صابون طبيعي صلب غني بالطين الأبيض المغربي، يُستخدم لتنقية وتنظيف البشرة بعمق.", price: 24, img: "asset/images/ghassoul-soap.jpg", stock: 35 },
+        { id: 98, name: "صابون الكركم الطبيعية", category: "عناية", desc: "صابونة طبيعية غنية بالكركم، تساعد في علاج مشاكل البشرة مثل حب الشباب والتصبغات.", price: 23, img: "asset/images/turmeric-soap.jpg", stock: 40 },
+        { id: 99, name: "صابون فيتامين سي المبيّضة", category: "عناية", desc: "صابون طبيعي يحتوي على فيتامين سي، يُستخدم لتنظيف البشرة وتفتيحها ومنحها إشراقة.", price: 25, img: "asset/images/vitc-soap.jpg", stock: 45 },
+        { id: 100, name: "الصابون الأفريقي الأسود التقليدي", category: "عناية", desc: "صابون طبيعي عضوي يصنع يدوياً من مواد خام من أفريقيا، يعتبر غذاءً متكاملاً للبشرة والشعر.", price: 28, img: "asset/images/african-soap.jpg", stock: 30 },
+        { id: 101, name: "ماسك السكر وزيت الزيتون (مقشر طبيعي)", category: "عناية", desc: "مقشر طبيعي مكوّن من السكر وزيت الزيتون، يُستخدم لتنظيف البشرة وتقشيرها بلطف.", price: 15, img: "asset/images/sugar-scrub.jpg", stock: 50 },
+        { id: 102, name: "مقشر القهوة للجسم", category: "عناية", desc: "مقشر طبيعي مصنوع من القهوة يُستخدم لإزالة خلايا الجلد الميتة وتنشيط الدورة الدموية.", price: 18, img: "asset/images/coffee-scrub.jpg", stock: 45 },
+        { id: 103, name: "ماسك العسل والشوفان والزبادي", category: "عناية", desc: "ماسك طبيعي مغذي للبشرة، يساعد على ترطيبها وتنظيفها وتغذيتها.", price: 16, img: "asset/images/honey-oat-mask.jpg", stock: 40 },
+        { id: 104, name: "مقشر السكر والليمون", category: "عناية", desc: "مقشر طبيعي يُستخدم لتنظيف البشرة وتقشيرها، يساعد على إزالة الخلايا الميتة.", price: 14, img: "asset/images/lemon-scrub.jpg", stock: 55 },
+        { id: 105, name: "مقشر السكر بالورد وزيت جوز الهند", category: "عناية", desc: "منتج فعال لتنظيف وتجديد البشرة يجمع بين فوائد زهرة الورد وزيت جوز الهند.", price: 22, img: "asset/images/rose-scrub.jpg", stock: 35 },
+        { id: 106, name: "زبدة الشيا", category: "عناية", desc: "مادة طبيعية مستخرجة من شجرة الشيا، تُستخدم لترطيب البشرة وعلاج مشاكلها.", price: 30, img: "asset/images/shea-butter.jpg", stock: 25 },
+        { id: 107, name: "كريم الورد المركز", category: "عناية", desc: "كريم منعش يحتوي على 70% ماء ورد طبيعي، يعمل على تبييض وتنعيم وترطيب البشرة.", price: 28, img: "asset/images/rose-cream.jpg", stock: 30 },
+        { id: 108, name: "لوشن الورد المرطب للجسم", category: "عناية", desc: "لوشن خفيف القوام وسريع الامتصاص، يجمع بين انتعاش ماء الورد وفوائد الشاي الأبيض.", price: 40, img: "asset/images/rose-lotion-body.jpg", stock: 20 },
+        { id: 109, name: "فازلين الورد الطبيعي للترطيب", category: "عناية", desc: "مرطب كثيف القوام معزز بخلاصة الورد، مثالي للعناية بالمناطق التي تعاني من جفاف شديد.", price: 12, img: "asset/images/rose-vaseline.jpg", stock: 50 },
+        { id: 110, name: "شمع الورد المرطب", category: "عناية", desc: "قوالب شمعية صغيرة تذوب بمجرد ملامستها لحرارة الجلد، مصممة لعلاج جفاف المفاصل واليدين.", price: 25, img: "asset/images/rose-wax.jpg", stock: 30 },
+        { id: 111, name: "جل الصبار (الألوفيرا)", category: "عناية", desc: "جل طبيعي يُستخرج من أوراق الألوفيرا، يتميز بخصائصه المرطبة والمهدئة.", price: 18, img: "asset/images/aloe-gel.jpg", stock: 45 },
+        { id: 112, name: "ماء الورد المقطر الطبيعي", category: "عناية", desc: "ماء عطري طبيعي مستخلص من تقطير بتلات الورد، يُستخدم كتونر طبيعي وبخاخ منعش.", price: 15, img: "asset/images/rose-water.jpg", stock: 60 },
+        { id: 113, name: "الليفة المغربية الأصلية", category: "عناية", desc: "ليفة فاخرة مصممة خصيصاً للتقشير العميق ومساعدة البشرة على امتصاص الزيوت والكريمات بشكل أفضل.", price: 25, img: "asset/images/moroccan-loofah.png", stock: 40 },
+        { id: 114, name: "طين الغسول المغربي الطبيعي", category: "عناية", desc: "مستحضر تجميل طبيعي عبارة عن طين معدني يستخدم منذ قرون للعناية بالبشرة والشعر.", price: 20, img: "asset/images/ghassoul-clay.jpg", stock: 35 },
+        { id: 115, name: "الحجر الخفاف الطبيعي", category: "عناية", desc: "أداة تجميل طبيعية تستخدم لتقشير البشرة وتنظيفها وإزالة الجلد الميت.", price: 12, img: "asset/images/pumice-stone.jpg", stock: 50 },
+        { id: 116, name: "بتلات الورد الطبيعية المجففة", category: "عناية", desc: "أوراق ورد طبيعية مجففة بعناية، تستخدم في الاسترخاء والعناية الشخصية.", price: 10, img: "asset/images/rose-petals.jpg", stock: 45 },
+        { id: 117, name: "كحل الإثمد الأصفهاني بماء الورد وماء زمزم", category: "عناية", desc: "منتج تقليدي فاخر محضر من حجر الإثمد الأصلي، يمنح العين برودة وانتعاشاً.", price: 35, img: "asset/images/kohl.jpg", stock: 25 },
+        { id: 118, name: "مرطب بلون دم الغزال للشفاه والخدود", category: "عناية", desc: "منتج طبيعي مزدوج المفعول يجمع بين الترطيب واللون الوردي الطبيعي.", price: 30, img: "asset/images/ghazal.jpg", stock: 30 },
+        { id: 119, name: "بودرة الورد الطبيعي", category: "عناية", desc: "منتج طبيعي 100% متعدد الاستخدامات، يستخلص من الورد الطبيعي.", price: 18, img: "asset/images/rose-powder.jpg", stock: 35 },
+        { id: 120, name: "الليفة الطبيعية (اللوفا)", category: "عناية", desc: "ليفة فاخرة من قلب الطبيعة مصممة خصيصاً للتنظيف العميق للحصول على بشرة منتعشة.", price: 25, img: "asset/images/nature-loofah.png", stock: 40 },
+        // بكجات (id 121-128)
+        { id: 121, name: "بكج النشاط والتوازن", category: "بكجات", desc: "بكج يجمع بين شاي الأعشاب المنعش، العسل الطبيعي ومستحضرات مهدئة تساعد على استعادة النشاط وتحقيق توازن صحي للجسم والعقل", price: 65, img: "asset/images/balance-package.png", stock: 25 },
+        { id: 122, name: "بكج جوهر الورد", category: "بكجات", desc: "بكج فاخر مستوحى من الورد الطبيعي، يحتوي على زيوت ومستحضرات تساعد على ترطيب البشرة وتغذيتها ومنحها نعومة وإشراقة طبيعية", price: 110, img: "asset/images/roseessence-package.png", stock: 20 },
+        { id: 123, name: "بكج عالم البهارات", category: "بكجات", desc: "بكج يجمع أشهى البهارات العالمية: بهارات مشكلة، غارام ماسالا، شاورما وبابريكا – جولة في مطابخ العالم", price: 45, img: "asset/images/spices-package.jpg", stock: 30 },
+        { id: 124, name: "بكج النضارة والإشراقة", category: "بكجات", desc: "بكج متكامل للعناية بالبشرة: تونر، صابون زيتون، كريم ورد، وزيت لوز حلو – لإشراقة طبيعية ونضارة دائمة", price: 75, img: "asset/images/freshness-package.jpg", stock: 20 },
+        { id: 125, name: "بكج الهدوء والتأمل", category: "بكجات", desc: "بكج مثالي للاسترخاء: زيت اللافندر، البابونج، الياسمين، والريحان – ليمنحك لحظات من الهدوء والتأمل العميق", price: 46, img: "asset/images/calm-package.jpg", stock: 25 },
+        { id: 126, name: "بكج العناية الفاخرة للبشرة", category: "بكجات", desc: "بكج عناية فاخر: طين أبيض مغربي، زيت أرجان، ماء ورد، وكريم مغذي – لبشرة ناعمة ومشرقة", price: 80, img: "asset/images/luxury-package.jpg", stock: 15 },
+        { id: 127, name: "بكج الشفاء الطبيعي", category: "بكجات", desc: "بكج يدعم المناعة والشفاء الطبيعي: عسل متعدد الأعشاب، حبة سوداء، بابونج، وزيت شجرة الشاي", price: 68, img: "asset/images/healing-package.jpg", stock: 20 },
+        { id: 128, name: "بكج العناية بالشعر", category: "بكجات", desc: "بكج متكامل للشعر: زيت إكليل الجبل، زيت جوز الهند، زيت الخروع، وزيت الأرجان – لتقوية وترطيب ونمو صحي للشعر", price: 85, img: "asset/images/hair-package.jpg", stock: 25 }
+    ];
 
-    function loadEmployeeData() {
-        // 1️⃣ نجيب البريد الإلكتروني للموظف من localStorage
-        currentEmployeeEmail = localStorage.getItem('elixir_employee_email');
-        
-        if (!currentEmployeeEmail) {
-            window.location.href = 'employee-login.html';
-            return;
-        }
-        
-        // 2️⃣ نجيب بيانات الموظف باستخدام المفتاح الصحيح
-        let empData = JSON.parse(localStorage.getItem(`elixir_employee_${currentEmployeeEmail}`));
-        
-        if (!empData || !empData.loggedIn) {
-            window.location.href = 'employee-login.html';
-            return;
-        }
-
-        // التأكد من وجود المصفوفات
-        if (!empData.tasks) empData.tasks = [];
-        if (!empData.completedTasks) empData.completedTasks = [];
-        if (!empData.cancelledTasks) empData.cancelledTasks = [];
-        
-        currentEmployee = empData;
-        
-        document.getElementById('empName').innerText = empData.name;
-        document.getElementById('empRole').innerText = empData.role;
-
-        renderTasks();
-        
-        // 3️⃣ بدء مراقبة المهام الجديدة من الأدمن (كل 3 ثواني)
-        startTaskSync();
+    let allProducts = JSON.parse(localStorage.getItem('elixir_all_products'));
+    if (!allProducts || allProducts.length < 128) {
+        allProducts = allProductsData;
+        localStorage.setItem('elixir_all_products', JSON.stringify(allProducts));
     }
 
-    function renderTasks() {
-        // المهام الحالية (غير مكتملة)
-        const currentList = document.getElementById('currentTasksList');
-        const pendingTasks = (currentEmployee.tasks || []).filter(t => t.status !== 'completed');
-        
-        if (pendingTasks.length === 0) {
-            currentList.innerHTML = '<li class="empty-msg">🎉 لا توجد مهام حالياً</li>';
-        } else {
-            currentList.innerHTML = pendingTasks.map(task => `
-                <li>
-                    <div style="flex:1">
-                        <div class="task-text">${task.text || task.desc}</div>
-                        <div class="task-date"><i class="far fa-calendar-alt"></i> استلمت: ${task.assignedAt || 'الآن'}</div>
-                    </div>
-                    <div class="actions">
-                        <button class="complete-btn" onclick="completeTask(${task.id})"><i class="fas fa-check"></i> تم الإنجاز</button>
-                        <button class="delete-btn" onclick="cancelTask(${task.id})"><i class="fas fa-times"></i> إلغاء</button>
-                    </div>
-                </li>
-            `).join('');
-        }
+    let nextId = Math.max(...allProducts.map(p => p.id), 0) + 1;
+    let filteredProducts = [...allProducts];
 
-        // المهام المكتملة
-        const completedList = document.getElementById('completedTasksList');
-        const completedTasks = (currentEmployee.completedTasks || []).filter(t => t.status === 'completed');
-        
-        if (completedTasks.length === 0) {
-            completedList.innerHTML = '<li class="empty-msg">📭 لا توجد مهام منجزة</li>';
-        } else {
-            completedList.innerHTML = completedTasks.map(task => `
-                <li class="completed-task">
-                    <div style="flex:1">
-                        <div class="task-text">${task.text || task.desc}</div>
-                        <div class="task-date"><i class="far fa-calendar-alt"></i> أنجزت: ${task.completedAt}</div>
-                    </div>
-                    <div class="actions">
-                        <button class="delete-btn" onclick="permanentlyDeleteTask(${task.id}, 'completed')"><i class="fas fa-trash"></i> حذف</button>
-                    </div>
-                </li>
-            `).join('');
-        }
+    // =================== دالة عرض المنتجات ===================
+   function renderProducts() {
+    const searchTerm = document.getElementById('searchProductInput')?.value.toLowerCase() || '';
+    const filtered = allProducts.filter(p => p.name.toLowerCase().includes(searchTerm));
+    const tbody = document.getElementById('productsTableBody');
+    
+    tbody.innerHTML = filtered.map(p => `
+        <tr>
+            <td><img class="product-img" src="${p.img}" onerror="this.src='asset/images/basil.jpg'"></td>
+            <td>${p.name}</td>
+            <td>
+                <select class="product-input" id="category-${p.id}" style="width:100%;">
+                    <option value="أعشاب" ${p.category === 'أعشاب' ? 'selected' : ''}>أعشاب</option>
+                    <option value="زيوت" ${p.category === 'زيوت' ? 'selected' : ''}>زيوت</option>
+                    <option value="بهارات" ${p.category === 'بهارات' ? 'selected' : ''}>بهارات</option>
+                    <option value="عناية" ${p.category === 'عناية' ? 'selected' : ''}>عناية</option>
+                    <option value="بكجات" ${p.category === 'بكجات' ? 'selected' : ''}>بكجات</option>
+                </select>
+            </td>
+            <td><input class="product-input" type="text" id="desc-${p.id}" value="${p.desc || ''}"></td>
+            <td><input class="product-input" type="number" id="price-${p.id}" value="${p.price}" style="width:80px;"></td>
+            <td><input class="product-input" type="number" id="stock-${p.id}" value="${p.stock}" style="width:80px;"></td>
+            <td>
+                <button class="edit-btn" onclick="updateProduct(${p.id})">حفظ</button>
+                <button class="delete-btn" onclick="deleteProduct(${p.id})">حذف</button>
+            </td>
+        </tr>
+    `).join('');
+}
 
-        // المهام الملغاة
-        const cancelledList = document.getElementById('cancelledTasksList');
-        const cancelledTasks = (currentEmployee.cancelledTasks || []).filter(t => t.status === 'cancelled');
-        
-        if (cancelledTasks.length === 0) {
-            cancelledList.innerHTML = '<li class="empty-msg">🗑️ لا توجد مهام ملغاة</li>';
-        } else {
-            cancelledList.innerHTML = cancelledTasks.map(task => `
-                <li>
-                    <div style="flex:1">
-                        <div class="task-text">${task.text || task.desc}</div>
-                        <div class="task-date"><i class="far fa-calendar-alt"></i> ألغيت: ${task.cancelledAt}</div>
-                    </div>
-                    <div class="actions">
-                        <button class="delete-btn" onclick="permanentlyDeleteTask(${task.id}, 'cancelled')"><i class="fas fa-trash"></i> حذف نهائي</button>
-                    </div>
-                </li>
-            `).join('');
+    function updateProduct(id) {
+        const product = allProducts.find(p => p.id === id);
+        if (product) {
+            product.price = parseFloat(document.getElementById(`price-${id}`).value);
+            product.desc = document.getElementById(`desc-${id}`).value;
+            product.stock = parseInt(document.getElementById(`stock-${id}`).value);
+            localStorage.setItem('elixir_all_products', JSON.stringify(allProducts));
+            showToast(`✅ تم تحديث ${product.name}`);
         }
     }
 
-    function completeTask(taskId) {
-        const task = (currentEmployee.tasks || []).find(t => t.id === taskId);
-        if (task && task.status !== 'completed') {
-            // نقل المهمة إلى completedTasks
-            if (!currentEmployee.completedTasks) currentEmployee.completedTasks = [];
-            currentEmployee.completedTasks.push({
-                id: task.id,
-                text: task.text || task.desc,
-                type: task.type,
-                productId: task.productId,
-                amount: task.amount,
-                status: 'completed',
-                completedAt: new Date().toLocaleString('ar-EG')
-            });
-            // حذفها من المهام الحالية
-            task.status = 'completed';
-            currentEmployee.tasks = (currentEmployee.tasks || []).filter(t => t.id !== taskId);
-            
-            saveAndRender();
-            showNotification('✅ تم إنجاز المهمة بنجاح!');
+    function deleteProduct(id) {
+        if (confirm('هل أنت متأكد من حذف هذا المنتج نهائياً؟')) {
+            allProducts = allProducts.filter(p => p.id !== id);
+            localStorage.setItem('elixir_all_products', JSON.stringify(allProducts));
+            renderProducts();
+            showToast('🗑️ تم حذف المنتج');
         }
     }
 
-    function cancelTask(taskId) {
-        const task = (currentEmployee.tasks || []).find(t => t.id === taskId);
-        if (task) {
-            if (!currentEmployee.cancelledTasks) currentEmployee.cancelledTasks = [];
-            currentEmployee.cancelledTasks.push({
-                id: task.id,
-                text: task.text || task.desc,
-                status: 'cancelled',
-                cancelledAt: new Date().toLocaleString('ar-EG')
-            });
-            currentEmployee.tasks = (currentEmployee.tasks || []).filter(t => t.id !== taskId);
-            
-            saveAndRender();
-            showNotification('🗑️ تم إلغاء المهمة');
-        }
+    function toggleAddForm() {
+        const form = document.getElementById('addProductForm');
+        form.classList.toggle('show');
     }
 
-    function permanentlyDeleteTask(taskId, from) {
-        if (from === 'completed') {
-            currentEmployee.completedTasks = (currentEmployee.completedTasks || []).filter(t => t.id !== taskId);
-        } else if (from === 'cancelled') {
-            currentEmployee.cancelledTasks = (currentEmployee.cancelledTasks || []).filter(t => t.id !== taskId);
-        }
-        saveAndRender();
-        showNotification('🗑️ تم حذف المهمة نهائياً');
+    function addNewProduct() {
+        const name = document.getElementById('newName').value.trim();
+        if (!name) return showToast('❌ الرجاء تعبئة اسم المنتج');
+        const newProduct = {
+            id: nextId++,
+            name: name,
+            category: document.getElementById('newCategory').value,
+            desc: document.getElementById('newDesc').value.trim(),
+            price: parseFloat(document.getElementById('newPrice').value) || 0,
+            stock: parseInt(document.getElementById('newStock').value) || 0,
+            img: document.getElementById('newImg').value.trim() || 'asset/images/placeholder.png'
+        };
+        allProducts.push(newProduct);
+        localStorage.setItem('elixir_all_products', JSON.stringify(allProducts));
+        renderProducts();
+        toggleAddForm();
+        showToast(`✅ تم إضافة المنتج: ${name}`);
+        // تفريغ الحقول
+        document.getElementById('newName').value = '';
+        document.getElementById('newDesc').value = '';
+        document.getElementById('newPrice').value = '';
+        document.getElementById('newStock').value = '';
+        document.getElementById('newImg').value = '';
     }
 
-    function saveAndRender() {
-        localStorage.setItem(`elixir_employee_${currentEmployeeEmail}`, JSON.stringify(currentEmployee));
-        renderTasks();
+    function showToast(msg) {
+        const old = document.querySelector('.custom-toast');
+        if (old) old.remove();
+        const toast = document.createElement('div');
+        toast.className = 'custom-toast';
+        toast.innerHTML = `<i class="fas fa-check-circle"></i> ${msg}`;
+        toast.style.cssText = 'position:fixed; bottom:20px; right:20px; background:#438e56; color:white; padding:10px 20px; border-radius:30px; z-index:9999;';
+        document.body.appendChild(toast);
+        setTimeout(() => toast.remove(), 3000);
     }
 
     function logout() {
-        if (currentEmployeeEmail) {
-            const empData = JSON.parse(localStorage.getItem(`elixir_employee_${currentEmployeeEmail}`));
-            if (empData) {
-                empData.loggedIn = false;
-                localStorage.setItem(`elixir_employee_${currentEmployeeEmail}`, JSON.stringify(empData));
-            }
-        }
-        localStorage.removeItem('elixir_employee_email');
+        localStorage.removeItem('elixir_employee');
         window.location.href = 'employee-login.html';
     }
 
-    // 4️⃣ مراقبة المهام الجديدة من الأدمن
-    function startTaskSync() {
-        setInterval(() => {
-            const freshData = JSON.parse(localStorage.getItem(`elixir_employee_${currentEmployeeEmail}`));
-            if (freshData) {
-                const oldTaskIds = (currentEmployee.tasks || []).map(t => t.id);
-                const newTasks = (freshData.tasks || []).filter(t => !oldTaskIds.includes(t.id));
-                
-                if (newTasks.length > 0) {
-                    currentEmployee = freshData;
-                    renderTasks();
-                    showNotification(`📋 لديك ${newTasks.length} مهمة جديدة!`);
-                } else {
-                    currentEmployee = freshData;
-                    renderTasks();
-                }
-            }
-        }, 3000);
+    // ========== نظام المهام (حسب الموظف الحالي) ==========
+function renderTasks() {
+    // جلب بيانات الموظف الحالي
+    const empData = JSON.parse(localStorage.getItem('elixir_employee'));
+    const currentEmployeeEmail = empData?.email || '';
+    
+    // جلب جميع المهام
+    let allTasks = JSON.parse(localStorage.getItem('elixir_all_tasks') || '[]');
+    
+    // فلترة المهام الخاصة بهذا الموظف فقط
+    let employeeTasks = allTasks.filter(t => t.assignedTo === currentEmployeeEmail);
+    
+    const pendingTasks = employeeTasks.filter(t => !t.completed);
+    const completedTasks = employeeTasks.filter(t => t.completed);
+    
+    const container = document.getElementById('tasksList');
+    
+    let html = `
+        <div style="display: flex; flex-wrap: wrap; gap: 25px;">
+            <!-- المهام الحالية -->
+            <div style="flex: 1; min-width: 300px; background: rgba(255,255,255,0.9); border-radius: 24px; padding: 20px;">
+                <h3 style="color: #e67e22; margin-bottom: 20px; border-right: 4px solid #e67e22; padding-right: 15px;">
+                    <i class="fas fa-tasks"></i> المهام الحالية
+                </h3>
+                <div style="display: flex; flex-direction: column; gap: 12px;">
+    `;
+    
+    if (pendingTasks.length === 0) {
+        html += '<div style="text-align: center; padding: 30px; color: #999;"><i class="fas fa-check-circle"></i> لا توجد مهام حالية</div>';
+    } else {
+        pendingTasks.forEach(task => {
+            html += `
+                <div style="background: white; border-radius: 16px; padding: 15px; box-shadow: 0 2px 8px rgba(0,0,0,0.05); display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px;">
+                    <div>
+                        <div style="font-weight: bold; color: #2c5f2d;">${task.text}</div>
+                        <div style="font-size: 0.7rem; color: #b9804b;"><i class="far fa-calendar-alt"></i> أضيفت: ${task.createdAt}</div>
+                    </div>
+                    <button class="complete-task" onclick="completeTask(${task.id})" style="background: #438e56; color: white; border: none; padding: 6px 15px; border-radius: 25px; cursor: pointer;">
+                        <i class="fas fa-check"></i> تم الإنجاز
+                    </button>
+                </div>
+            `;
+        });
     }
+    
+    html += `
+                </div>
+            </div>
+            
+            <!-- المهام المنجزة -->
+            <div style="flex: 1; min-width: 300px; background: rgba(255,255,255,0.9); border-radius: 24px; padding: 20px;">
+                <h3 style="color: #438e56; margin-bottom: 20px; border-right: 4px solid #438e56; padding-right: 15px;">
+                    <i class="fas fa-history"></i> المهام المنجزة
+                </h3>
+                <div style="display: flex; flex-direction: column; gap: 12px;">
+    `;
+    
+    if (completedTasks.length === 0) {
+        html += '<div style="text-align: center; padding: 30px; color: #999;"><i class="fas fa-check-double"></i> لا توجد مهام منجزة</div>';
+    } else {
+        completedTasks.forEach(task => {
+            html += `
+                <div style="background: #f0f7ea; border-radius: 16px; padding: 12px 15px;">
+                    <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 8px;">
+                        <div style="font-weight: bold; color: #2c5f2d; text-decoration: line-through;">${task.text}</div>
+                        <div style="font-size: 0.7rem; color: #438e56;"><i class="far fa-calendar-alt"></i> أنجزت: ${task.completedAt}</div>
+                    </div>
+                </div>
+            `;
+        });
+    }
+    
+    html += `
+                </div>
+            </div>
+        </div>
+    `;
+    
+    container.innerHTML = html;
+}
 
-    function showNotification(message) {
-        let toast = document.getElementById('customToast');
-        if (!toast) {
-            toast = document.createElement('div');
-            toast.id = 'customToast';
-            toast.style.cssText = 'position:fixed; bottom:20px; left:20px; background:#438e56; color:white; padding:12px 20px; border-radius:30px; z-index:9999; display:none; align-items:center; gap:8px; font-weight:bold; box-shadow:0 5px 15px rgba(0,0,0,0.2);';
-            toast.innerHTML = '<i class="fas fa-bell"></i> <span id="toastText"></span>';
-            document.body.appendChild(toast);
+// ========== إنجاز مهمة ==========
+function completeTask(id) {
+    let allTasks = JSON.parse(localStorage.getItem('elixir_all_tasks') || '[]');
+    const taskIndex = allTasks.findIndex(t => t.id === id);
+    if (taskIndex !== -1 && !allTasks[taskIndex].completed) {
+        allTasks[taskIndex].completed = true;
+        allTasks[taskIndex].completedAt = new Date().toLocaleString('ar-EG');
+        localStorage.setItem('elixir_all_tasks', JSON.stringify(allTasks));
+        renderTasks();
+        showToast(`✅ تم إنجاز مهمة: ${allTasks[taskIndex].text}`);
+    }
+}
+function renderOrders() {
+    const orders = JSON.parse(localStorage.getItem('elixir_orders') || '[]');
+    const container = document.getElementById('ordersList');
+    
+    if (orders.length === 0) {
+        container.innerHTML = `
+            <div style="text-align: center; padding: 50px; background: rgba(255,255,255,0.9); border-radius: 24px;">
+                <i class="fas fa-box-open" style="font-size: 3rem; color: #b9804b; margin-bottom: 15px; display: block;"></i>
+                <h3 style="color: #2c5f2d;">📭 لا توجد طلبات حالياً</h3>
+                <p style="color: #999;">سيظهر هنا طلبات العملاء الجديدة</p>
+            </div>
+        `;
+        return;
+    }
+    
+    container.innerHTML = orders.map(order => {
+        // حساب إجمالي الطلب (للتأكيد)
+        let orderTotal = 0;
+        if (order.items && order.items.length) {
+            orderTotal = order.items.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+        } else {
+            orderTotal = order.total; // إذا كان مخزناً مسبقاً
         }
-        const toastText = document.getElementById('toastText');
-        toastText.innerText = message;
-        toast.style.display = 'flex';
-        setTimeout(() => {
-            toast.style.display = 'none';
-        }, 3000);
+        
+        return `
+        <div style="background: rgba(255,255,255,0.95); border-radius: 20px; padding: 20px; margin-bottom: 20px; box-shadow: 0 2px 10px rgba(0,0,0,0.05);">
+            <!-- معلومات العميل -->
+            <div style="display: flex; justify-content: space-between; flex-wrap: wrap; gap: 15px; margin-bottom: 15px; padding-bottom: 15px; border-bottom: 1px solid #e0d5c0;">
+                <div>
+                    <strong style="color: #2c5f2d;">📋 طلب رقم: ${order.id || Math.floor(Math.random() * 10000)}</strong><br>
+                    👤 <strong>الاسم:</strong> ${order.customer}<br>
+                    📞 <strong>الهاتف:</strong> ${order.phone}<br>
+                    📍 <strong>العنوان:</strong> ${order.address}<br>
+                    📅 <strong>التاريخ:</strong> ${order.date}
+                </div>
+                <div style="text-align: left;">
+                    <div style="background: ${order.status === 'جديد' ? '#e67e22' : (order.status === 'تم التوصيل' ? '#438e56' : '#b9804b')}; color: white; padding: 5px 15px; border-radius: 25px; display: inline-block; font-weight: bold;">
+                        ${order.status || 'جديد'}
+                    </div>
+                    <button onclick="updateOrderStatus(${order.id})" style="background: #438e56; color: white; border: none; padding: 6px 15px; border-radius: 25px; margin-top: 8px; cursor: pointer; width: 100%;">
+                        🔄 تغيير الحالة
+                    </button>
+                </div>
+            </div>
+            
+            <!-- المنتجات المطلوبة -->
+            <div>
+                <strong style="color: #2c5f2d; display: block; margin-bottom: 10px;"><i class="fas fa-boxes"></i> المنتجات المطلوبة:</strong>
+                <div style="background: #f9f9f9; border-radius: 16px; padding: 10px;">
+                    <div style="display: grid; grid-template-columns: 3fr 1fr 1fr 1fr; gap: 10px; padding: 8px; font-weight: bold; border-bottom: 2px solid #e0d5c0;">
+                        <span>المنتج</span>
+                        <span>الكمية</span>
+                        <span>السعر</span>
+                        <span>الإجمالي</span>
+                    </div>
+                    ${order.items ? order.items.map(item => `
+                        <div style="display: grid; grid-template-columns: 3fr 1fr 1fr 1fr; gap: 10px; padding: 8px; border-bottom: 1px solid #e0d5c0;">
+                            <span>${item.name}</span>
+                            <span>${item.quantity}</span>
+                            <span>${item.price} ₪</span>
+                            <span style="color: #438e56; font-weight: bold;">${(item.price * item.quantity).toFixed(2)} ₪</span>
+                        </div>
+                    `).join('') : '<div style="padding: 8px; text-align: center;">لا توجد منتجات</div>'}
+                    <div style="display: flex; justify-content: space-between; padding: 12px 8px; font-weight: bold; border-top: 2px solid #e0d5c0; margin-top: 5px;">
+                        <span>💰 إجمالي الطلب</span>
+                        <span style="color: #e67e22; font-size: 1.1rem;">${orderTotal.toFixed(2)} ₪</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+        `;
+    }).join('');
+}
+    
+ 
+
+function updateOrderStatus(orderId) {
+    let orders = JSON.parse(localStorage.getItem('elixir_orders') || '[]');
+    const order = orders.find(o => o.id === orderId);
+    if (order) {
+        const statuses = ['جديد', 'قيد التجهيز', 'تم التوصيل', 'ملغي'];
+        let currentIndex = statuses.indexOf(order.status);
+        let nextIndex = (currentIndex + 1) % statuses.length;
+        order.status = statuses[nextIndex];
+        localStorage.setItem('elixir_orders', JSON.stringify(orders));
+        renderOrders();
+        showToast(`✅ تم تحديث حالة الطلب إلى: ${order.status}`);
     }
+}
 
-    loadEmployeeData();
+    document.querySelectorAll('.tab-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+            document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+            document.querySelectorAll('.tab-content').forEach(tab => tab.classList.remove('active'));
+            document.getElementById(`${btn.dataset.tab}Tab`).classList.add('active');
+            if (btn.dataset.tab === 'products') renderProducts();
+        });
+    });
+
+    const empData = JSON.parse(localStorage.getItem('elixir_employee'));
+    if (!empData || !empData.loggedIn) window.location.href = 'employee-login.html';
+    else document.getElementById('empName').innerText = empData.name || 'موظف';
+
+    document.getElementById('searchProductInput')?.addEventListener('input', () => renderProducts());
+    renderProducts();
+    console.log(allProducts.length);
+    renderTasks();
+    renderOrders();
 </script>
-
 </body>
 </html>
