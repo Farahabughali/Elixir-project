@@ -9,9 +9,23 @@
     <link rel="stylesheet" href="floating-cart.css">
     <link rel="stylesheet" href="floating-share.css">
     <link rel="stylesheet" href="best-sellers.css">
+    <style>
+        /* إضافة ستايل بسيط للترقيم */
+        .rank-number {
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            background: #e74c3c;
+            color: white;
+            font-weight: bold;
+            padding: 5px 12px;
+            border-radius: 30px;
+            font-size: 12px;
+            z-index: 10;
+        }
+    </style>
 </head>
 <body>
-
 
 <div class="container">
     <div class="main-header">
@@ -31,7 +45,7 @@
     </div>
 
     <div class="best-header">
-        <h1> الأكثر مبيعًا</h1>
+        <h1>🏆 الأكثر مبيعًا</h1>
     </div>
 
     <div class="products-grid" id="bestSellersGrid"></div>
@@ -49,8 +63,8 @@
 <script src="floating-share.js"></script>
 
 <script>
-    // ========== منتجات الأكثر مبيعاً ==========
-    const bestSellers = [
+    // ========== المنتجات الافتراضية (احتياط إذا ما في طلبات) ==========
+    const defaultBestSellers = [
         { 
             id: 38, 
             name: "زيت اللافندر العطري", 
@@ -59,7 +73,7 @@
         },
         { 
             id: 6, 
-            name: " إكليل الجبل", 
+            name: "إكليل الجبل", 
             price: 55, 
             img: "asset/images/rosemary.png"
         },
@@ -70,6 +84,81 @@
             img: "asset/images/rose.jpg"
         }
     ];
+
+    // ========== حساب المنتجات الأكثر مبيعاً من الطلبات (عدد المرات) ==========
+    function getBestSellingProductsFromOrders(limit = 12) {
+        // جلب الطلبات من localStorage
+        let allOrders = JSON.parse(localStorage.getItem('elixir_orders')) || [];
+        let allProducts = JSON.parse(localStorage.getItem('elixir_products')) || [];
+        let allPackages = JSON.parse(localStorage.getItem('elixir_packages')) || [];
+        
+        // دمج المنتجات والبكجات
+        let allItems = [...allProducts, ...allPackages.map(pkg => ({ ...pkg, isPackage: true, section: "packages" }))];
+        
+        // إذا ما في طلبات، نرجع المنتجات الافتراضية
+        if (allOrders.length === 0) {
+            console.log("📭 لا توجد طلبات، عرض المنتجات الافتراضية");
+            return defaultBestSellers.map((item, index) => ({ ...item, rank: index + 1, totalSold: 0 }));
+        }
+        
+        // حساب عدد المرات اللي انطلب فيها كل منتج
+        let requestCountMap = new Map();
+        
+        allOrders.forEach(order => {
+            if (order.items && order.items.length > 0) {
+                const productsInThisOrder = new Set();
+                order.items.forEach(item => {
+                    productsInThisOrder.add(item.name);
+                });
+                productsInThisOrder.forEach(productName => {
+                    requestCountMap.set(productName, (requestCountMap.get(productName) || 0) + 1);
+                });
+            }
+        });
+        
+        // إذا ما في منتجات انطلبت (الطلبات فاضية)
+        if (requestCountMap.size === 0) {
+            return defaultBestSellers.map((item, index) => ({ ...item, rank: index + 1, totalSold: 0 }));
+        }
+        
+        // ترتيب حسب عدد المرات
+        let sortedProducts = Array.from(requestCountMap.entries())
+            .map(([name, count]) => ({ name, total: count }))
+            .sort((a, b) => b.total - a.total)
+            .slice(0, limit);
+        
+        // إضافة التفاصيل الكاملة لكل منتج
+        let bestSellingWithDetails = [];
+        for (let i = 0; i < sortedProducts.length; i++) {
+            let item = sortedProducts[i];
+            let product = allItems.find(p => p.name === item.name);
+            
+            if (product) {
+                bestSellingWithDetails.push({
+                    id: product.id,
+                    name: product.name,
+                    price: product.price,
+                    img: product.image || product.img || "asset/images/placeholder.png",
+                    category: product.category,
+                    desc: product.description || product.desc || product.usage,
+                    totalSold: item.total,
+                    rank: i + 1
+                });
+            } else {
+                // إذا المنتج غير موجود في allItems (مشكلة)
+                bestSellingWithDetails.push({
+                    id: null,
+                    name: item.name,
+                    price: 0,
+                    img: "asset/images/placeholder.png",
+                    totalSold: item.total,
+                    rank: i + 1
+                });
+            }
+        }
+        
+        return bestSellingWithDetails;
+    }
 
     // ========== حركة القلوب المتطايرة ==========
     function burstHearts(x, y) {
@@ -113,21 +202,28 @@
         updateFavCount();
     }
 
-    // ========== عرض المنتجات ==========
+    // ========== عرض المنتجات (ديناميكي مع الاحتياط) ==========
     function renderBestSellers() {
         const grid = document.getElementById('bestSellersGrid');
         let favorites = JSON.parse(localStorage.getItem('elixir_favorites') || '[]');
-
-        if (bestSellers.length === 0) {
-            grid.innerHTML = `<div class="no-products" style="text-align:center; padding:60px; background:rgba(255,255,255,0.85); border-radius:30px;"><i class="fas fa-crown"></i><br>لا توجد منتجات متاحة حالياً</div>`;
+        
+        // جلب المنتجات الأكثر مبيعاً (تلقائياً من الطلبات أو المنتجات الافتراضية)
+        const bestSellingProducts = getBestSellingProductsFromOrders(12);
+        
+        if (bestSellingProducts.length === 0) {
+            grid.innerHTML = `<div class="no-products" style="text-align:center; padding:60px; background:rgba(255,255,255,0.85); border-radius:30px;">
+                <i class="fas fa-crown" style="font-size: 3rem; color: #438e56;"></i>
+                <p style="margin-top: 15px;">🏆 لا توجد منتجات متاحة حالياً</p>
+            </div>`;
             return;
         }
 
-        grid.innerHTML = bestSellers.map(product => {
+        grid.innerHTML = bestSellingProducts.map(product => {
             let isFav = favorites.includes(product.id);
             return `
                 <div class="product-card fade-up">
-                    <div class="best-badge"> الأكثر مبيعًا</div>
+                    <div class="rank-number">🏆 #${product.rank}</div>
+                    <div class="best-badge">الأكثر مبيعاً</div>
                     <div class="fav-icon ${isFav ? 'active' : ''}" data-id="${product.id}">
                         <i class="fa-${isFav ? 'solid' : 'regular'} fa-heart"></i>
                     </div>
@@ -146,14 +242,16 @@
             `;
         }).join('');
 
+        // ربط أحداث المفضلة
         document.querySelectorAll('.fav-icon').forEach(icon => {
             icon.addEventListener('click', (e) => {
                 e.stopPropagation();
                 const id = parseInt(icon.getAttribute('data-id'));
-                toggleFavorite(icon, id);
+                if (!isNaN(id)) toggleFavorite(icon, id);
             });
         });
 
+        // ربط أحداث عرض التفاصيل
         document.querySelectorAll('.view-details').forEach(btn => {
             btn.addEventListener('click', (e) => {
                 e.preventDefault();
@@ -162,6 +260,7 @@
             });
         });
 
+        // ربط أحداث إضافة إلى السلة
         document.querySelectorAll('.add-to-cart').forEach(btn => {
             btn.addEventListener('click', (e) => {
                 e.preventDefault();
@@ -173,6 +272,7 @@
             });
         });
 
+        // تأثير ظهور البطاقات
         const observer = new IntersectionObserver((entries) => {
             entries.forEach(entry => {
                 if (entry.isIntersecting) entry.target.classList.add('visible');
@@ -192,7 +292,7 @@
         }
         localStorage.setItem('elixir_cart', JSON.stringify(cart));
         
-        showToast(`✅ تمت إضافة ${name} إلى السلة يتمنى ${name} أن ينال إعجابكم`);
+        showToast(`✅ تمت إضافة ${name} إلى السلة`);
         
         const headerBadge = document.querySelector('.cart-count');
         if (headerBadge) {
@@ -212,7 +312,7 @@
         }, 3000);
     }
 
-    // ========== تعديل نص المشاركة لصفحة الأكثر مبيعاً ==========
+    // ========== تعديل نص المشاركة ==========
     (function() {
         const originalShareHandler = async () => {
             const shareData = {
@@ -247,14 +347,23 @@
         }, 500);
     })();
 
-    // إظهار زر المشاركة فوراً
+    // إظهار زر المشاركة
     setTimeout(() => {
         const shareBtn = document.querySelector('.share-fixed-btn');
         if (shareBtn) shareBtn.style.display = 'flex';
     }, 300);
 
+    // تشغيل العرض
     renderBestSellers();
     updateFavCount();
+    
+    // الاستماع للتغييرات في localStorage (لو أضيف طلب جديد)
+    window.addEventListener('storage', function(e) {
+        if (e.key === 'elixir_orders' || e.key === 'elixir_products' || e.key === 'elixir_packages') {
+            console.log("🔄 تم تحديث البيانات، إعادة تحميل الأكثر مبيعاً");
+            renderBestSellers();
+        }
+    });
 </script>
 
 </body>
