@@ -31,17 +31,6 @@
 
     <div class="offers-header">
         <h1> عروض وخصومات Elixir </h1>
-        <div class="countdown-banner">
-            <div class="countdown-label">
-                <i class="fa-regular fa-hourglass-half"></i> ينتهي العرض خلال:
-            </div>
-            <div class="countdown-timer" id="offerTimer">
-                <div class="timer-block"><span id="days">00</span><span>يوم</span></div>
-                <div class="timer-block"><span id="hours">00</span><span>ساعة</span></div>
-                <div class="timer-block"><span id="minutes">00</span><span>دقيقة</span></div>
-                <div class="timer-block"><span id="seconds">00</span><span>ثانية</span></div>
-            </div>
-        </div>
     </div>
 
     <div class="products-grid" id="offersGrid"></div>
@@ -59,61 +48,240 @@
 <script src="floating-share.js"></script>
 
 <script>
-    // ========== منتجات العروض ==========
-    const offersProducts = [
+    // ========== العروض الثابتة (الافتراضية) ==========
+    const DEFAULT_OFFERS = [
         { 
             id: 1, 
-            name: "عسل طبيعي متعدد الأعشاب", 
-            oldPrice: 150, 
-            newPrice: 135, 
+            productId: 1,
+            productName: "عسل طبيعي متعدد الأعشاب", 
+            productPrice: 150,
             discount: 10,
-            img: "asset/images/herbalhoney.png"
+            newPrice: 135,
+            productImg: "asset/images/herbalhoney.png",
+            endDate: null,  // عرض دائم
+            isFixed: true
         },
         { 
             id: 113, 
-            name: "الليفة المغربية", 
-            oldPrice: 70, 
-            newPrice: 49, 
+            productId: 113,
+            productName: "الليفة المغربية", 
+            productPrice: 70,
             discount: 30,
-            img: "asset/images/moroccan-loofah.png"
+            newPrice: 49,
+            productImg: "asset/images/moroccan-loofah.png",
+            endDate: null,
+            isFixed: true
         },
         { 
             id: 42, 
-            name: "زيت الياسمين", 
-            oldPrice: 45, 
-            newPrice: 36, 
+            productId: 42,
+            productName: "زيت الياسمين", 
+            productPrice: 45,
             discount: 20,
-            img: "asset/images/jasmine-oil.png"
+            newPrice: 36,
+            productImg: "asset/images/jasmine-oil.png",
+            endDate: null,
+            isFixed: true
         }
     ];
 
-    // ========== المؤقت العد التنازلي ==========
-    let endDate = new Date(2026, 6, 6, 23, 59, 59);
-
-    function updateCountdown() {
-        const now = new Date().getTime();
-        const distance = endDate - now;
-
-        if (distance < 0) {
-            document.getElementById("offerTimer").innerHTML = '<div class="timer-block"><span>انتهى</span><span>العرض</span></div>';
-            return;
+    // ========== تهيئة العروض الافتراضية ==========
+    function initializeDefaultOffers() {
+        let existingOffers = localStorage.getItem('elixir_offers');
+        
+        if (!existingOffers || existingOffers === '[]') {
+            localStorage.setItem('elixir_offers', JSON.stringify(DEFAULT_OFFERS));
+            console.log("✅ تم تهيئة العروض الافتراضية");
         }
+    }
 
+    // ========== تحميل العروض من localStorage ==========
+    function loadOffers() {
+        initializeDefaultOffers();
+        
+        let offers = JSON.parse(localStorage.getItem('elixir_offers') || '[]');
+        
+        // فلترة العروض الصالحة (لم تنته صلاحيتها)
+        const today = new Date();
+        today.setHours(0, 0, 0, 0);
+        
+        let validOffers = offers.filter(offer => {
+            if (!offer.endDate || offer.endDate === "") return true;
+            const endDate = new Date(offer.endDate);
+            endDate.setHours(0, 0, 0, 0);
+            return endDate >= today;
+        });
+        
+        if (validOffers.length !== offers.length) {
+            localStorage.setItem('elixir_offers', JSON.stringify(validOffers));
+        }
+        
+        return validOffers;
+    }
+
+
+
+    // ========== تنظيف العروض من المنتجات المحذوفة ==========
+function cleanDeletedProductsOffers() {
+    // نجلب العروض من localStorage
+    let offers = JSON.parse(localStorage.getItem('elixir_offers') || '[]');
+    
+    // نجلب المنتجات النشطة من localStorage (أو نفحص)
+    // بما أن offers.html لا تعرف المنتجات، نعتمد على علامة isFixed
+    
+    let validOffers = offers.filter(offer => {
+        // العروض الثابتة نتركها
+        if (offer.isFixed) return true;
+        
+        // العروض العادية: نتحقق من وجودها في قاعدة البيانات عن طريق API
+        // ولكن هذا سيكون async، لذلك نستخدم localStorage آخر لتخزين IDs المنتجات النشطة
+        
+        return true;
+    });
+    
+    if (validOffers.length !== offers.length) {
+        localStorage.setItem('elixir_offers', JSON.stringify(validOffers));
+        console.log(` تم تنظيف ${offers.length - validOffers.length} عرض لمنتجات محذوفة`);
+        renderOffers(); // إعادة تحميل العروض
+    }
+}
+
+// تشغيل التنظيف عند تحميل الصفحة
+setTimeout(cleanDeletedProductsOffers, 1000);
+
+
+    // ========== حساب الوقت المتبقي ==========
+    function getTimeRemaining(endDate) {
+        if (!endDate || endDate === "") return null;
+        
+        const now = new Date().getTime();
+        const end = new Date(endDate).getTime();
+        const distance = end - now;
+        
+        if (distance <= 0) return null;
+        
         const days = Math.floor(distance / (1000 * 60 * 60 * 24));
         const hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
         const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
         const seconds = Math.floor((distance % (1000 * 60)) / 1000);
-
-        document.getElementById("days").innerHTML = days < 10 ? "0" + days : days;
-        document.getElementById("hours").innerHTML = hours < 10 ? "0" + hours : hours;
-        document.getElementById("minutes").innerHTML = minutes < 10 ? "0" + minutes : minutes;
-        document.getElementById("seconds").innerHTML = seconds < 10 ? "0" + seconds : seconds;
+        
+        return { days, hours, minutes, seconds };
     }
 
-    setInterval(updateCountdown, 1000);
-    updateCountdown();
+    // ========== عرض المنتجات ==========
+    function renderOffers() {
+        const grid = document.getElementById('offersGrid');
+        let offers = loadOffers();
+        let favorites = JSON.parse(localStorage.getItem('elixir_favorites') || '[]');
 
-    // ========== حركة القلوب المتطايرة ==========
+        if (offers.length === 0) {
+            grid.innerHTML = `<div class="no-products" style="text-align:center; padding:60px; background:rgba(255,255,255,0.85); border-radius:30px;">
+                <i class="fas fa-tags" style="font-size:50px; color:#438e56;"></i><br>
+                <strong style="font-size:20px;">لا توجد عروض حالياً</strong><br>
+                <span style="color:#666;">ترقبوا عروضنا القادمة!</span>
+            </div>`;
+            return;
+        }
+
+        grid.innerHTML = offers.map(offer => {
+            let isFav = favorites.includes(offer.productId);
+            const productImg = offer.productImg && offer.productImg !== "" ? offer.productImg : "asset/images/placeholder.png";
+            
+            
+            return `
+                <div class="product-card fade-up" data-id="${offer.productId}" data-end="${offer.endDate || ''}">
+                    <div class="discount-badge">-${offer.discount}%</div>
+                    <div class="fav-icon ${isFav ? 'active' : ''}" data-id="${offer.productId}">
+                        <i class="fa-${isFav ? 'solid' : 'regular'} fa-heart"></i>
+                    </div>
+                    <img class="product-img" src="${productImg}" alt="${offer.productName}" onerror="this.src='asset/images/placeholder.png'">
+                    <div class="product-info">
+                        <div class="product-title">${offer.productName}</div>
+                        <div class="price-row">
+                            <span class="old-price">${parseFloat(offer.productPrice).toFixed(2)} ₪</span>
+                            <span class="new-price">${parseFloat(offer.newPrice).toFixed(2)} ₪</span>
+                        </div>
+                        
+                        <div class="btn-group">
+                            <button class="details-btn view-details" data-id="${offer.productId}"> عرض التفاصيل</button>
+                            <button class="add-cart-btn add-to-cart" data-id="${offer.productId}" data-name="${offer.productName}" data-price="${offer.newPrice}" data-img="${productImg}"> إضافة إلى السلة</button>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }).join('');
+
+        attachEventListeners();
+        animateCards();
+       
+    }
+
+    function attachEventListeners() {
+        document.querySelectorAll('.fav-icon').forEach(icon => {
+            icon.removeEventListener('click', handleFavClick);
+            icon.addEventListener('click', handleFavClick);
+        });
+
+        document.querySelectorAll('.view-details').forEach(btn => {
+            btn.removeEventListener('click', handleViewDetails);
+            btn.addEventListener('click', handleViewDetails);
+        });
+
+        document.querySelectorAll('.add-to-cart').forEach(btn => {
+            btn.removeEventListener('click', handleAddToCart);
+            btn.addEventListener('click', handleAddToCart);
+        });
+    }
+
+    function handleFavClick(e) {
+        e.stopPropagation();
+        const icon = e.currentTarget;
+        const id = parseInt(icon.getAttribute('data-id'));
+        const rect = icon.getBoundingClientRect();
+        burstHearts(rect.left + rect.width / 2, rect.top + rect.height / 2);
+        
+        let favorites = JSON.parse(localStorage.getItem('elixir_favorites') || '[]');
+        const index = favorites.indexOf(id);
+        if (index === -1) {
+            favorites.push(id);
+            icon.classList.add('active');
+            icon.innerHTML = '<i class="fa-solid fa-heart"></i>';
+        } else {
+            favorites.splice(index, 1);
+            icon.classList.remove('active');
+            icon.innerHTML = '<i class="fa-regular fa-heart"></i>';
+        }
+        localStorage.setItem('elixir_favorites', JSON.stringify(favorites));
+        updateFavCount();
+    }
+
+    function handleViewDetails(e) {
+        e.preventDefault();
+        const id = e.currentTarget.dataset.id;
+        window.location.href = `product-details.html?id=${id}`;
+    }
+
+    function handleAddToCart(e) {
+        e.preventDefault();
+        const btn = e.currentTarget;
+        const id = parseInt(btn.dataset.id);
+        const name = btn.dataset.name;
+        const price = parseFloat(btn.dataset.price);
+        const img = btn.dataset.img;
+        addToCart(id, name, price, img);
+    }
+
+    function animateCards() {
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) entry.target.classList.add('visible');
+            });
+        }, { threshold: 0.1 });
+        document.querySelectorAll('.fade-up').forEach(el => observer.observe(el));
+    }
+
+   
+
     function burstHearts(x, y) {
         for (let i = 0; i < 12; i++) {
             const heart = document.createElement('div');
@@ -129,102 +297,12 @@
         }
     }
 
-    // ========== دوال المفضلة ==========
     function updateFavCount() {
         let favorites = JSON.parse(localStorage.getItem('elixir_favorites') || '[]');
         const countSpan = document.querySelector('.favorite-count');
         if (countSpan) countSpan.innerText = favorites.length;
     }
 
-    function toggleFavorite(icon, productId) {
-        const rect = icon.getBoundingClientRect();
-        burstHearts(rect.left + rect.width / 2, rect.top + rect.height / 2);
-        
-        let favorites = JSON.parse(localStorage.getItem('elixir_favorites') || '[]');
-        const index = favorites.indexOf(productId);
-        if (index === -1) {
-            favorites.push(productId);
-            icon.classList.add('active');
-            icon.innerHTML = '<i class="fa-solid fa-heart"></i>';
-        } else {
-            favorites.splice(index, 1);
-            icon.classList.remove('active');
-            icon.innerHTML = '<i class="fa-regular fa-heart"></i>';
-        }
-        localStorage.setItem('elixir_favorites', JSON.stringify(favorites));
-        updateFavCount();
-    }
-
-    // ========== عرض المنتجات ==========
-    function renderOffers() {
-        const grid = document.getElementById('offersGrid');
-        let favorites = JSON.parse(localStorage.getItem('elixir_favorites') || '[]');
-
-        if (offersProducts.length === 0) {
-            grid.innerHTML = `<div class="no-products" style="text-align:center; padding:60px; background:rgba(255,255,255,0.85); border-radius:30px;"><i class="fas fa-tags"></i><br>لا توجد عروض حالياً<br>ترقبوا عروضنا القادمة!</div>`;
-            return;
-        }
-
-        grid.innerHTML = offersProducts.map(product => {
-            let isFav = favorites.includes(product.id);
-            return `
-                <div class="product-card fade-up">
-                    <div class="discount-badge">-${product.discount}%</div>
-                    <div class="fav-icon ${isFav ? 'active' : ''}" data-id="${product.id}">
-                        <i class="fa-${isFav ? 'solid' : 'regular'} fa-heart"></i>
-                    </div>
-                    <img class="product-img" src="${product.img}" alt="${product.name}" onerror="this.src='asset/images/placeholder.png'">
-                    <div class="product-info">
-                        <div class="product-title">${product.name}</div>
-                        <div class="price-row">
-                            <span class="old-price">${product.oldPrice} ₪</span>
-                            <span class="new-price">${product.newPrice} ₪</span>
-                        </div>
-                        <div class="btn-group">
-                            <button class="details-btn view-details" data-id="${product.id}"> عرض التفاصيل</button>
-                            <button class="add-cart-btn add-to-cart" data-id="${product.id}" data-name="${product.name}" data-price="${product.newPrice}" data-img="${product.img}"> إضافة إلى السلة</button>
-                        </div>
-                    </div>
-                </div>
-            `;
-        }).join('');
-
-        document.querySelectorAll('.fav-icon').forEach(icon => {
-            icon.addEventListener('click', (e) => {
-                e.stopPropagation();
-                const id = parseInt(icon.getAttribute('data-id'));
-                toggleFavorite(icon, id);
-            });
-        });
-
-        document.querySelectorAll('.view-details').forEach(btn => {
-            btn.addEventListener('click', (e) => {
-                e.preventDefault();
-                const id = btn.dataset.id;
-                window.location.href = `product-details.html?id=${id}`;
-            });
-        });
-
-        document.querySelectorAll('.add-to-cart').forEach(btn => {
-            btn.addEventListener('click', (e) => {
-                e.preventDefault();
-                const id = parseInt(btn.dataset.id);
-                const name = btn.dataset.name;
-                const price = parseFloat(btn.dataset.price);
-                const img = btn.dataset.img;
-                addToCart(id, name, price, img);
-            });
-        });
-
-        const observer = new IntersectionObserver((entries) => {
-            entries.forEach(entry => {
-                if (entry.isIntersecting) entry.target.classList.add('visible');
-            });
-        }, { threshold: 0.1 });
-        document.querySelectorAll('.fade-up').forEach(el => observer.observe(el));
-    }
-
-    // ========== إضافة إلى السلة ==========
     function addToCart(id, name, price, img) {
         let cart = JSON.parse(localStorage.getItem('elixir_cart') || '[]');
         const existing = cart.find(item => item.id === id);
@@ -235,13 +313,8 @@
         }
         localStorage.setItem('elixir_cart', JSON.stringify(cart));
         
-        showToast(`✅ تمت إضافة ${name} إلى السلة يتمنى ${name} أن ينال إعجابكم`);
+        showToast(`✅ تمت إضافة ${name} إلى السلة`);
         
-        const headerBadge = document.querySelector('.cart-count');
-        if (headerBadge) {
-            const total = cart.reduce((sum, i) => sum + i.quantity, 0);
-            headerBadge.innerText = total;
-        }
         if (window.updateFloatingCart) window.updateFloatingCart();
     }
 
@@ -255,11 +328,8 @@
         }, 3000);
     }
 
-    // تعديل نص المشاركة لصفحة العروض
- 
-    // ========== تعديل نص المشاركة لصفحة العروض ==========
+    // ========== تعديل نص المشاركة ==========
     (function() {
-        // تغيير نص المشاركة عند الضغط على الزر
         const originalShareHandler = async () => {
             const shareData = {
                 title: 'Elixir | عروض وخصومات',
@@ -280,11 +350,9 @@
             }
         };
 
-        // البحث عن زر المشاركة واستبدال حدثه
         setTimeout(() => {
             const shareBtn = document.querySelector('.share-fixed-btn');
             if (shareBtn) {
-                // إزالة الحدث القديم وإضافة الحدث الجديد
                 const newBtn = shareBtn.cloneNode(true);
                 shareBtn.parentNode.replaceChild(newBtn, shareBtn);
                 newBtn.addEventListener('click', (e) => {
@@ -295,20 +363,12 @@
         }, 500);
     })();
 
-    // إظهار زر المشاركة فوراً
     setTimeout(() => {
         const shareBtn = document.querySelector('.share-fixed-btn');
         if (shareBtn) shareBtn.style.display = 'flex';
     }, 300);
 
-
-
-    // إظهار زر المشاركة فوراً في صفحة العروض
-    setTimeout(() => {
-        const shareBtn = document.querySelector('.share-fixed-btn');
-        if (shareBtn) shareBtn.style.display = 'flex';
-    }, 300);
-
+    // تشغيل العرض
     renderOffers();
     updateFavCount();
 </script>
