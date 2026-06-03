@@ -37,9 +37,19 @@
             <input type="text" id="newName" placeholder="اسم المنتج">
             <select id="newCategory"><option value="أعشاب">أعشاب</option><option value="زيوت">زيوت</option><option value="بهارات">بهارات</option><option value="عناية">عناية</option><option value="بكجات">بكجات</option></select>
             <textarea id="newDesc" placeholder="وصف المنتج" rows="2"></textarea>
+            <!-- حقول إضافية لجميع المنتجات -->
+<div style="grid-column: span 2; border-top: 1px solid #ddd; margin: 10px 0; padding-top: 10px;">
+    <strong> معلومات إضافية للمنتج</strong>
+</div>
+<textarea id="newBenefits" placeholder="الفوائد (كل فائدة في سطر جديد)" rows="3" style="grid-column: span 2;"></textarea>
+<textarea id="newHowToUse" placeholder="طريقة الاستخدام" rows="2" style="grid-column: span 2;"></textarea>
+<textarea id="newWarnings" placeholder="التحذيرات" rows="2" style="grid-column: span 2;"></textarea>
+<input type="text" id="newSource" placeholder="المصدر (مثل: ويب طب)" style="grid-column: span 2;">
+<input type="text" id="newSourceLink" placeholder="رابط المصدر (اختياري)" style="grid-column: span 2;">
             <input type="number" id="newPrice" placeholder="السعر">
             <input type="number" id="newStock" placeholder="الكمية">
             <input type="text" id="newImg" placeholder="مسار الصورة">
+
             <button class="form-submit" onclick="addNewProduct()"><i class="fas fa-save"></i> حفظ المنتج</button>
         </div>
         
@@ -210,7 +220,7 @@
     
     tbody.innerHTML = filtered.map(p => `
         <tr>
-            <td><img class="product-img" src="${p.img}" onerror="this.src='asset/images/basil.jpg'"></td>
+            <td><img class="product-img" src="${p.img}" onerror="this.src='asset/images/basil.png'"></td>
             <td>${p.name}</td>
             <td>
                 <select class="product-input" id="category-${p.id}" style="width:100%;">
@@ -257,30 +267,35 @@
         form.classList.toggle('show');
     }
 
-    function addNewProduct() {
-        const name = document.getElementById('newName').value.trim();
-        if (!name) return showToast('❌ الرجاء تعبئة اسم المنتج');
-        const newProduct = {
-            id: nextId++,
-            name: name,
-            category: document.getElementById('newCategory').value,
-            desc: document.getElementById('newDesc').value.trim(),
-            price: parseFloat(document.getElementById('newPrice').value) || 0,
-            stock: parseInt(document.getElementById('newStock').value) || 0,
-            img: document.getElementById('newImg').value.trim() || 'asset/images/placeholder.png'
-        };
-        allProducts.push(newProduct);
-        localStorage.setItem('elixir_all_products', JSON.stringify(allProducts));
-        renderProducts();
-        toggleAddForm();
-        showToast(`✅ تم إضافة المنتج: ${name}`);
-        // تفريغ الحقول
-        document.getElementById('newName').value = '';
-        document.getElementById('newDesc').value = '';
-        document.getElementById('newPrice').value = '';
-        document.getElementById('newStock').value = '';
-        document.getElementById('newImg').value = '';
-    }
+  function addNewProduct() {
+    const name = document.getElementById('newName').value.trim();
+    if (!name) return showToast('❌ الرجاء تعبئة اسم المنتج');
+    
+    const newProduct = {
+        id: nextId++,
+        name: name,
+        category: document.getElementById('newCategory').value,
+        desc: document.getElementById('newDesc').value.trim(),
+        price: parseFloat(document.getElementById('newPrice').value) || 0,
+        stock: parseInt(document.getElementById('newStock').value) || 0,
+        img: document.getElementById('newImg').value.trim() || 'asset/images/placeholder.png',
+        benefits: document.getElementById('newBenefits').value.split('\n').filter(b => b.trim() !== ''),
+        howToUse: document.getElementById('newHowToUse').value,
+        warnings: document.getElementById('newWarnings').value,
+        source: document.getElementById('newSource').value || 'Elixir',
+        sourceLink: document.getElementById('newSourceLink').value || ''
+    };
+    
+    allProducts.push(newProduct);
+    localStorage.setItem('elixir_all_products', JSON.stringify(allProducts));
+    renderProducts();
+    toggleAddForm();
+    showToast(`✅ تم إضافة المنتج: ${name}`);
+    
+    // تفريغ جميع الحقول
+    const fields = ['newName', 'newDesc', 'newPrice', 'newStock', 'newImg', 'newBenefits', 'newHowToUse', 'newWarnings', 'newSource', 'newSourceLink'];
+    fields.forEach(id => document.getElementById(id).value = '');
+}
 
     function showToast(msg) {
         const old = document.querySelector('.custom-toast');
@@ -467,17 +482,23 @@ function renderOrders() {
     
  
 
-function updateOrderStatus(orderId) {
-    let orders = JSON.parse(localStorage.getItem('elixir_orders') || '[]');
-    const order = orders.find(o => o.id === orderId);
-    if (order) {
-        const statuses = ['جديد', 'قيد التجهيز', 'تم التوصيل', 'ملغي'];
-        let currentIndex = statuses.indexOf(order.status);
-        let nextIndex = (currentIndex + 1) % statuses.length;
-        order.status = statuses[nextIndex];
-        localStorage.setItem('elixir_orders', JSON.stringify(orders));
-        renderOrders();
-        showToast(`✅ تم تحديث حالة الطلب إلى: ${order.status}`);
+function updateProduct(id) {
+    const product = allProducts.find(p => p.id === id);
+    if (product) {
+        product.category = document.getElementById(`category-${id}`).value;
+        product.desc = document.getElementById(`desc-${id}`).value;
+        product.price = parseFloat(document.getElementById(`price-${id}`).value);
+        product.stock = parseInt(document.getElementById(`stock-${id}`).value);
+        // تحديث الحقول الجديدة
+        product.benefits = document.getElementById(`benefits-${id}`)?.value.split('\n').filter(b=>b.trim()) || product.benefits;
+        product.howToUse = document.getElementById(`howToUse-${id}`)?.value || product.howToUse;
+        product.warnings = document.getElementById(`warnings-${id}`)?.value || product.warnings;
+        product.source = document.getElementById(`source-${id}`)?.value || product.source;
+        product.sourceLink = document.getElementById(`sourceLink-${id}`)?.value || product.sourceLink;
+        
+        localStorage.setItem('elixir_all_products', JSON.stringify(allProducts));
+        showToast(`✅ تم تحديث ${product.name}`);
+        renderProducts();
     }
 }
 
