@@ -41,14 +41,38 @@
         renderProductDetails(product);
     }
 
-    function renderProductDetails(p) {
-        // تحديد صفحة العودة حسب القسم
-        let backUrl = 'index.html';
+  function renderProductDetails(p) {
+    // تحديد صفحة العودة بناءً على المصدر (source) أولاً، ثم القسم (category)
+    const urlParams = new URLSearchParams(window.location.search);
+    const source = urlParams.get('source');
+    let backUrl = 'index.html';
+    
+    if (source === 'home') {
+        backUrl = 'index.html';
+    } else if (source === 'new-arrivals') {
+        backUrl = 'new-arrivals.html';
+    } else if (source === 'best-sellers') {
+        backUrl = 'best-sellers.html';
+    } else if (source === 'packages') {
+        backUrl = 'packages.html';
+    } else if (source === 'oils') {
+        backUrl = 'oils.html';
+    } else if (source === 'herbs') {
+        backUrl = 'herbs.html';
+    } else if (source === 'spices') {
+        backUrl = 'spices.html';
+    } else if (source === 'care') {
+        backUrl = 'personal-care.html';
+    } else {
+        // إذا لم يوجد source، استخدمي الـ category القديم
         if (p.category === 'أعشاب') backUrl = 'herbs.html';
         else if (p.category === 'زيوت') backUrl = 'oils.html';
         else if (p.category === 'بهارات') backUrl = 'spices.html';
         else if (p.category === 'عناية') backUrl = 'personal-care.html';
-        document.getElementById('backLink').href = backUrl;
+        else backUrl = 'index.html';
+    }
+    
+    document.getElementById('backLink').href = backUrl;
 
         const oldPriceHtml = p.oldPrice ? `<span class="old-price">${p.oldPrice} ₪</span>` : '';
         

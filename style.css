@@ -616,6 +616,13 @@ body {
     background-color: #f9fbf9;
     direction: rtl;
 }
+.new-arrivals .product-image {
+    position: relative;
+    width: 100%;
+    height: 350px; 
+    margin: 0;
+    padding: 0;
+}
 
 .new-grid {
     display: flex;
@@ -639,6 +646,7 @@ body {
     transform: translateY(-8px);
     transition: 0.3s;
 }
+
 
 /*************************************************************/
 
@@ -901,11 +909,6 @@ body {
     color: #2c5f2d;
 }
 
-.rating {
-    color: #89c86e;
-    font-size: 13px;
-    margin-bottom: 8px;
-}
 
 .price-row {
     display: flex;
@@ -927,26 +930,45 @@ body {
     color: #438e56;
 }
 
-.offer-add-btn {
+
+
+/* تنسيق أزرار العروض */
+.offers-section .btn-group {
+    display: flex;
+    gap: 10px;
+    margin-top: 10px;
+}
+
+.offers-section .details-btn {
+    flex: 1;
     background: #438e56;
     color: white;
     border: none;
-    width: 100%;
     padding: 8px;
-    border-radius: 40px;
-    font-weight: bold;
-    font-size: 0.85rem;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 8px;
+    border-radius: 30px;
     cursor: pointer;
+    font-size: 0.8rem;
     transition: 0.2s;
 }
 
-.offer-add-btn:hover {
-    background: #2d5a2c;
-    transform: scale(1.02);
+.offers-section .details-btn:hover {
+    background: #438e56;
+}
+
+.offers-section .offer-add-btn {
+    flex: 1;
+    background: #438e56;
+    color: white;
+    border: none;
+    padding: 8px;
+    border-radius: 30px;
+    cursor: pointer;
+    font-size: 0.8rem;
+    transition: 0.2s;
+}
+
+.offers-section .offer-add-btn:hover {
+    background: #2c5f2d;
 }
 
 @media (max-width: 650px) {
@@ -1266,7 +1288,167 @@ body {
         justify-content: center;
     }
 }
+/* ========== تنسيق قسم الأكثر مبيعاً (best-sellers) ========== */
+.best-sellers .product-card {
+    background: white;
+    border-radius: 20px;
+    overflow: hidden;
+    box-shadow: 0 8px 20px rgba(0,0,0,0.05);
+    transition: transform 0.3s, box-shadow 0.3s;
+    position: relative;
+}
 
+.best-sellers .product-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 15px 30px rgba(0,0,0,0.1);
+}
+
+.best-sellers .product-image {
+    position: relative;
+    width: 100%;
+    height: 350px; 
+    margin: 0;
+    padding: 0;
+}
+
+.best-sellers .product-image img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.5s ease;
+}
+
+.best-sellers .product-image img:hover {
+    transform: scale(1.08);
+}
+
+/* شارة الأكثر مبيعاً */
+.best-sellers .product-badge {
+    position: absolute;
+    top: 12px;
+    right: 12px;
+    background: #438e56;
+    color: white;
+    padding: 4px 12px;
+    border-radius: 30px;
+    font-weight: bold;
+    font-size: 0.7rem;
+    z-index: 2;
+}
+/* تنسيق أزرار الأقسام */
+.new-arrivals .btn-group,
+.best-sellers .btn-group,
+.packages .btn-group {
+    display: flex;
+    gap: 10px;
+    margin-top: 10px;
+}
+
+.new-arrivals .details-btn,
+.best-sellers .details-btn,
+.packages .details-btn {
+    flex: 1;
+    background: #438e56;
+    color: white;
+    border: none;
+    padding: 8px;
+    border-radius: 30px;
+    cursor: pointer;
+    font-size: 0.8rem;
+    transition: 0.2s;
+}
+
+.new-arrivals .details-btn:hover,
+.best-sellers .details-btn:hover,
+.packages .details-btn:hover {
+    background: #379a46;
+}
+
+.new-arrivals .add-cart-btn,
+.best-sellers .add-cart-btn,
+.packages .add-cart-btn {
+    flex: 1;
+    background: #438e56;
+    color: white;
+    border: none;
+    padding: 8px;
+    border-radius: 30px;
+    cursor: pointer;
+    font-size: 0.8rem;
+    transition: 0.2s;
+}
+
+.new-arrivals .add-cart-btn:hover,
+.best-sellers .add-cart-btn:hover,
+.packages .add-cart-btn:hover {
+    background: #2c5f2d;
+}
+
+/* المعلومات */
+.best-sellers .product-info {
+    padding: 15px;
+    text-align: right;
+}
+
+.best-sellers .product-info h3 {
+    font-size: 1rem;
+    color: #2c5f2d;
+    margin-bottom: 5px;
+}
+
+.best-sellers .product-eng-title {
+    font-size: 0.7rem;
+    color: #438e56;
+    letter-spacing: 1px;
+    margin-bottom: 5px;
+}
+
+.best-sellers .price {
+    font-weight: bold;
+    color: #438e56;
+    font-size: 1.2rem;
+    margin: 10px 0;
+    display: block;
+}
+
+/* أزرار الإجراءات */
+.best-sellers .btn-group {
+    display: flex;
+    gap: 10px;
+    margin-top: 10px;
+}
+
+.best-sellers .details-btn {
+    flex: 1;
+    background: #438e56;
+    color: #f0f7f0;
+    border: none;
+    padding: 8px;
+    border-radius: 30px;
+    cursor: pointer;
+    font-size: 0.8rem;
+    transition: 0.2s;
+}
+
+.best-sellers .details-btn:hover {
+    background: #96c898;
+}
+
+.best-sellers .add-cart-btn {
+    flex: 1;
+    background: #438e56;
+    color: white;
+    border: none;
+    padding: 8px;
+    border-radius: 30px;
+    cursor: pointer;
+    font-size: 0.8rem;
+    transition: 0.2s;
+}
+
+.best-sellers .add-cart-btn:hover {
+    background: #2c5f2d;
+}
 
 /* ****************** تنسيق الفوتر **************/
  
