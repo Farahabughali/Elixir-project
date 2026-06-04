@@ -1,0 +1,59 @@
+
+        /* نفس التنسيقات السابقة (أضيفيها كاملة) */
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Cairo', sans-serif;
+            background: rgba(228, 248, 224, 0.96);
+            padding: 30px 20px;
+            direction: rtl;
+        }
+        .container {
+            max-width: 1300px;
+            margin: 0 auto;
+            background: rgba(255, 255, 255, 0.96);
+            border-radius: 32px;
+            padding: 35px;
+            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.05);
+        }
+        .back-link {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            background: #c1eaa6;
+            padding: 8px 20px;
+            border-radius: 40px;
+            text-decoration: none;
+            color: #032e07;
+            margin-bottom: 30px;
+        }
+        .product-main { display: flex; flex-wrap: wrap; gap: 40px; margin-bottom: 40px; }
+        .product-gallery { flex: 1; min-width: 280px; }
+        .main-img { width: 100%; border-radius: 28px; box-shadow: 0 10px 25px rgba(0,0,0,0.08); }
+        .product-info { flex: 1; }
+        .product-title { font-size: 2rem; color: #2c5f2d; margin-bottom: 15px; }
+        .short-desc { color: #555; line-height: 1.6; margin-bottom: 20px; }
+        .price-row { display: flex; align-items: baseline; gap: 15px; margin-bottom: 20px; flex-wrap: wrap; }
+        .wholesale-price { font-size: 1.8rem; font-weight: bold; color: #178f10; }
+        .wholesale-label { font-size: 0.9rem; color: #438e56; background: #e8f5e9; padding: 2px 8px; border-radius: 20px; }
+        .unit-info { margin: 10px 0; color: #438e56; font-size: 0.9rem; background: #e8f5e9; display: inline-block; padding: 4px 12px; border-radius: 30px; }
+        .quantity-control { display: flex; align-items: center; gap: 15px; margin: 20px 0; }
+        .qty-btn { background: #e0d5c0; border: none; width: 38px; height: 38px; border-radius: 50%; font-size: 1.2rem; cursor: pointer; }
+        .qty-value { font-size: 1.2rem; font-weight: bold; min-width: 40px; text-align: center; }
+        .add-to-cart-btn { background: #438e56; color: white; border: none; padding: 12px; border-radius: 40px; font-size: 1rem; cursor: pointer; width: 50%; margin-top: 15px; }
+        .share-btn { background: #25a55b; color: white; border: none; padding: 12px; border-radius: 40px; font-size: 1rem; cursor: pointer; width: 50%; margin-top: 12px; display: flex; align-items: center; justify-content: center; gap: 8px; }
+        .checkout-btn { display: block; background: #25a55b; color: white; text-align: center; padding: 12px; width: 50%; border-radius: 40px; text-decoration: none; margin-top: 15px; }
+        .details-section { margin-top: 40px; display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 20px; }
+        .detail-card { background: #fefef7; border-radius: 24px; padding: 20px; border-right: 4px solid #438e56; }
+        .detail-card h3 { color: #2c5f2d; margin-bottom: 12px; display: flex; align-items: center; gap: 8px; }
+        .detail-card ul { padding-right: 20px; }
+        .detail-card li { margin-bottom: 8px; line-height: 1.6; }
+        .detail-card p { line-height: 1.6; }
+        .warning { border-right-color: #e67e22; background: #fff8f0; }
+        .source { background: #e8f5e9; text-align: right; }
+        .source a { text-decoration: none; color: #438e56; }
+        @media (max-width: 800px) {
+            .container { padding: 20px; }
+            .product-title { font-size: 1.5rem; }
+            .add-to-cart-btn, .share-btn, .checkout-btn { width: 100%; }
+        }
+    

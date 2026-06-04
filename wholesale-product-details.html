@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Elixir | تفاصيل المنتج - جملة</title>
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <link rel="stylesheet" href="wholesale-product-details.css">
+    <link rel="stylesheet" href="wholesale-floating-cart.css">
+   
+</head>
+<body>
+
+<div class="container" id="productDetailsContainer">
+    <a href="wholesale.html" id="backLink" class="back-link"><i class="fas fa-arrow-right"></i> العودة إلى متجر الجملة</a>
+    <div id="productContent"></div>
+</div>
+
+<div id="customToast" style="display:none; position:fixed; bottom:20px; right:20px; background:#438e56; color:white; padding:12px 20px; border-radius:30px; z-index:9999;">
+    <i class="fas fa-check-circle"></i> <span id="toastText"></span>
+</div>
+
+<script src="wholesale-floating-cart.js"></script>
+<script>
+    function getUnitByCategory(category) {
+        if (category === 'زيوت') return '10 مل';
+        if (category === 'أعشاب' || category === 'بهارات') return '30 جم (أوقية)';
+        if (category === 'عناية') return 'علبة';
+        return 'وحدة';
+    }
+
+    const urlParams = new URLSearchParams(window.location.search);
+    const productId = parseInt(urlParams.get('id'));
+    let currentQuantity = 1;
+
+    // ========== قاعدة بيانات كاملة بجميع المنتجات ==========
+    const fullWholesaleDatabase = [
+        // أعشاب (101-112)
+        { id: 101, name: "البابونج", category: "أعشاب", price: 9, img: "asset/images/chamomileherb.jpg", desc: "عشبة مهدئة، تساعد على الاسترخاء والنوم." },
+        { id: 102, name: "الزعتر", category: "أعشاب", price: 11, img: "asset/images/thymeherb.jpg", desc: "مضاد للسعال والتهاب الحلق، يقوي المناعة." },
+        { id: 103, name: "المريمية", category: "أعشاب", price: 12, img: "asset/images/sageherb.jpg", desc: "تخفف التعرق الليلي وأعراض سن اليأس." },
+        { id: 104, name: "الحبة السوداء", category: "أعشاب", price: 14, img: "asset/images/blackseedherb.jpg", desc: "تقوي المناعة، تعالج مشاكل الجلد والشعر." },
+        { id: 105, name: "اليانسون", category: "أعشاب", price: 8, img: "asset/images/anise.jpg", desc: "مفيد للجهاز الهضمي، يخفف المغص." },
+        { id: 106, name: "الكركديه", category: "أعشاب", price: 7, img: "asset/images/hibiscus.jpg", desc: "يخفض ضغط الدم، غني بمضادات الأكسدة." },
+        { id: 107, name: "الزنجبيل", category: "أعشاب", price: 9, img: "asset/images/ginger.jpg", desc: "مضاد للغثيان، يخفف آلام المفاصل." },
+        { id: 108, name: "القرفة", category: "أعشاب", price: 7, img: "asset/images/cinnamon.jpg", desc: "تنظم سكر الدم، مضادة للأكسدة." },
+        { id: 109, name: "البردقوش", category: "أعشاب", price: 10, img: "asset/images/marjoram.jpg", desc: "مهدئ للأعصاب، يساعد على الهضم." },
+        { id: 110, name: "الشمر", category: "أعشاب", price: 8, img: "asset/images/fennel.jpg", desc: "مفيد للهضم، يخفف الانتفاخات." },
+        { id: 111, name: "العرقسوس", category: "أعشاب", price: 7, img: "asset/images/licorice.jpg", desc: "ملين للمعدة، يخفف السعال." },
+        { id: 112, name: "القراص", category: "أعشاب", price: 8, img: "asset/images/nettle.jpg", desc: "مضاد للحساسية، غني بالحديد." },
+        // زيوت (201-212)
+        { id: 201, name: "زيت اللافندر العطري", category: "زيوت", price: 14, img: "asset/images/lavender.jpg", desc: "زيت عطري مهدئ للأعصاب." },
+        { id: 202, name: "زيت الورد الجوري", category: "زيوت", price: 45, img: "asset/images/rose.jpg", desc: "مضاد للشيخوخة، مرطب طبيعي." },
+        { id: 203, name: "زيت إكليل الجبل", category: "زيوت", price: 17, img: "asset/images/rosemaryoil.png", desc: "منشط للدورة الدموية." },
+        { id: 204, name: "زيت شجرة الشاي", category: "زيوت", price: 15, img: "asset/images/teatree.jpg", desc: "مطهر طبيعي." },
+        { id: 205, name: "زيت النعناع الفلفلي", category: "زيوت", price: 12, img: "asset/images/peppermint.jpg", desc: "منعش ومنشط." },
+        { id: 206, name: "زيت الياسمين", category: "زيوت", price: 16, img: "asset/images/jasmine-oil.png", desc: "مضاد للتوتر." },
+        { id: 207, name: "زيت البابونج", category: "زيوت", price: 16, img: "asset/images/chamomileoil.png", desc: "مهدئ للبشرة." },
+        { id: 208, name: "زيت البرتقال الحلو", category: "زيوت", price: 12, img: "asset/images/orangeoil.jpg", desc: "منشط للذهن." },
+        { id: 209, name: "زيت الليمون", category: "زيوت", price: 12, img: "asset/images/lemon.jpg", desc: "مضاد للبكتيريا." },
+        { id: 210, name: "زيت الزيتون البكر", category: "زيوت", price: 16, img: "asset/images/olive.jpg", desc: "مرطب طبيعي." },
+        { id: 211, name: "زيت اللوز الحلو", category: "زيوت", price: 14, img: "asset/images/almondoil.png", desc: "مرطب عميق." },
+        { id: 212, name: "زيت جوز الهند", category: "زيوت", price: 12, img: "asset/images/coconut.jpg", desc: "للشعر والبشرة." },
+        // بهارات (301-312)
+        { id: 301, name: "بهارات مشكلة", category: "بهارات", price: 9, img: "asset/images/spice-mix.jpg", desc: "خليط بهارات." },
+        { id: 302, name: "غارام ماسالا", category: "بهارات", price: 17, img: "asset/images/garam-masala.jpg", desc: "بهارات هندية." },
+        { id: 303, name: "بهارات شاورما", category: "بهارات", price: 9, img: "asset/images/shawarma-spice.jpg", desc: "للدجاج واللحوم." },
+        { id: 304, name: "بابريكا", category: "بهارات", price: 7, img: "asset/images/paprika.jpg", desc: "نكهة مدخنة." },
+        { id: 305, name: "كركم", category: "بهارات", price: 7, img: "asset/images/turmeric-spice.jpg", desc: "مضاد للأكسدة." },
+        { id: 306, name: "فلفل أسود", category: "بهارات", price: 6, img: "asset/images/black-pepper.jpg", desc: "أشهر بهار." },
+        { id: 307, name: "كمون", category: "بهارات", price: 5, img: "asset/images/cumin-spice.jpg", desc: "للهضم." },
+        { id: 308, name: "كزبرة", category: "بهارات", price: 4, img: "asset/images/coriander-spice.jpg", desc: "نكهة دافئة." },
+        { id: 309, name: "هيل", category: "بهارات", price: 20, img: "asset/images/cardamom-spice.jpg", desc: "للقهاوة." },
+        { id: 310, name: "قرنفل", category: "بهارات", price: 9, img: "asset/images/clove-spice.jpg", desc: "للمخللات." },
+        { id: 311, name: "زنجبيل مطحون", category: "بهارات", price: 8, img: "asset/images/ginger-spice.jpg", desc: "مفيد للهضم." },
+        { id: 312, name: "قرفة مطحونة", category: "بهارات", price: 8, img: "asset/images/cinnamon-spice.jpg", desc: "نكهة دافئة." },
+        // عناية (401-414)
+        { id: 401, name: "صابون زيت الزيتون", category: "عناية", price: 14, img: "asset/images/olive-soap.jpg", desc: "صابون طبيعي." },
+        { id: 402, name: "صابونة الفحم النشط", category: "عناية", price: 17, img: "asset/images/charcoal-soap.jpg", desc: "لتنظيف البشرة." },
+        { id: 403, name: "الصابون الأفريقي", category: "عناية", price: 22, img: "asset/images/african-soap.jpg", desc: "عضوي." },
+        { id: 404, name: "صابون العسل", category: "عناية", price: 16, img: "asset/images/honey-soap.jpg", desc: "مرطب." },
+        { id: 405, name: "صابون الصبار", category: "عناية", price: 17, img: "asset/images/aloe-soap.jpg", desc: "غني بالألوفيرا." },
+        { id: 406, name: "زبدة الشيا", category: "عناية", price: 24, img: "asset/images/shea-butter.jpg", desc: "لترطيب البشرة." },
+        { id: 407, name: "كريم الورد", category: "عناية", price: 22, img: "asset/images/rose-cream.jpg", desc: "كريم منعش." },
+        { id: 408, name: "جل الصبار", category: "عناية", price: 14, img: "asset/images/aloe-gel.jpg", desc: "مهدئ." },
+        { id: 409, name: "ماء الورد", category: "عناية", price: 12, img: "asset/images/rose-water.jpg", desc: "تونر." },
+        { id: 410, name: "الليفة المغربية", category: "عناية", price: 20, img: "asset/images/moroccan-loofah.png", desc: "للتقشير." },
+        { id: 411, name: "طين الغسول", category: "عناية", price: 16, img: "asset/images/ghassoul-clay.jpg", desc: "طين معدني." },
+        { id: 412, name: "صابون فيتامين سي", category: "عناية", price: 20, img: "asset/images/vitc-soap.jpg", desc: "لتفتيح البشرة." },
+        { id: 414, name: "مقشر السكر بالورد", category: "عناية", price: 17, img: "asset/images/rose-scrub.jpg", desc: "لتجديد البشرة." }
+    ];
+
+    // تحديث localStorage بقاعدة البيانات الكاملة
+    localStorage.setItem('elixir_wholesale_products', JSON.stringify(fullWholesaleDatabase));
+    const allProducts = fullWholesaleDatabase;
+
+    const product = allProducts.find(p => p.id === productId);
+
+    if (!product) {
+        document.getElementById('productContent').innerHTML = `
+            <div style="text-align:center; padding:50px;">
+                <i class="fas fa-exclamation-triangle" style="font-size:3rem; color:#e67e22;"></i>
+                <h3>⚠️ المنتج غير موجود في متجر الجملة</h3>
+                <p>تأكد من الرابط: <strong style="color:#438e56;">wholesale-product-details.html?id=201</strong></p>
+                <a href="wholesale.html" style="color:#438e56;">← العودة إلى متجر الجملة</a>
+            </div>`;
+    } else {
+        renderWholesaleProductDetails(product);
+    }
+
+    function renderWholesaleProductDetails(p) {
+        const benefitsArray = p.benefits || ["منتج طبيعي 100%", "سعر الجملة – مناسب لأصحاب المتاجر", "جودة عالية مضمونة"];
+        const howToUseText = p.howToUse || p.desc || "استخدم حسب التعليمات الموجودة على المنتج";
+        const warningsText = p.warnings || "للاستخدام الخارجي فقط. يحفظ بعيداً عن متناول الأطفال.";
+        const sourceText = p.source || "ويب طب";
+        const sourceLink = p.sourceLink || "https://www.webteb.com/";
+        const unit = p.unit || getUnitByCategory(p.category);
+
+        const html = `
+            <div class="product-main">
+                <div class="product-gallery">
+                    <img class="main-img" src="${p.img}" alt="${p.name}" onerror="this.src='asset/images/placeholder.png'">
+                </div>
+                <div class="product-info">
+                    <h1 class="product-title">${p.name}</h1>
+                    <p class="short-desc">${p.desc || ""}</p>
+                    <div class="price-row">
+                        <span class="wholesale-price">${p.price} ₪</span>
+                        <span class="wholesale-label">سعر الجملة</span>
+                    </div>
+                    <div class="unit-info"><i class="fas fa-balance-scale"></i> الوحدة: ${unit}</div>
+                    <div class="quantity-control">
+                        <button class="qty-btn" id="decreaseQty">-</button>
+                        <span class="qty-value" id="qtyValue">1</span>
+                        <button class="qty-btn" id="increaseQty">+</button>
+                    </div>
+                    <button class="add-to-cart-btn" id="addToCartBtn"> إضافة إلى سلة الجملة</button>
+                    <button class="share-btn" id="shareWhatsappBtn"><i class="fab fa-whatsapp"></i> واتساب / تواصل معنا</button>
+                    <button class="share-btn" id="copyLinkBtn"><i class="fas fa-link"></i> نسخ الرابط</button>
+                    <a href="wholesalecheckout.html" class="checkout-btn"> إتمام طلب الجملة</a>
+                </div>
+            </div>
+            <div class="details-section">
+                <div class="detail-card"><h3><i class="fas fa-leaf"></i> الفوائد</h3><ul>${benefitsArray.map(b => `<li>${b}</li>`).join('')}</ul></div>
+                <div class="detail-card"><h3><i class="fas fa-hand-sparkles"></i> طريقة الاستخدام</h3><p>${howToUseText}</p></div>
+                <div class="detail-card warning"><h3><i class="fas fa-exclamation-triangle"></i> التحذيرات</h3><p>${warningsText}</p></div>
+                <div class="detail-card source"><h3> المصدر</h3><p><a href="${sourceLink}" target="_blank">📖 ${sourceText}</a></p></div>
+            </div>
+        `;
+        document.getElementById('productContent').innerHTML = html;
+
+        document.getElementById('decreaseQty').onclick = () => { if (currentQuantity > 1) currentQuantity--; document.getElementById('qtyValue').innerText = currentQuantity; };
+        document.getElementById('increaseQty').onclick = () => { currentQuantity++; document.getElementById('qtyValue').innerText = currentQuantity; };
+        document.getElementById('addToCartBtn').onclick = () => { addToWholesaleCart(p.id, p.name, p.price, p.img, currentQuantity); };
+        document.getElementById('shareWhatsappBtn').onclick = () => { window.open(`https://wa.me/970598288142?text=${encodeURIComponent('السلام عليكم، أريد الاستفسار عن منتج الجملة: ' + p.name)}`, '_blank'); };
+        document.getElementById('copyLinkBtn').onclick = () => { navigator.clipboard.writeText(window.location.href); showToast('✅ تم نسخ الرابط بنجاح'); };
+    }
+
+    function addToWholesaleCart(id, name, price, img, quantity) {
+        let cart = JSON.parse(localStorage.getItem('elixir_wholesale_cart') || '[]');
+        const existing = cart.find(item => item.id === id);
+        if (existing) existing.quantity += quantity;
+        else cart.push({ id, name, price, img, quantity });
+        localStorage.setItem('elixir_wholesale_cart', JSON.stringify(cart));
+        
+        const total = cart.reduce((s, i) => s + i.quantity, 0);
+        const badge = document.querySelector('.cart-count');
+        if (badge) badge.innerText = total;
+        if (window.updateWholesaleFloatingCart) window.updateWholesaleFloatingCart();
+        
+        showToast(`✅ تمت إضافة ${name} إلى سلة الجملة`);
+    }
+
+    function showToast(msg) {
+        const toast = document.getElementById('customToast');
+        document.getElementById('toastText').innerText = msg;
+        toast.style.display = 'flex';
+        setTimeout(() => toast.style.display = 'none', 3000);
+    }
+
+    const cart = JSON.parse(localStorage.getItem('elixir_wholesale_cart') || '[]');
+    const total = cart.reduce((s, i) => s + i.quantity, 0);
+    const badge = document.querySelector('.cart-count');
+    if (badge) badge.innerText = total;
+</script>
+</body>
+</html>
