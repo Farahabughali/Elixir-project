@@ -113,7 +113,7 @@
         { id: 41, name: "زيت النعناع الفلفلي", category: "زيوت", desc: "يخفف الصداع وانسداد الأنف، منعش ومنشط", price: 30, img: "asset/images/peppermint.jpg", stock: 40 },
         { id: 42, name: "زيت الياسمين", category: "زيوت", desc: "مضاد للتوتر، يحسن المزاج، يمنح رائحة فواحة", price: 45, img: "asset/images/jasmine-oil.png", stock: 25 },
         { id: 43, name: "زيت شجرة الشاي", category: "زيوت", desc: "مطهر طبيعي، مضاد لحب الشباب والفطريات", price: 42, img: "asset/images/teatree.jpg", stock: 30 },
-        { id: 44, name: "زيت البابونج", category: "زيوت", desc: "مهدئ للبشرة الحساسة، يخفف الالتهابات", price: 48, img: "asset/images/chamomileoil.png", stock: 25 },
+        { id: 44, name: "زيت البابونج", category: "زيوت", desc: "مهدئ للبشرة الحساسة، يخفف الالتهابات", price: 48, img: "asset/images/Chamomileoil.png", stock: 25 },
         { id: 45, name: "زيت البرتقال الحلو", category: "زيوت", desc: "منشط للذهن، يخفف القلق، يضيء البشرة", price: 35, img: "asset/images/orangeoil.jpg", stock: 35 },
         { id: 46, name: "زيت الليمون", category: "زيوت", desc: "مضاد للبكتيريا، ينقي الهواء، يمنح طاقة", price: 32, img: "asset/images/lemon.jpg", stock: 40 },
         { id: 47, name: "زيت اليانغ يانغ", category: "زيوت", desc: "متوازن للهرمونات، يمنح رائحة استوائية جذابة", price: 50, img: "asset/images/ylang.jpg", stock: 15 },
@@ -220,7 +220,7 @@
     
     tbody.innerHTML = filtered.map(p => `
         <tr>
-            <td><img class="product-img" src="${p.img}" onerror="this.src='asset/images/basil.png'"></td>
+            <td><img class="product-img" src="${p.img}" onerror="this.src='asset/images/basil.jpg'"></td>
             <td>${p.name}</td>
             <td>
                 <select class="product-input" id="category-${p.id}" style="width:100%;">
