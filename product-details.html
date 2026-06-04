@@ -7,66 +7,155 @@
     <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <link rel="stylesheet" href="product-details.css">
+    <link rel="stylesheet" href="floating-cart.css">
+    <link rel="stylesheet" href="product-details.css">
 </head>
 <body>
 
-<header>
-    <div class="main-header">
-        <div class="header-right">
-            <a href="index.html" style="display: flex; align-items: center; gap: 15px; text-decoration: none;">
-                <div class="logo-circle"><img src="asset/images/logo.png" alt="Logo"></div>
-                <span class="web-name">Elixir</span>
-            </a>
-            <span class="page-title-in-header" id="category-name">الزيوت الطبيعية والعطرية</span>
-            <span class="page-title-in-header" id="product-name-header" style="margin-right: 5px;"></span>
-        </div>
-        <div class="header-left">
-            <span class="help-text"> هل تحتاج لمساعدة في اختيار الزيت المناسب لك؟</span>
-            <a href="chatbot.html" class="ai-consult-link"><i class="fas fa-robot"></i> استشر الذكاء الاصطناعي</a>
-        </div>
+<div class="container" id="productDetailsContainer">
+    <a href="#" id="backLink" class="back-link"><i class="fas fa-arrow-right"></i> العودة إلى المنتجات</a>
+    <div id="productContent">
+        <!-- سيتم تعبئة المحتوى ديناميكياً -->
     </div>
-</header>
-
-<div class="product-main">
-    <div class="product-image"><img src="" alt="صورة المنتج" id="product-img"></div>
-    <div class="product-title" id="product-title"></div>
-
-    <div class="buy-section">
-        <div class="current-price" id="display-price"></div>
-        <div class="size-selector" id="size-selector"></div>
-        <div class="quantity-selector">
-            <button class="qty-btn" id="decrease-qty">-</button>
-            <span id="quantity-value">1</span>
-            <button class="qty-btn" id="increase-qty">+</button>
-        </div>
-        <button class="add-to-cart" id="add-to-cart-btn">+ إضافة إلى السلة</button>
-    </div>
-
-    <div class="delivery-note">
-        <i class="fas fa-map-marker-alt"></i> نُوصل لكل مدن فلسطين: جنين، نابلس، رام الله، الخليل، بيت لحم، القدس، أريحا وغيرها.
-    </div>
-
-    <div class="info-section">
-        <h3>الفوائد الأساسية</h3>
-        <ul id="benefits-list"></ul>
-    </div>
-    <div class="info-section">
-        <h3>طريقة الاستخدام</h3>
-        <ul id="usage-list"></ul>
-    </div>
-    <div class="info-section">
-        <h3>نصائح وتحذيرات</h3>
-        <ul id="precautions-list"></ul>
-    </div>
-
-    <a href="#" class="back-link" id="back-link">← العودة إلى المنتجات</a>
 </div>
-<link rel="stylesheet" href="floating-cart.css">
+
+<div id="customToast" style="display:none; position:fixed; bottom:20px; right:20px; background:#438e56; color:white; padding:12px 20px; border-radius:30px; z-index:9999;">
+    <i class="fas fa-check-circle"></i> <span id="toastText"></span>
+</div>
+
 <script src="floating-cart.js"></script>
 <script>
-    // هالجزء حيتم التعامل معه من قِبل صاحبتك (Backend)
-    // البيانات اللي راح تستلمها من PHP حتستخدمها في displayProduct(productData)
-</script>
+    // الحصول على معرف المنتج من الرابط
+    const urlParams = new URLSearchParams(window.location.search);
+    const productId = parseInt(urlParams.get('id'));
 
+    let currentQuantity = 1;
+
+    // قراءة جميع المنتجات من localStorage
+    let allProducts = JSON.parse(localStorage.getItem('elixir_all_products')) || [];
+    const product = allProducts.find(p => p.id === productId);
+
+    if (!product) {
+        document.getElementById('productContent').innerHTML = '<div style="text-align:center; padding:50px;"><i class="fas fa-exclamation-triangle"></i> عذراً، هذا المنتج غير موجود</div>';
+    } else {
+        renderProductDetails(product);
+    }
+
+    function renderProductDetails(p) {
+        // تحديد صفحة العودة حسب القسم
+        let backUrl = 'index.html';
+        if (p.category === 'أعشاب') backUrl = 'herbs.html';
+        else if (p.category === 'زيوت') backUrl = 'oils.html';
+        else if (p.category === 'بهارات') backUrl = 'spices.html';
+        else if (p.category === 'عناية') backUrl = 'personal-care.html';
+        document.getElementById('backLink').href = backUrl;
+
+        const oldPriceHtml = p.oldPrice ? `<span class="old-price">${p.oldPrice} ₪</span>` : '';
+        
+        const benefitsArray = p.benefits || ["منتج طبيعي عالي الجودة", "مضمون 100%"];
+        const howToUseText = p.howToUse || "استخدم حسب التعليمات الموجودة على المنتج";
+        const warningsText = p.warnings || "للاستخدام الخارجي فقط. يحفظ بعيداً عن متناول الأطفال.";
+        const sourceText = p.source || "ويب طب";
+        const sourceLink = p.sourceLink || (p.source ? "https://www.webteb.com/" : "#");
+
+        const html = `
+            <div class="product-main">
+                <div class="product-gallery">
+                    <img class="main-img" src="${p.img}" alt="${p.name}" onerror="this.src='asset/images/placeholder.png'">
+                </div>
+                <div class="product-info">
+                    <h1 class="product-title">${p.name}</h1>
+                    <p class="short-desc">${p.desc || ""}</p>
+                    <div class="price-row">
+                        ${oldPriceHtml}
+                        <span class="new-price">${p.price} ₪</span>
+                    </div>
+                    <div class="quantity-control">
+                        <button class="qty-btn" id="decreaseQty">-</button>
+                        <span class="qty-value" id="qtyValue">1</span>
+                        <button class="qty-btn" id="increaseQty">+</button>
+                    </div>
+                    <button class="add-to-cart-btn" id="addToCartBtn"> إضافة إلى السلة</button>
+                    <button class="share-btn" id="shareWhatsappBtn"><i class="fab fa-whatsapp"></i> واتساب / تواصل معنا لمزيد من التفاصيل</button>
+                    <button class="share-btn" id="copyLinkBtn"><i class="fas fa-link"></i> نسخ الرابط</button>
+                    <a href="checkout.html" class="checkout-btn"> إتمام الشراء</a>
+                </div>
+            </div>
+            <div class="details-section">
+                <div class="detail-card">
+                    <h3> الفوائد</h3>
+                    <ul>${benefitsArray.map(b => `<li>${b}</li>`).join('')}</ul>
+                </div>
+                <div class="detail-card">
+                    <h3><i class="fas fa-hand-sparkles"></i> طريقة الاستخدام</h3>
+                    <p>${howToUseText}</p>
+                </div>
+                <div class="detail-card warning">
+                    <h3><i class="fas fa-exclamation-triangle"></i> التحذيرات</h3>
+                    <p>${warningsText}</p>
+                </div>
+                <div class="detail-card source">
+                    <h3> المصدر</h3>
+    <p><a href="https://www.webteb.com/" target="_blank" rel="noopener noreferrer">🌐 ويب طب - Webteb</a></p>
+                </div>
+            </div>
+        `;
+        document.getElementById('productContent').innerHTML = html;
+
+        // ربط أحداث الكمية
+        document.getElementById('decreaseQty').addEventListener('click', () => {
+            if (currentQuantity > 1) currentQuantity--;
+            document.getElementById('qtyValue').innerText = currentQuantity;
+        });
+        document.getElementById('increaseQty').addEventListener('click', () => {
+            currentQuantity++;
+            document.getElementById('qtyValue').innerText = currentQuantity;
+        });
+
+        // إضافة إلى السلة
+        document.getElementById('addToCartBtn').addEventListener('click', () => {
+            addToCart(p.id, p.name, p.price, p.img, currentQuantity);
+        });
+
+        // مشاركة واتساب
+        document.getElementById('shareWhatsappBtn').addEventListener('click', () => {
+            const msg = `السلام عليكم ورحمة الله وبركاته، أريد الاستفسار عن منتج: ${p.name} - السعر: ${p.price} ₪`;
+            window.open(`https://wa.me/970598288142?text=${encodeURIComponent(msg)}`, '_blank');
+        });
+
+        // نسخ الرابط
+        document.getElementById('copyLinkBtn').addEventListener('click', () => {
+            navigator.clipboard.writeText(window.location.href);
+            showToast('✅ تم نسخ الرابط بنجاح');
+        });
+    }
+
+    function addToCart(id, name, price, img, quantity) {
+        let cart = JSON.parse(localStorage.getItem('elixir_cart') || '[]');
+        const existing = cart.find(item => item.id === id);
+        if (existing) existing.quantity += quantity;
+        else cart.push({ id, name, price, img, quantity });
+        localStorage.setItem('elixir_cart', JSON.stringify(cart));
+        updateCartBadge();
+        showToast(`✅ تمت إضافة ${name} إلى السلة`);
+    }
+
+    function updateCartBadge() {
+        const cart = JSON.parse(localStorage.getItem('elixir_cart') || '[]');
+        const total = cart.reduce((s, i) => s + i.quantity, 0);
+        const badge = document.querySelector('.cart-count');
+        if (badge) badge.innerText = total;
+        if (window.updateFloatingCart) window.updateFloatingCart();
+    }
+
+    function showToast(msg) {
+        const toast = document.getElementById('customToast');
+        document.getElementById('toastText').innerText = msg;
+        toast.style.display = 'flex';
+        setTimeout(() => toast.style.display = 'none', 3000);
+    }
+
+    updateCartBadge();
+</script>
 </body>
 </html>
