@@ -24,6 +24,7 @@ const corrections = [
     { wrong: "حبة البركة", correct: "الحبة السوداء", category: "أعشاب" },
     { wrong: "جنزبيل", correct: "الزنجبيل", category: "أعشاب" },
     { wrong: "الروزماري", correct: "زيت إكليل الجبل", category: "زيوت" },
+    { wrong: "روزماري", correct: "زيت إكليل الجبل", category: "زيوت" },
     { wrong: "مرمية", correct: "زيت الميرمية", category: "زيوت" }
 
 
