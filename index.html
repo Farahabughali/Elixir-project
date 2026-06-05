@@ -600,6 +600,49 @@ function updateCountdown() {
     document.getElementById("hours").innerHTML = hours < 10 ? "0" + hours : hours;
     document.getElementById("minutes").innerHTML = minutes < 10 ? "0" + minutes : minutes;
     document.getElementById("seconds").innerHTML = seconds < 10 ? "0" + seconds : seconds;
+
+    // ========== العد التنازلي وإخفاء العروض عند الانتهاء ==========
+const endDate = new Date(2026, 6, 15, 23, 59, 59); // 15 يوليو 2026 - غيريه حسب رغبتك
+
+function updateCountdown() {
+    const now = new Date().getTime();
+    const distance = endDate - now;
+
+    if (distance < 0) {
+        // إخفاء قسم العروض بالكامل
+        const offersSection = document.querySelector('.offers-section');
+        if (offersSection) offersSection.classList.add('hide-offers');
+        return;
+    }
+
+    // إذا كان القسم مخفياً، أظهره (عند تغيير التاريخ لاحقاً)
+    const offersSection = document.querySelector('.offers-section');
+    if (offersSection && offersSection.classList.contains('hide-offers')) {
+        offersSection.classList.remove('hide-offers');
+    }
+
+    const days = Math.floor(distance / (1000 * 60 * 60 * 24));
+    const hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+    const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
+    const seconds = Math.floor((distance % (1000 * 60)) / 1000);
+
+    document.getElementById("days").innerHTML = days < 10 ? "0" + days : days;
+    document.getElementById("hours").innerHTML = hours < 10 ? "0" + hours : hours;
+    document.getElementById("minutes").innerHTML = minutes < 10 ? "0" + minutes : minutes;
+    document.getElementById("seconds").innerHTML = seconds < 10 ? "0" + seconds : seconds;
+
+}
+if (distance < 0) {
+    document.querySelector('.offers-section').innerHTML = `
+        <div class="container" style="text-align:center; padding:50px;">
+            <i class="fas fa-clock" style="font-size:3rem; color:#e67e22;"></i>
+            <h3>⏰ انتهت عروضنا الحالية</h3>
+            <p>ترقبوا عروضاً جديدة قريباً!</p>
+            <a href="offers.html" class="view-all">عروض سابقة</a>
+        </div>
+    `;
+    return;
+}
 }
 
 setInterval(updateCountdown, 1000);
